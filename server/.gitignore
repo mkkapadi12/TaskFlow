@@ -1,0 +1,8 @@
+# Upload temp folder if any
+uploads/
+
+# Database directory
+database/
+
+# Build output
+dist/

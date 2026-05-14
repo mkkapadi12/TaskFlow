@@ -1,0 +1,9 @@
+# Vite build output
+dist/
+dist-ssr/
+
+# Local env overrides
+*.local
+
+# Coverage reports
+coverage/
