@@ -6,21 +6,18 @@ import {
   getAllUsers,
   deleteUser,
 } from "../controllers/user.controller.js";
-import { protect } from "../middlewares/auth.middleware.js";
+import { protect, restrictTo } from "../middlewares/auth.middleware.js";
 import upload from "../middlewares/upload.middleware.js";
 
 const router = Router();
 
-router.get("/", getAllUsers);
+router.get("/", protect, restrictTo("ADMIN"), getAllUsers);
 
-router.get("/:id", getUserById);
-
+// ⚠️ Static routes MUST come before dynamic /:id routes
 router.get("/profile", protect, getProfile);
-
-// // update user
 router.put("/profile", protect, upload.single("avatar"), updateProfile);
 
-// // delete user
+router.get("/:id", protect, getUserById);
 router.delete("/:id", deleteUser);
 
 export default router;
