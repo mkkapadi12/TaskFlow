@@ -31,6 +31,14 @@ const env = {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   },
+
+  email: {
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+    mailFrom: process.env.MAIL_FROM,
+  },
 };
 
 // Validate all critical variables on startup
