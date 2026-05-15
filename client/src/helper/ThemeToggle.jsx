@@ -1,19 +1,19 @@
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import { ICONS } from "@/lib/icons/icons";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className="rounded-full"
       aria-label="Theme toggle"
     >
-      {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+      {theme === "dark" ? <ICONS.SUN size={18} /> : <ICONS.MOON size={18} />}
 
       <span className="sr-only">Toggle theme</span>
     </Button>
