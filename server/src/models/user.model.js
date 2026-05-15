@@ -12,6 +12,14 @@ const UserModel = {
     return users;
   },
 
+  getUserById: async ({ id }) => {
+    const [user] = await callProcedure("sp_GetUserById", [id]);
+
+    if (!user[0]) throw new AppError("User not found", 404);
+
+    return user[0];
+  },
+
   update: async ({ id, body, file }) => {
     const existuser = await callProcedure("sp_GetUserById", [id]);
 
@@ -42,7 +50,18 @@ const UserModel = {
 
     return updatedUser[0][0];
   },
-  delete: async ({ id }) => {},
+  delete: async ({ id }) => {
+    const user = await callProcedure("sp_GetUserById", [id]);
+
+    if (!user[0]) throw new AppError("User not found", 404);
+
+    if (user[0].publicId) {
+      await cloudinary.v2.uploader.destroy(user[0].publicId);
+    }
+    const deletedUser = await callProcedure("sp_DeleteUser", [id]);
+
+    return deletedUser[0][0];
+  },
 };
 
 export default UserModel;

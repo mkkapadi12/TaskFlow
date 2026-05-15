@@ -10,6 +10,15 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+const getUserById = async (req, res, next) => {
+  try {
+    const user = await UserModel.getUserById({ id: req.params.id });
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getProfile = (req, res, next) => {
   try {
     res.status(200).json({ success: true, user: req.user });
@@ -33,11 +42,17 @@ const updateProfile = async (req, res, next) => {
     next(error);
   }
 };
-const deleteUser = (req, res, next) => {
+const deleteUser = async (req, res, next) => {
   try {
+    const deletedUser = await UserModel.delete({ id: req.params.id });
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+      user: deletedUser,
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export { getProfile, updateProfile, deleteUser, getAllUsers };
+export { getProfile, updateProfile, deleteUser, getAllUsers, getUserById };

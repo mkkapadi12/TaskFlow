@@ -1,0 +1,31 @@
+import {
+  X,
+  PanelLeft,
+  CircleCheck,
+  Info,
+  TriangleAlert,
+  OctagonX,
+  Loader2,
+  ChevronDown,
+  Check,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal,
+} from "lucide-react";
+
+export const UI_ICONS = {
+  X: X,
+  PANEL_LEFT: PanelLeft,
+  CIRCLE_CHECK: CircleCheck,
+  INFO: Info,
+  TRIANGLE_ALERT: TriangleAlert,
+  OCTAGON_X: OctagonX,
+  LOADER2: Loader2,
+  CHEVRON_DOWN: ChevronDown,
+  CHECK: Check,
+  CHEVRON_UP: ChevronUp,
+  CHEVRON_LEFT: ChevronLeft,
+  CHEVRON_RIGHT: ChevronRight,
+  MORE_HORIZONTAL: MoreHorizontal,
+};
