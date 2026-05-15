@@ -4,6 +4,8 @@ import helmet from "helmet";
 import routes from "./routes.js";
 import { globalErrorHandler } from "./middlewares/error.middleware.js";
 import env from "./config/env.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.js";
 
 const app = express();
 
@@ -16,6 +18,9 @@ app.use(
   }),
 );
 app.use(express.json());
+
+// mount after other middleware
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get("/api", (req, res) =>
   res.json({ status: "ok", message: "API is live!" }),
