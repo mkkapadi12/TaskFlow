@@ -4,8 +4,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
 import { Badge } from "@/components/ui/badge";
 
-const { LISTCHECKS: ListChecks, CLOCK: Clock } = DASHBOARD_ICONS;
-
 const statusColors = {
   TODO: "bg-muted text-muted-foreground border-muted-foreground/20",
   IN_PROGRESS: "bg-primary/10 text-primary border-primary/20",
@@ -32,7 +30,7 @@ const TaskList = ({ tasks, isLoading }) => {
   if (!tasks || tasks.length === 0) {
     return (
       <div className="text-center py-12 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm">
-        <ListChecks className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+        <DASHBOARD_ICONS.LISTCHECKS className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
         <h3 className="text-lg font-semibold">No tasks found</h3>
         <p className="text-muted-foreground mt-1">
           You're all caught up! Or try changing the filters.
@@ -70,7 +68,7 @@ const TaskList = ({ tasks, isLoading }) => {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               {task.deadline && (
                 <div className="flex items-center gap-1">
-                  <Clock size={14} className="text-primary" />
+                  <DASHBOARD_ICONS.CLOCK size={14} className="text-primary" />
                   <span>
                     Due: {new Date(task.deadline).toLocaleDateString()}
                   </span>

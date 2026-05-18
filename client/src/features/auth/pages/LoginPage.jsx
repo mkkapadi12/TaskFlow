@@ -2,18 +2,11 @@ import LoginForm from "../components/LoginForm";
 import { Link } from "react-router-dom";
 import { GUEST_ICONS } from "@/lib/icons/guest.icons";
 
-const {
-  CHECK: CheckCircle,
-  ZAP: Zap,
-  SHIELD_CHECK: ShieldCheck,
-  USERS: Users,
-} = GUEST_ICONS;
-
 const HIGHLIGHTS = [
-  { icon: Zap, text: "Real-time project tracking" },
-  { icon: Users, text: "Seamless team collaboration" },
-  { icon: ShieldCheck, text: "Secure role-based access" },
-  { icon: CheckCircle, text: "Smart task management" },
+  { icon: GUEST_ICONS.ZAP, text: "Real-time project tracking" },
+  { icon: GUEST_ICONS.USERS, text: "Seamless team collaboration" },
+  { icon: GUEST_ICONS.SHIELD_CHECK, text: "Secure role-based access" },
+  { icon: GUEST_ICONS.CHECK, text: "Smart task management" },
 ];
 
 const LoginPage = () => {
@@ -30,7 +23,7 @@ const LoginPage = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="h-10 w-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center transition-transform group-hover:scale-105">
-              <Zap className="h-5 w-5" />
+              <GUEST_ICONS.ZAP className="h-5 w-5" />
             </div>
             <span className="text-xl font-bold tracking-tight">TaskFlow</span>
           </Link>
@@ -78,7 +71,7 @@ const LoginPage = () => {
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2 mb-4">
             <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-              <Zap className="h-4 w-4 text-primary-foreground" />
+              <GUEST_ICONS.ZAP className="h-4 w-4 text-primary-foreground" />
             </div>
             <span className="text-lg font-bold tracking-tight">TaskFlow</span>
           </div>

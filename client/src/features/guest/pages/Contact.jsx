@@ -7,8 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { GUEST_ICONS } from "@/lib/icons/guest.icons";
 import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
-const { MESSAGE: MessageSquare, SEND: Send } = GUEST_ICONS;
-const { LOADER2: Loader2 } = DASHBOARD_ICONS;
 import { contactSchema } from "@/schemas/contact.schema";
 import { INFO_CARDS } from "@/constant";
 
@@ -39,7 +37,7 @@ const Contact = () => {
       <section className="container mx-auto px-6 pt-20 pb-10 lg:pt-28 lg:pb-14 text-center">
         <div className="mx-auto max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-6">
-            <MessageSquare size={14} />
+            <GUEST_ICONS.MESSAGE size={14} />
             Get in Touch
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
@@ -148,12 +146,12 @@ const Contact = () => {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <DASHBOARD_ICONS.LOADER2 className="mr-2 h-5 w-5 animate-spin" />
                     Sending...
                   </>
                 ) : (
                   <>
-                    <Send className="mr-2 h-5 w-5" />
+                    <GUEST_ICONS.SEND className="mr-2 h-5 w-5" />
                     Send Message
                   </>
                 )}

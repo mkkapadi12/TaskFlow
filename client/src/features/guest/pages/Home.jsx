@@ -1,7 +1,7 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GUEST_ICONS } from "@/lib/icons/guest.icons";
-const { ARROW_RIGHT: ArrowRight, SPARKLES: Sparkles } = GUEST_ICONS;
 import { FEATURES, STATS } from "@/constant";
 
 const Home = () => {
@@ -43,7 +43,7 @@ const Home = () => {
             >
               <Link to="/register">
                 Get Started for Free
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                <GUEST_ICONS.ARROW_RIGHT className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
             <Button
@@ -78,7 +78,7 @@ const Home = () => {
       <section className="container mx-auto px-6 py-20 lg:py-28">
         <div className="text-center max-w-2xl mx-auto mb-16 animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
-            <Sparkles size={14} />
+            <GUEST_ICONS.SPARKLES size={14} />
             Features
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
@@ -132,7 +132,7 @@ const Home = () => {
               >
                 <Link to="/register">
                   Start Free Trial
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <GUEST_ICONS.ARROW_RIGHT className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
               <Button

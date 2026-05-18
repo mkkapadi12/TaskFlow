@@ -123,3 +123,65 @@ export const PAGE_TITLES = [
     description: "View and manage your tasks",
   },
 ];
+
+export const VALUES = [
+  {
+    icon: Target,
+    title: "Focused Simplicity",
+    description:
+      "We strip away complexity so you can focus on what truly matters — getting things done.",
+  },
+  {
+    icon: Heart,
+    title: "User First",
+    description:
+      "Every feature is built with empathy. We listen, iterate, and ship what our users need.",
+  },
+  {
+    icon: Lightbulb,
+    title: "Continuous Innovation",
+    description:
+      "We push boundaries to deliver cutting-edge tools that redefine task management.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Trust & Security",
+    description:
+      "Your data integrity and privacy are non-negotiable. We encrypt and protect everything.",
+  },
+  {
+    icon: Rocket,
+    title: "Performance Driven",
+    description:
+      "Speed is a feature. We obsess over milliseconds so your workflow is never interrupted.",
+  },
+  {
+    icon: Users,
+    title: "Community Powered",
+    description:
+      "Built by the community, for the community. Your feedback shapes our roadmap.",
+  },
+];
+
+export const TEAM = [
+  {
+    name: "Alex Rivera",
+    role: "Founder & CEO",
+    initials: "AR",
+  },
+  {
+    name: "Sarah Chen",
+    role: "Lead Designer",
+    initials: "SC",
+  },
+  {
+    name: "Marcus Johnson",
+    role: "Full-Stack Engineer",
+    initials: "MJ",
+  },
+  {
+    name: "Priya Patel",
+    role: "Product Manager",
+    initials: "PP",
+  },
+];

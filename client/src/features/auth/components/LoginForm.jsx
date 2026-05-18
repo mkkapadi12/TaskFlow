@@ -9,8 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GUEST_ICONS } from "@/lib/icons/guest.icons";
 
-const { MAIL: Mail, SHIELD: Lock } = GUEST_ICONS;
-
 const LoginForm = () => {
   const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
@@ -39,7 +37,7 @@ const LoginForm = () => {
           Email address
         </Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <GUEST_ICONS.MAIL className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             id="login-email"
             type="email"
@@ -63,7 +61,7 @@ const LoginForm = () => {
           </Label>
         </div>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <GUEST_ICONS.SHIELD className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             id="login-password"
             type="password"

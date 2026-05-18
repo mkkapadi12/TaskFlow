@@ -1,74 +1,6 @@
+import React from "react";
+import { TEAM, VALUES } from "@/constant";
 import { GUEST_ICONS } from "@/lib/icons/guest.icons";
-const {
-  TARGET: Target,
-  HEART: Heart,
-  LIGHTBULB: Lightbulb,
-  USERS: Users,
-  ROCKET: Rocket,
-  SHIELD_CHECK: ShieldCheck,
-} = GUEST_ICONS;
-
-const VALUES = [
-  {
-    icon: Target,
-    title: "Focused Simplicity",
-    description:
-      "We strip away complexity so you can focus on what truly matters — getting things done.",
-  },
-  {
-    icon: Heart,
-    title: "User First",
-    description:
-      "Every feature is built with empathy. We listen, iterate, and ship what our users need.",
-  },
-  {
-    icon: Lightbulb,
-    title: "Continuous Innovation",
-    description:
-      "We push boundaries to deliver cutting-edge tools that redefine task management.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Trust & Security",
-    description:
-      "Your data integrity and privacy are non-negotiable. We encrypt and protect everything.",
-  },
-  {
-    icon: Rocket,
-    title: "Performance Driven",
-    description:
-      "Speed is a feature. We obsess over milliseconds so your workflow is never interrupted.",
-  },
-  {
-    icon: Users,
-    title: "Community Powered",
-    description:
-      "Built by the community, for the community. Your feedback shapes our roadmap.",
-  },
-];
-
-const TEAM = [
-  {
-    name: "Alex Rivera",
-    role: "Founder & CEO",
-    initials: "AR",
-  },
-  {
-    name: "Sarah Chen",
-    role: "Lead Designer",
-    initials: "SC",
-  },
-  {
-    name: "Marcus Johnson",
-    role: "Full-Stack Engineer",
-    initials: "MJ",
-  },
-  {
-    name: "Priya Patel",
-    role: "Product Manager",
-    initials: "PP",
-  },
-];
 
 const About = () => {
   return (
@@ -77,13 +9,12 @@ const About = () => {
       <section className="container mx-auto px-6 py-20 lg:py-28">
         <div className="mx-auto max-w-3xl text-center animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-6">
-            <Target size={14} />
+            <GUEST_ICONS.TARGET size={14} />
             Our Mission
           </div>
 
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-            Making productivity{" "}
-            <span className="text-primary">effortless</span>
+            Making productivity <span className="text-primary">effortless</span>
           </h1>
 
           <p className="mt-6 text-lg text-muted-foreground leading-relaxed sm:text-xl">
@@ -150,7 +81,7 @@ const About = () => {
       <section className="container mx-auto px-6 py-20 lg:py-28">
         <div className="text-center max-w-2xl mx-auto mb-14 animate-in fade-in slide-in-from-bottom-6 duration-700 fill-mode-both">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
-            <Heart size={14} />
+            <GUEST_ICONS.HEART size={14} />
             Our Values
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">

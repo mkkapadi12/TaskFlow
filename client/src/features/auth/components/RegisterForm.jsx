@@ -9,8 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GUEST_ICONS } from "@/lib/icons/guest.icons";
 
-const { USER: UserIcon, MAIL: Mail, SHIELD: Lock } = GUEST_ICONS;
-
 const RegisterForm = () => {
   const navigate = useNavigate();
   const [registerUser, { isLoading }] = useRegisterMutation();
@@ -39,7 +37,7 @@ const RegisterForm = () => {
           Full name
         </Label>
         <div className="relative">
-          <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <GUEST_ICONS.USER className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             id="register-name"
             placeholder="John Doe"
@@ -48,9 +46,7 @@ const RegisterForm = () => {
           />
         </div>
         {errors.name && (
-          <p className="text-xs text-destructive mt-1">
-            {errors.name.message}
-          </p>
+          <p className="text-xs text-destructive mt-1">{errors.name.message}</p>
         )}
       </div>
 
@@ -60,7 +56,7 @@ const RegisterForm = () => {
           Email address
         </Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <GUEST_ICONS.MAIL className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             id="register-email"
             type="email"
@@ -82,7 +78,7 @@ const RegisterForm = () => {
           Password
         </Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <GUEST_ICONS.SHIELD className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
             id="register-password"
             type="password"
