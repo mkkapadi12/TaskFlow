@@ -3,6 +3,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
 
+// ── Error Page
+import ErrorPage from "./features/guest/pages/ErrorPage";
+
 // ── Route Components
 import GuestRoute from "./components/routes/GuestRoute";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
@@ -21,8 +24,8 @@ import SettingPage from "./features/users/pages/SettingPage";
 import ProfilePage from "./features/users/pages/ProfilePage";
 import UserDashboard from "./features/users/pages/UserDashboard";
 import UserCalendar from "./features/users/pages/UserCalendar";
-import ProjectPage from "./features/users/pages/ProjectPage";
-import MyTask from "./features/users/pages/MyTask";
+import ProjectPage from "./features/project/pages/ProjectPage";
+import MyTask from "./features/tasks/pages/MyTask";
 
 const router = createBrowserRouter([
   // ── Guest routes (redirect to /dashboard if already logged in)
@@ -42,7 +45,6 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ── Protected routes (redirect to /login if not logged in)
   {
     element: <ProtectedRoute />,
     children: [
@@ -60,7 +62,7 @@ const router = createBrowserRouter([
     ],
   },
   // ── Fallback
-  { path: "*", element: <LoginPage /> },
+  { path: "*", element: <ErrorPage /> },
 ]);
 
 const App = () => <RouterProvider router={router} />;
