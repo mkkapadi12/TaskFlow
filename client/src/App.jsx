@@ -11,8 +11,8 @@ import GuestRoute from "./components/routes/GuestRoute";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 
 // ── Layout Components
-import GuestLayout from "./components/layouts/GuestLayout";
-import AppLayout from "./components/layouts/AppLayout";
+import GuestLayout from "./components/layouts/guest/GuestLayout";
+import AppLayout from "./components/layouts/app/AppLayout";
 
 // ── Guest Pages Components
 import Home from "./features/guest/pages/Home";

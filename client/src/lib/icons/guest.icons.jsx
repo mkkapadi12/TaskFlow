@@ -26,6 +26,7 @@ import {
   Clock,
   BarChart3,
   Sparkles,
+  GitBranch,
 } from "lucide-react";
 
 export const GUEST_ICONS = {
@@ -56,4 +57,5 @@ export const GUEST_ICONS = {
   CLOCK: Clock,
   CHART: BarChart3,
   SPARKLES: Sparkles,
+  GITHUB: GitBranch,
 };
