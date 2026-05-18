@@ -24,7 +24,12 @@ import SettingPage from "./features/users/pages/SettingPage";
 import ProfilePage from "./features/users/pages/ProfilePage";
 import UserDashboard from "./features/users/pages/UserDashboard";
 import UserCalendar from "./features/users/pages/UserCalendar";
-import ProjectPage from "./features/project/pages/ProjectPage";
+
+// ── Project Pages Components
+import Projects from "./features/project/pages/Projects";
+import ProjectDetails from "./features/project/pages/ProjectDetails";
+
+// ── Task Pages Components
 import MyTask from "./features/tasks/pages/MyTask";
 
 const router = createBrowserRouter([
@@ -55,7 +60,8 @@ const router = createBrowserRouter([
           { path: "/profile", element: <ProfilePage /> },
           { path: "/settings", element: <SettingPage /> },
           { path: "/calendar", element: <UserCalendar /> },
-          { path: "/projects", element: <ProjectPage /> },
+          { path: "/projects", element: <Projects /> },
+          { path: "/projects/:projectId", element: <ProjectDetails /> },
           { path: "/tasks", element: <MyTask /> },
         ],
       },

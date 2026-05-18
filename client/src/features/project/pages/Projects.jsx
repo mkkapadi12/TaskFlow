@@ -8,7 +8,7 @@ import {
 } from "../project.api";
 import { toast } from "sonner";
 
-const ProjectPage = () => {
+const Projects = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: projectsData, isLoading, refetch } = useGetMyProjectsQuery();
@@ -40,4 +40,4 @@ const ProjectPage = () => {
   );
 };
 
-export default ProjectPage;
+export default Projects;

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useDispatch } from "react-redux";
 import { logout } from "@/features/auth/auth.slice";
@@ -9,19 +9,27 @@ import { GUEST_ICONS } from "@/lib/icons/guest.icons";
 import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
 import { PAGE_TITLES } from "@/constant";
 import { ThemeToggle } from "@/helper/ThemeToggle";
+import { useGetProjectDetailsQuery } from "@/features/project/project.api";
 
 const Topbar = ({ onMenuClick }) => {
   const location = useLocation();
   const { user } = useAuth();
+  const { projectId } = useParams();
   const dispatch = useDispatch();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const { data: project } = useGetProjectDetailsQuery(projectId);
+  const projectData = project?.data;
 
   // Derive page info — fallback for dynamic routes like /projects/:id
   const currentPage =
     PAGE_TITLES.find((p) => p.path === location.pathname) ||
     (location.pathname.startsWith("/projects/")
-      ? { title: "Project Detail", description: "" }
+      ? {
+          title: projectData?.title,
+          description: `Manage Project - ${projectData?.title}`,
+        }
       : { title: "Page", description: "" });
 
   // Close dropdown on outside click
