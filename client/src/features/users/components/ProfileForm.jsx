@@ -4,8 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
 
-const { UPLOAD: Upload, LOADER2: Loader2 } = DASHBOARD_ICONS;
-
 const ProfileForm = ({ user, onSave, isLoading }) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -41,8 +39,9 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex flex-col items-center gap-4 mb-6">
-        <div className="relative h-24 w-24 rounded-full overflow-hidden border-2 border-border/50 bg-muted flex items-center justify-center">
+      {/* Avatar Upload (Compact) */}
+      <div className="flex items-center gap-4 p-4 border border-border/50 rounded-xl bg-background/30 backdrop-blur-sm">
+        <div className="relative h-16 w-16 rounded-full overflow-hidden border border-border/50 bg-muted flex items-center justify-center">
           {previewUrl ? (
             <img
               src={previewUrl}
@@ -50,26 +49,31 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
               className="h-full w-full object-cover"
             />
           ) : (
-            <span className="text-2xl font-bold text-muted-foreground">
+            <span className="text-xl font-bold text-muted-foreground">
               {name.charAt(0)?.toUpperCase() || "?"}
             </span>
           )}
         </div>
 
-        <Label
-          htmlFor="avatar-upload"
-          className="cursor-pointer inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
-        >
-          <Upload size={16} />
-          Change Avatar
-          <input
-            id="avatar-upload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-        </Label>
+        <div className="flex-1">
+          <Label
+            htmlFor="avatar-upload"
+            className="cursor-pointer inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+          >
+            <DASHBOARD_ICONS.UPLOAD size={16} />
+            Change Avatar
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </Label>
+          <p className="text-xs text-muted-foreground mt-1">
+            Only .jpg, .jpeg, .png or .webp format. Maximum file size: 5MB.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -80,28 +84,31 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           onChange={(e) => setName(e.target.value)}
           placeholder="Your Name"
           required
-          className="border-border/50 bg-background/50"
+          className="border-border/50 bg-background/50 h-11"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email (Cannot be changed)</Label>
+        <Label htmlFor="email">Email Address</Label>
         <Input
           id="email"
           value={user?.email || ""}
           disabled
-          className="border-border/50 bg-muted/50 text-muted-foreground cursor-not-allowed"
+          className="border-border/50 bg-muted/50 text-muted-foreground cursor-not-allowed h-11"
         />
+        <p className="text-xs text-muted-foreground">
+          Email cannot be changed. Contact support if needed.
+        </p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone</Label>
+        <Label htmlFor="phone">Phone Number</Label>
         <Input
           id="phone"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Your Phone Number"
-          className="border-border/50 bg-background/50"
+          className="border-border/50 bg-background/50 h-11"
         />
       </div>
 
@@ -112,7 +119,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
       >
         {isLoading ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <DASHBOARD_ICONS.LOADER2 className="mr-2 h-4 w-4 animate-spin" />
             Saving...
           </>
         ) : (

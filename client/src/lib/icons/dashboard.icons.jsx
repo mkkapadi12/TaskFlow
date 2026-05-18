@@ -28,6 +28,7 @@ import {
   ChevronDown,
   Menu,
   Loader2,
+  Briefcase,
 } from "lucide-react";
 
 export const DASHBOARD_ICONS = {
@@ -60,4 +61,5 @@ export const DASHBOARD_ICONS = {
   CHEVRONDOWN: ChevronDown,
   MENU: Menu,
   LOADER2: Loader2,
+  BRIEFCASE: Briefcase,
 };
