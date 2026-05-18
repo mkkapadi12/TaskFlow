@@ -175,6 +175,97 @@
  *           type: string
  *           example: LEAD
  *
+ *     # ── Task ────────────────────────────────────────────
+ *     Task:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 1
+ *         title:
+ *           type: string
+ *           example: Design landing page mockup
+ *         description:
+ *           type: string
+ *           nullable: true
+ *         status:
+ *           type: string
+ *           enum: [TODO, IN_PROGRESS, IN_REVIEW, DONE]
+ *         priority:
+ *           type: string
+ *           enum: [LOW, MEDIUM, HIGH, URGENT]
+ *         deadline:
+ *           type: string
+ *           format: date-time
+ *           nullable: true
+ *         projectId:
+ *           type: integer
+ *         assigneeId:
+ *           type: integer
+ *           nullable: true
+ *         creatorId:
+ *           type: integer
+ *         assigneeName:
+ *           type: string
+ *           nullable: true
+ *         creatorName:
+ *           type: string
+ *         projectTitle:
+ *           type: string
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *
+ *     CreateTaskInput:
+ *       type: object
+ *       required: [title, projectId]
+ *       properties:
+ *         title:
+ *           type: string
+ *           example: Design landing page mockup
+ *         description:
+ *           type: string
+ *           example: Create wireframes and high-fidelity mockups
+ *         status:
+ *           type: string
+ *           enum: [TODO, IN_PROGRESS, IN_REVIEW, DONE]
+ *           default: TODO
+ *         priority:
+ *           type: string
+ *           enum: [LOW, MEDIUM, HIGH, URGENT]
+ *           default: MEDIUM
+ *         deadline:
+ *           type: string
+ *           format: date-time
+ *         projectId:
+ *           type: integer
+ *           example: 1
+ *         assigneeId:
+ *           type: integer
+ *           example: 2
+ *
+ *     UpdateTaskInput:
+ *       type: object
+ *       properties:
+ *         title:
+ *           type: string
+ *         description:
+ *           type: string
+ *         status:
+ *           type: string
+ *           enum: [TODO, IN_PROGRESS, IN_REVIEW, DONE]
+ *         priority:
+ *           type: string
+ *           enum: [LOW, MEDIUM, HIGH, URGENT]
+ *         deadline:
+ *           type: string
+ *           format: date-time
+ *         assigneeId:
+ *           type: integer
+ *
  *     # ── Generic ─────────────────────────────────────────
  *     SuccessResponse:
  *       type: object

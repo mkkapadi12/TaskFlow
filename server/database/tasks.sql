@@ -53,29 +53,11 @@ BEGIN
 END //
 
 
--- ── 2. Get All Tasks ──────────────────────────────────────────
-DROP PROCEDURE IF EXISTS sp_GetAllTasks //
-CREATE PROCEDURE sp_GetAllTasks()
-BEGIN
-    SELECT
-        t.id, t.title, t.description, t.status, t.priority,
-        t.deadline, t.projectId, t.assigneeId, t.creatorId,
-        t.createdAt, t.updatedAt,
-        a.name  AS assigneeName,
-        c.name  AS creatorName,
-        p.title AS projectTitle
-    FROM tasks t
-    LEFT JOIN users    a ON a.id = t.assigneeId
-    JOIN      users    c ON c.id = t.creatorId
-    JOIN      projects p ON p.id = t.projectId
-    ORDER BY t.createdAt DESC;
-END //
-
-
--- ── 3. Get Tasks by Project ───────────────────────────────────
+-- ── 2. Get Tasks by Project (optional status filter) ─────────
 DROP PROCEDURE IF EXISTS sp_GetTasksByProject //
 CREATE PROCEDURE sp_GetTasksByProject(
-    IN p_projectId INT
+    IN p_projectId INT,
+    IN p_status    VARCHAR(20)
 )
 BEGIN
     SELECT
@@ -88,11 +70,12 @@ BEGIN
     LEFT JOIN users a ON a.id = t.assigneeId
     JOIN      users c ON c.id = t.creatorId
     WHERE t.projectId = p_projectId
+      AND (p_status IS NULL OR t.status = p_status)
     ORDER BY t.createdAt DESC;
 END //
 
 
--- ── 4. Get Tasks Assigned to a User ──────────────────────────
+-- ── 3. Get Tasks Assigned to a User ──────────────────────────
 DROP PROCEDURE IF EXISTS sp_GetTasksByAssignee //
 CREATE PROCEDURE sp_GetTasksByAssignee(
     IN p_assigneeId INT
@@ -112,27 +95,7 @@ BEGIN
 END //
 
 
--- ── 5. Get Tasks Created by a User ───────────────────────────
-DROP PROCEDURE IF EXISTS sp_GetTasksByCreator //
-CREATE PROCEDURE sp_GetTasksByCreator(
-    IN p_creatorId INT
-)
-BEGIN
-    SELECT
-        t.id, t.title, t.description, t.status, t.priority,
-        t.deadline, t.projectId, t.assigneeId, t.creatorId,
-        t.createdAt, t.updatedAt,
-        a.name  AS assigneeName,
-        p.title AS projectTitle
-    FROM tasks t
-    LEFT JOIN users    a ON a.id = t.assigneeId
-    JOIN      projects p ON p.id = t.projectId
-    WHERE t.creatorId = p_creatorId
-    ORDER BY t.createdAt DESC;
-END //
-
-
--- ── 6. Get Task By ID ─────────────────────────────────────────
+-- ── 4. Get Task By ID ─────────────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_GetTaskById //
 CREATE PROCEDURE sp_GetTaskById(
     IN p_id INT
@@ -153,7 +116,7 @@ BEGIN
 END //
 
 
--- ── 7. Update Task ────────────────────────────────────────────
+-- ── 5. Update Task ────────────────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_UpdateTask //
 CREATE PROCEDURE sp_UpdateTask(
     IN p_id          INT,
@@ -180,30 +143,18 @@ BEGIN
         t.id, t.title, t.description, t.status, t.priority,
         t.deadline, t.projectId, t.assigneeId, t.creatorId,
         t.createdAt, t.updatedAt,
-        a.name AS assigneeName
+        a.name AS assigneeName,
+        c.name AS creatorName,
+        p.title AS projectTitle
     FROM tasks t
-    LEFT JOIN users a ON a.id = t.assigneeId
+    LEFT JOIN users    a ON a.id = t.assigneeId
+    JOIN      users    c ON c.id = t.creatorId
+    JOIN      projects p ON p.id = t.projectId
     WHERE t.id = p_id;
 END //
 
 
--- ── 8. Update Task Status ─────────────────────────────────────
-DROP PROCEDURE IF EXISTS sp_UpdateTaskStatus //
-CREATE PROCEDURE sp_UpdateTaskStatus(
-    IN p_id     INT,
-    IN p_status VARCHAR(20)
-)
-BEGIN
-    UPDATE tasks
-    SET status    = p_status,
-        updatedAt = NOW()
-    WHERE id = p_id;
-
-    SELECT id, status, updatedAt FROM tasks WHERE id = p_id;
-END //
-
-
--- ── 9. Delete Task ────────────────────────────────────────────
+-- ── 6. Delete Task ────────────────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_DeleteTask //
 CREATE PROCEDURE sp_DeleteTask(
     IN p_id INT
@@ -214,27 +165,7 @@ BEGIN
 END //
 
 
--- ── 10. Get Tasks by Status (within a project) ────────────────
-DROP PROCEDURE IF EXISTS sp_GetTasksByStatus //
-CREATE PROCEDURE sp_GetTasksByStatus(
-    IN p_projectId INT,
-    IN p_status    VARCHAR(20)
-)
-BEGIN
-    SELECT
-        t.id, t.title, t.description, t.status, t.priority,
-        t.deadline, t.projectId, t.assigneeId, t.creatorId,
-        t.createdAt, t.updatedAt,
-        a.name AS assigneeName
-    FROM tasks t
-    LEFT JOIN users a ON a.id = t.assigneeId
-    WHERE t.projectId = p_projectId
-      AND t.status    = p_status
-    ORDER BY t.deadline ASC;
-END //
-
-
--- ── 11. Get Overdue Tasks ─────────────────────────────────────
+-- ── 7. Get Overdue Tasks ─────────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_GetOverdueTasks //
 CREATE PROCEDURE sp_GetOverdueTasks(
     IN p_userId INT
