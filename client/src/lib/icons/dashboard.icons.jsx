@@ -29,6 +29,7 @@ import {
   Menu,
   Loader2,
   Briefcase,
+  Clock,
 } from "lucide-react";
 
 export const DASHBOARD_ICONS = {
@@ -61,5 +62,6 @@ export const DASHBOARD_ICONS = {
   CHEVRONDOWN: ChevronDown,
   MENU: Menu,
   LOADER2: Loader2,
+  CLOCK: Clock,
   BRIEFCASE: Briefcase,
 };

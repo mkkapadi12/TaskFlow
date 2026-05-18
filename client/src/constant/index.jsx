@@ -126,37 +126,37 @@ export const PAGE_TITLES = [
 
 export const VALUES = [
   {
-    icon: Target,
+    icon: GUEST_ICONS.TARGET,
     title: "Focused Simplicity",
     description:
       "We strip away complexity so you can focus on what truly matters — getting things done.",
   },
   {
-    icon: Heart,
+    icon: GUEST_ICONS.HEART,
     title: "User First",
     description:
       "Every feature is built with empathy. We listen, iterate, and ship what our users need.",
   },
   {
-    icon: Lightbulb,
+    icon: GUEST_ICONS.LIGHTBULB,
     title: "Continuous Innovation",
     description:
       "We push boundaries to deliver cutting-edge tools that redefine task management.",
   },
   {
-    icon: ShieldCheck,
+    icon: GUEST_ICONS.SHIELD_CHECK,
     title: "Trust & Security",
     description:
       "Your data integrity and privacy are non-negotiable. We encrypt and protect everything.",
   },
   {
-    icon: Rocket,
+    icon: GUEST_ICONS.ROCKET,
     title: "Performance Driven",
     description:
       "Speed is a feature. We obsess over milliseconds so your workflow is never interrupted.",
   },
   {
-    icon: Users,
+    icon: GUEST_ICONS.USERS,
     title: "Community Powered",
     description:
       "Built by the community, for the community. Your feedback shapes our roadmap.",

@@ -59,6 +59,12 @@ const LoginForm = () => {
           <Label htmlFor="login-password" className="text-sm font-medium">
             Password
           </Label>
+          <Link
+            to="/forgot-password"
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Forgot password?
+          </Link>
         </div>
         <div className="relative">
           <GUEST_ICONS.SHIELD className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />

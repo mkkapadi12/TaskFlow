@@ -162,4 +162,17 @@ BEGIN
     WHERE email = p_email;
 END //
 
+-- 12. Update Password
+DROP PROCEDURE IF EXISTS sp_UpdatePassword //
+CREATE PROCEDURE sp_UpdatePassword(
+    IN p_id INT,
+    IN p_password VARCHAR(255)
+)
+BEGIN
+    UPDATE users
+    SET password = p_password,
+        updatedAt = NOW()
+    WHERE id = p_id;
+END //
+
 DELIMITER ;

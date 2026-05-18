@@ -85,7 +85,7 @@ const TaskModel = {
     }
 
     const task = existing[0];
-
+    
     // Allow delete if user is the task creator
     if (task.creatorId !== userId) {
       // Otherwise, must be project owner
