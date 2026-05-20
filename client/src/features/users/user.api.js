@@ -15,7 +15,20 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+
+    getAllUsers: builder.query({
+      query: (search) => ({
+        url: "/users",
+        method: "GET",
+        params: search ? { search } : undefined,
+      }),
+      providesTags: ["User"],
+    }),
   }),
 });
 
-export const { useGetProfileQuery, useUpdateProfileMutation } = userApi;
+export const {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useGetAllUsersQuery,
+} = userApi;

@@ -1,181 +1,472 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import { useGetProjectDetailsQuery } from "@/features/project/project.api";
-import { useUpdateTaskMutation } from "@/features/tasks/task.api";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Link, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  useGetProjectDetailsQuery,
+  useUpdateProjectMutation,
+  useAddProjectMemberMutation,
+  useUpdateMemberRoleMutation,
+  useRemoveProjectMemberMutation,
+} from "@/features/project/project.api";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
-import TaskDetailDialog from "@/features/tasks/components/TaskDetailDialog";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import EditProjectDialog from "@/features/project/components/EditProjectDialog";
+import AddMemberDialog from "@/features/project/components/AddMemberDialog";
+import { useAuth } from "@/hooks/useAuth";
+import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
 import { formatDateDisplay } from "@/lib/utils";
+import { ProjectDetailsSkeleton } from "@/skeleton/ProjectDetalsSkeleton";
 
-const COLUMNS = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
+const ROLE_OPTIONS = ["ADMIN", "MEMBER", "OWNER"];
 
-const KanbanColumn = ({ status, tasks, onTaskClick }) => {
-  const { setNodeRef } = useDroppable({ id: status });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className="bg-muted/50 p-4 rounded-lg min-h-[500px] w-full space-y-4"
-    >
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">
-          {status.replace("_", " ")}
-        </h2>
-        <Badge variant="secondary">{tasks.length}</Badge>
-      </div>
-      <div className="space-y-3">
-        {tasks.map((task) => (
-          <KanbanTask
-            key={task.id}
-            task={task}
-            onClick={() => onTaskClick(task)}
-          />
-        ))}
-      </div>
-    </div>
-  );
+const STATUS_STYLES = {
+  ACTIVE: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+  INACTIVE: "bg-gray-500/10 text-gray-600 border-gray-500/30",
 };
 
-const KanbanTask = ({ task, onClick }) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: task.id.toString(),
-  });
-
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        zIndex: 10,
-      }
-    : undefined;
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-      className="touch-none"
-    >
-      <Card
-        className="cursor-grab hover:shadow-md transition-shadow active:cursor-grabbing"
-        onClick={onClick}
-      >
-        <CardHeader className="p-3">
-          <CardTitle className="text-sm font-medium">{task.title}</CardTitle>
-        </CardHeader>
-        <CardContent className="p-3 pt-0 flex justify-between items-center">
-          <Badge
-            variant={
-              task.priority === "URGENT" || task.priority === "HIGH"
-                ? "destructive"
-                : "secondary"
-            }
-          >
-            {task.priority}
-          </Badge>
-          {task.deadline && (
-            <span className="text-xs text-muted-foreground">
-              {formatDateDisplay(task.deadline)}
-            </span>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
+const ROLE_STYLES = {
+  OWNER: "bg-primary/15 text-primary border-primary/30",
+  ADMIN: "bg-purple-500/10 text-purple-600 border-purple-500/30",
+  MEMBER: "bg-sky-500/10 text-sky-600 border-sky-500/30",
 };
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
+  const { user } = useAuth();
+
   const {
     data: resData,
     isLoading,
     isError,
   } = useGetProjectDetailsQuery(projectId);
-  const data = resData?.data;
-  const [updateTask] = useUpdateTaskMutation();
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  if (isLoading) return <div className="p-6">Loading project details...</div>;
-  if (isError || !data)
+  const [updateProject, { isLoading: isUpdatingProject }] =
+    useUpdateProjectMutation();
+  const [addProjectMember, { isLoading: isAddingMember }] =
+    useAddProjectMemberMutation();
+  const [updateMemberRole] = useUpdateMemberRoleMutation();
+  const [removeProjectMember] = useRemoveProjectMemberMutation();
+
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState(null);
+  const [removeReason, setRemoveReason] = useState("");
+
+  if (isLoading) return <ProjectDetailsSkeleton />;
+
+  if (isError || !resData?.data) {
     return (
-      <div className="p-6 text-destructive">Error loading project details.</div>
+      <div className="container mx-auto px-6 py-8">
+        <Card className="border-destructive/40 bg-destructive/5">
+          <CardContent className="py-10 text-center">
+            <DASHBOARD_ICONS.ALERTTRIANGLE className="mx-auto h-10 w-10 text-destructive mb-3" />
+            <p className="text-destructive font-medium">
+              Unable to load project details.
+            </p>
+            <Link to="/projects">
+              <Button variant="outline" className="mt-4 border-border/50">
+                <DASHBOARD_ICONS.ARROWLEFT className="mr-2 h-4 w-4" />
+                Back to Projects
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
     );
+  }
 
-  const project = data;
-  const tasks = data.tasks || [];
-  const members = data.members || [];
+  const project = resData.data;
+  const members = project.members || [];
+  const tasks = project.tasks || [];
+  const isOwner = user?.id === project.ownerId;
+  const existingMemberIds = members.map((m) => m.userId);
 
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const taskId = active.id;
-    const newStatus = over.id;
-
-    const task = tasks.find((t) => t.id.toString() === taskId);
-    if (task && task.status !== newStatus) {
-      updateTask({ taskId, status: newStatus, projectId });
+  const handleSaveProject = async (payload) => {
+    try {
+      await updateProject({ projectId, ...payload }).unwrap();
+      toast.success("Project updated successfully");
+      setIsEditOpen(false);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to update project");
     }
   };
 
-  const handleTaskClick = (task) => {
-    setSelectedTask(task);
-    setIsDialogOpen(true);
+  const handleAddMember = async ({ userId, role }) => {
+    try {
+      await addProjectMember({ projectId, userId, role }).unwrap();
+      toast.success("Member added successfully");
+      setIsAddMemberOpen(false);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to add member");
+    }
+  };
+
+  const handleRoleChange = async (member, role) => {
+    if (role === member.role) return;
+    try {
+      await updateMemberRole({
+        projectId,
+        userId: member.userId,
+        role,
+      }).unwrap();
+      toast.success(`Role updated to ${role}`);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to update role");
+    }
+  };
+
+  const handleConfirmRemove = async () => {
+    if (!memberToRemove) return;
+    try {
+      await removeProjectMember({
+        projectId,
+        userId: memberToRemove.userId,
+        reason: removeReason.trim(),
+      }).unwrap();
+      toast.success("Member removed");
+      setMemberToRemove(null);
+      setRemoveReason("");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to remove member");
+    }
+  };
+
+  const handleRemoveDialogChange = (next) => {
+    if (!next) {
+      setMemberToRemove(null);
+      setRemoveReason("");
+    }
   };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {project?.title}
-          </h1>
-          <p className="text-muted-foreground">{project?.description}</p>
-        </div>
-
-        {/* Members */}
-        <div className="flex flex-col items-end gap-2">
-          <span className="text-sm font-medium text-muted-foreground">
-            Team Members
-          </span>
-          <div className="flex -space-x-2">
-            {members.map((member) => (
-              <div
-                key={member.id}
-                className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground border-2 border-background text-xs font-medium"
-                title={`${member.userName} (${member.role})`}
-              >
-                {member?.userName?.charAt(0).toUpperCase()}
-              </div>
-            ))}
-          </div>
-        </div>
+    <div className="container mx-auto px-6 py-8 space-y-6">
+      {/* Back nav */}
+      <div className="flex items-center justify-between gap-3">
+        <Link to="/projects">
+          <Button
+            variant="ghost"
+            className="h-9 px-3 text-muted-foreground hover:text-foreground"
+          >
+            <DASHBOARD_ICONS.ARROWLEFT className="mr-2 h-4 w-4" />
+            Back to Projects
+          </Button>
+        </Link>
+        {isOwner && (
+          <Button
+            onClick={() => setIsEditOpen(true)}
+            className="h-10 rounded-full shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25"
+          >
+            <DASHBOARD_ICONS.PENCIL className="mr-2 h-4 w-4" />
+            Edit Project
+          </Button>
+        )}
       </div>
 
-      {/* Kanban Board */}
-      <DndContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {COLUMNS.map((status) => (
-            <KanbanColumn
-              key={status}
-              status={status}
-              tasks={tasks.filter((t) => t.status === status)}
-              onTaskClick={handleTaskClick}
-            />
-          ))}
-        </div>
-      </DndContext>
+      {/* Project header card */}
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader>
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 flex-wrap">
+                <CardTitle className="text-3xl font-bold tracking-tight">
+                  {project.title}
+                </CardTitle>
+                <Badge
+                  variant="outline"
+                  className={
+                    STATUS_STYLES[project.status] || STATUS_STYLES.ARCHIVED
+                  }
+                >
+                  {(project.status || "—").replace("_", " ")}
+                </Badge>
+              </div>
+              <CardDescription className="text-base">
+                {project.description || "No description provided."}
+              </CardDescription>
+            </div>
 
-      {/* Task Detail Dialog */}
-      <TaskDetailDialog
-        task={selectedTask}
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        members={members}
+            <div className="flex items-center gap-3 rounded-lg border border-border/50 bg-background/40 p-3">
+              <Avatar size="lg">
+                <AvatarFallback>
+                  {project.ownerName?.charAt(0).toUpperCase() || "?"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Owner
+                </div>
+                <div className="text-sm font-medium truncate">
+                  {project.ownerName}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {project.ownerEmail}
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="h-11 w-11 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              <DASHBOARD_ICONS.USERS className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                Members
+              </div>
+              <div className="text-2xl font-semibold">
+                {project.memberCount ?? members.length}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="h-11 w-11 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              <DASHBOARD_ICONS.LISTCHECKS className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                Tasks
+              </div>
+              <div className="text-2xl font-semibold">
+                {project.taskCount ?? tasks.length}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="h-11 w-11 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              <DASHBOARD_ICONS.CALENDARDAYS className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                Created
+              </div>
+              <div className="text-sm font-medium">
+                {project.createdAt ? formatDateDisplay(project.createdAt) : "—"}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Members */}
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-xl">Project Members</CardTitle>
+              <CardDescription>
+                {isOwner
+                  ? "Manage who has access to this project."
+                  : "People with access to this project."}
+              </CardDescription>
+            </div>
+            {isOwner && (
+              <Button
+                onClick={() => setIsAddMemberOpen(true)}
+                variant="outline"
+                className="border-border/50"
+              >
+                <DASHBOARD_ICONS.PLUS className="mr-2 h-4 w-4" />
+                Add Member
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {members.length === 0 ? (
+            <div className="text-center py-10 rounded-lg border border-dashed border-border/50">
+              <DASHBOARD_ICONS.USERS className="mx-auto h-10 w-10 text-muted-foreground/50 mb-3" />
+              <p className="text-sm text-muted-foreground">No members yet.</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-border/50">
+              {members.map((member) => {
+                const isMemberOwner = member.role === "OWNER";
+                const canManage = isOwner && !isMemberOwner;
+
+                return (
+                  <li
+                    key={member.id}
+                    className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
+                  >
+                    <Avatar size="lg">
+                      {member.userAvatar && (
+                        <AvatarImage src={member.userAvatar} />
+                      )}
+                      <AvatarFallback>
+                        {member.userName?.charAt(0).toUpperCase() || "?"}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium truncate">
+                          {member.userName}
+                        </span>
+                        {member.userId === user?.id && (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] uppercase"
+                          >
+                            You
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {member.userEmail}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {canManage ? (
+                        <Select
+                          value={member.role}
+                          onValueChange={(role) =>
+                            handleRoleChange(member, role)
+                          }
+                        >
+                          <SelectTrigger
+                            size="sm"
+                            className="w-[120px] border-border/50 bg-background/50"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent
+                            position="popper"
+                            className="bg-card/95 backdrop-blur-sm border-border/50"
+                          >
+                            {ROLE_OPTIONS.map((role) => (
+                              <SelectItem key={role} value={role}>
+                                {role}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className={
+                            ROLE_STYLES[member.role] || ROLE_STYLES.MEMBER
+                          }
+                        >
+                          {member.role}
+                        </Badge>
+                      )}
+
+                      {canManage && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setMemberToRemove(member)}
+                          className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          aria-label={`Remove ${member.userName}`}
+                        >
+                          <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <EditProjectDialog
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        project={project}
+        onSave={handleSaveProject}
+        isSaving={isUpdatingProject}
       />
+
+      <AddMemberDialog
+        open={isAddMemberOpen}
+        onOpenChange={setIsAddMemberOpen}
+        existingMemberIds={existingMemberIds}
+        onAdd={handleAddMember}
+        isSaving={isAddingMember}
+      />
+
+      <AlertDialog
+        open={!!memberToRemove}
+        onOpenChange={handleRemoveDialogChange}
+      >
+        <AlertDialogContent className="border-border/50 bg-card/95 backdrop-blur-sm sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove member?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {memberToRemove
+                ? `${memberToRemove.userName} will lose access to this project. They'll receive an email notification.`
+                : ""}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="space-y-2">
+            <Label htmlFor="remove-reason" className="text-sm">
+              Reason{" "}
+              <span className="text-muted-foreground">
+                (shared in the email)
+              </span>
+            </Label>
+            <Textarea
+              id="remove-reason"
+              value={removeReason}
+              onChange={(e) => setRemoveReason(e.target.value)}
+              placeholder="Why are you removing this member?"
+              className="border-border/50 bg-background/50 min-h-[88px]"
+            />
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmRemove}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

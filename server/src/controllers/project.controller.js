@@ -1,4 +1,15 @@
 import ProjectModel from "../models/project.model.js";
+import UserModel from "../models/user.model.js";
+import callProcedure from "../config/callProcedure.js";
+import {
+  sendProjectMemberAddedEmail,
+  sendProjectMemberRemovedEmail,
+} from "../services/email.service.js";
+
+const getProjectBasicInfo = async (projectId) => {
+  const [rows] = await callProcedure("sp_GetProjectById", [projectId]);
+  return rows?.[0] || null;
+};
 
 const createProject = async (req, res, next) => {
   try {
@@ -89,11 +100,30 @@ const getMembers = async (req, res, next) => {
 
 const addProjectMember = async (req, res, next) => {
   try {
+    const projectId = Number(req.params.projectId);
     const member = await ProjectModel.addMember(
-      Number(req.params.projectId),
+      projectId,
       req.user.id,
       req.body,
     );
+
+    try {
+      const project = await getProjectBasicInfo(projectId);
+      if (project && member?.userEmail) {
+        await sendProjectMemberAddedEmail({
+          memberName: member.userName,
+          memberEmail: member.userEmail,
+          projectId,
+          projectTitle: project.title,
+          projectDescription: project.description,
+          ownerName: project.ownerName,
+          role: member.role,
+        });
+      }
+    } catch (emailErr) {
+      console.error("Failed to send add-member email:", emailErr.message);
+    }
+
     res.status(201).json({
       success: true,
       message: "Member added successfully",
@@ -124,11 +154,38 @@ const updateMemberRole = async (req, res, next) => {
 
 const removeMember = async (req, res, next) => {
   try {
+    const projectId = Number(req.params.projectId);
+    const targetUserId = Number(req.params.userId);
+
+    let targetUser = null;
+    let project = null;
+    try {
+      targetUser = await UserModel.getUserById({ id: targetUserId });
+      project = await getProjectBasicInfo(projectId);
+    } catch (lookupErr) {
+      console.error("Failed to look up email recipients:", lookupErr.message);
+    }
+
     const result = await ProjectModel.removeMember(
-      Number(req.params.projectId),
+      projectId,
       req.user.id,
-      Number(req.params.userId),
+      targetUserId,
     );
+
+    try {
+      if (targetUser?.email && project) {
+        await sendProjectMemberRemovedEmail({
+          memberName: targetUser.name,
+          memberEmail: targetUser.email,
+          projectTitle: project.title,
+          ownerName: project.ownerName,
+          reason: req.body.reason,
+        });
+      }
+    } catch (emailErr) {
+      console.error("Failed to send remove-member email:", emailErr.message);
+    }
+
     res.status(200).json({
       success: true,
       message: result.message,
@@ -154,9 +211,7 @@ const getMyProjects = async (req, res, next) => {
 // Get projects owned by a specific user (admin)
 const getProjectsByOwner = async (req, res, next) => {
   try {
-    const projects = await ProjectModel.getByOwner(
-      Number(req.params.ownerId),
-    );
+    const projects = await ProjectModel.getByOwner(Number(req.params.ownerId));
     res.status(200).json({
       success: true,
       data: projects,
