@@ -184,4 +184,47 @@ BEGIN
 END //
 
 
+-- ── 8. Verify Task (owner approves/rejects IN_REVIEW) ────────
+DROP PROCEDURE IF EXISTS sp_VerifyTask //
+CREATE PROCEDURE sp_VerifyTask(
+    IN p_id      INT,
+    IN p_approve TINYINT(1)
+)
+BEGIN
+    DECLARE v_currentStatus VARCHAR(20);
+
+    SELECT status INTO v_currentStatus
+    FROM tasks
+    WHERE id = p_id;
+
+    IF v_currentStatus IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Task not found';
+    END IF;
+
+    IF v_currentStatus <> 'IN_REVIEW' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Task must be in IN_REVIEW to be verified';
+    END IF;
+
+    UPDATE tasks
+    SET status    = IF(p_approve = 1, 'DONE', 'IN_PROGRESS'),
+        updatedAt = NOW()
+    WHERE id = p_id;
+
+    SELECT
+        t.id, t.title, t.description, t.status, t.priority,
+        t.deadline, t.projectId, t.assigneeId, t.creatorId,
+        t.createdAt, t.updatedAt,
+        a.name  AS assigneeName,
+        c.name  AS creatorName,
+        p.title AS projectTitle
+    FROM tasks t
+    LEFT JOIN users    a ON a.id = t.assigneeId
+    JOIN      users    c ON c.id = t.creatorId
+    JOIN      projects p ON p.id = t.projectId
+    WHERE t.id = p_id;
+END //
+
+
 DELIMITER ;

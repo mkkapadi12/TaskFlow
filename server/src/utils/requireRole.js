@@ -28,4 +28,21 @@ const requireOwner = async (projectId, userId) => {
   return membership;
 };
 
-export { getMembership, requireMembership, requireOwner };
+// Helper: require owner or admin (project-level managers)
+const requireManager = async (projectId, userId) => {
+  const membership = await requireMembership(projectId, userId);
+  if (membership.role !== "OWNER" && membership.role !== "ADMIN") {
+    throw new AppError(
+      "Only project owner or admin can perform this action",
+      403,
+    );
+  }
+  return membership;
+};
+
+export {
+  getMembership,
+  requireMembership,
+  requireOwner,
+  requireManager,
+};

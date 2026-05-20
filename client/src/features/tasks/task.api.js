@@ -32,6 +32,7 @@ export const tasksApi = baseApi.injectEndpoints({
       invalidatesTags: (result, error, { projectId }) => [
         "Task",
         { type: "Task", id: `project-${projectId}` },
+        { type: "Project", id: String(projectId) },
       ],
     }),
 
@@ -45,11 +46,40 @@ export const tasksApi = baseApi.injectEndpoints({
         "Task",
         { type: "Task", id: taskId },
         { type: "Task", id: `project-${projectId}` },
+        { type: "Project", id: String(projectId) },
+      ],
+    }),
+
+    updateTaskStatus: builder.mutation({
+      query: ({ taskId, status }) => ({
+        url: `/tasks/${taskId}/status`,
+        method: "PATCH",
+        data: { status },
+      }),
+      invalidatesTags: (result, error, { taskId, projectId }) => [
+        "Task",
+        { type: "Task", id: taskId },
+        { type: "Task", id: `project-${projectId}` },
+        { type: "Project", id: String(projectId) },
+      ],
+    }),
+
+    verifyTask: builder.mutation({
+      query: ({ taskId, approve }) => ({
+        url: `/tasks/${taskId}/verify`,
+        method: "PATCH",
+        data: { approve },
+      }),
+      invalidatesTags: (result, error, { taskId, projectId }) => [
+        "Task",
+        { type: "Task", id: taskId },
+        { type: "Task", id: `project-${projectId}` },
+        { type: "Project", id: String(projectId) },
       ],
     }),
 
     deleteTask: builder.mutation({
-      query: ({ taskId, projectId }) => ({
+      query: ({ taskId }) => ({
         url: `/tasks/${taskId}`,
         method: "DELETE",
       }),
@@ -57,6 +87,7 @@ export const tasksApi = baseApi.injectEndpoints({
         "Task",
         { type: "Task", id: taskId },
         { type: "Task", id: `project-${projectId}` },
+        { type: "Project", id: String(projectId) },
       ],
     }),
 
@@ -73,6 +104,8 @@ export const {
   useGetTaskByIdQuery,
   useCreateTaskMutation,
   useUpdateTaskMutation,
+  useUpdateTaskStatusMutation,
+  useVerifyTaskMutation,
   useDeleteTaskMutation,
   useGetOverdueTasksQuery,
 } = tasksApi;

@@ -39,6 +39,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import EditProjectDialog from "@/features/project/components/EditProjectDialog";
 import AddMemberDialog from "@/features/project/components/AddMemberDialog";
+import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
+import TaskDetailDialog from "@/features/tasks/components/TaskDetailDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
 import { formatDateDisplay } from "@/lib/utils";
@@ -55,6 +57,20 @@ const ROLE_STYLES = {
   OWNER: "bg-primary/15 text-primary border-primary/30",
   ADMIN: "bg-purple-500/10 text-purple-600 border-purple-500/30",
   MEMBER: "bg-sky-500/10 text-sky-600 border-sky-500/30",
+};
+
+const TASK_STATUS_STYLES = {
+  TODO: "bg-muted text-muted-foreground border-muted-foreground/30",
+  IN_PROGRESS: "bg-primary/10 text-primary border-primary/30",
+  IN_REVIEW: "bg-amber-500/10 text-amber-600 border-amber-500/30",
+  DONE: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+};
+
+const TASK_PRIORITY_STYLES = {
+  LOW: "bg-blue-500/10 text-blue-500",
+  MEDIUM: "bg-yellow-500/10 text-yellow-600",
+  HIGH: "bg-orange-500/10 text-orange-600",
+  URGENT: "bg-destructive/10 text-destructive",
 };
 
 const ProjectDetails = () => {
@@ -78,6 +94,8 @@ const ProjectDetails = () => {
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState(null);
   const [removeReason, setRemoveReason] = useState("");
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   if (isLoading) return <ProjectDetailsSkeleton />;
 
@@ -107,6 +125,15 @@ const ProjectDetails = () => {
   const tasks = project.tasks || [];
   const isOwner = user?.id === project.ownerId;
   const existingMemberIds = members.map((m) => m.userId);
+
+  const currentMembership = members.find((m) => m.userId === user?.id);
+  const projectRole = currentMembership?.role;
+  const isManager = projectRole === "OWNER" || projectRole === "ADMIN";
+  const tasksWithProjectId = tasks.map((t) => ({
+    ...t,
+    projectId: Number(projectId),
+  }));
+  const selectedTask = tasksWithProjectId.find((t) => t.id === selectedTaskId);
 
   const handleSaveProject = async (payload) => {
     try {
@@ -410,6 +437,95 @@ const ProjectDetails = () => {
         </CardContent>
       </Card>
 
+      {/* Tasks */}
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-xl">Tasks</CardTitle>
+              <CardDescription>
+                {isManager
+                  ? "Assign work to members and verify completed tasks."
+                  : "Tasks in this project."}
+              </CardDescription>
+            </div>
+            {isManager && (
+              <Button
+                onClick={() => setIsCreateTaskOpen(true)}
+                variant="outline"
+                className="border-border/50"
+              >
+                <DASHBOARD_ICONS.PLUS className="mr-2 h-4 w-4" />
+                Create Task
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {tasksWithProjectId.length === 0 ? (
+            <div className="text-center py-10 rounded-lg border border-dashed border-border/50">
+              <DASHBOARD_ICONS.LISTCHECKS className="mx-auto h-10 w-10 text-muted-foreground/50 mb-3" />
+              <p className="text-sm text-muted-foreground">No tasks yet.</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-border/50">
+              {tasksWithProjectId.map((task) => {
+                const needsReview =
+                  isOwner && task.status === "IN_REVIEW";
+                return (
+                  <li
+                    key={task.id}
+                    onClick={() => setSelectedTaskId(task.id)}
+                    className="flex items-center gap-4 py-3 first:pt-0 last:pb-0 cursor-pointer hover:bg-muted/30 -mx-2 px-2 rounded-md transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium truncate">
+                          {task.title}
+                        </span>
+                        {task.priority && (
+                          <Badge
+                            className={`${
+                              TASK_PRIORITY_STYLES[task.priority]
+                            } border-transparent text-[10px] uppercase`}
+                          >
+                            {task.priority}
+                          </Badge>
+                        )}
+                        {needsReview && (
+                          <Badge
+                            variant="outline"
+                            className="border-amber-500/40 text-amber-600 text-[10px] uppercase"
+                          >
+                            Needs verification
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate mt-0.5">
+                        {task.assigneeName
+                          ? `Assigned to ${task.assigneeName}`
+                          : "Unassigned"}
+                        {task.deadline &&
+                          ` · Due ${formatDateDisplay(task.deadline)}`}
+                      </div>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={
+                        TASK_STATUS_STYLES[task.status] ||
+                        TASK_STATUS_STYLES.TODO
+                      }
+                    >
+                      {task.status?.replace("_", " ")}
+                    </Badge>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
       <EditProjectDialog
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
@@ -424,6 +540,22 @@ const ProjectDetails = () => {
         existingMemberIds={existingMemberIds}
         onAdd={handleAddMember}
         isSaving={isAddingMember}
+      />
+
+      <CreateTaskDialog
+        open={isCreateTaskOpen}
+        onOpenChange={setIsCreateTaskOpen}
+        projectId={projectId}
+        members={members}
+      />
+
+      <TaskDetailDialog
+        task={selectedTask}
+        isOpen={!!selectedTask}
+        onClose={() => setSelectedTaskId(null)}
+        members={members}
+        currentUserId={user?.id}
+        projectRole={projectRole}
       />
 
       <AlertDialog

@@ -100,6 +100,42 @@ const getOverdueTasks = async (req, res, next) => {
   }
 };
 
+const updateTaskStatus = async (req, res, next) => {
+  try {
+    const task = await TaskModel.updateStatus(
+      Number(req.params.taskId),
+      req.user.id,
+      req.body.status,
+    );
+    res.status(200).json({
+      success: true,
+      message: "Task status updated",
+      data: task,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const verifyTask = async (req, res, next) => {
+  try {
+    const task = await TaskModel.verify(
+      Number(req.params.taskId),
+      req.user.id,
+      Boolean(req.body.approve),
+    );
+    res.status(200).json({
+      success: true,
+      message: req.body.approve
+        ? "Task approved and marked DONE"
+        : "Task sent back for changes",
+      data: task,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export {
   createTask,
   getTasksByProject,
@@ -108,4 +144,6 @@ export {
   updateTask,
   deleteTask,
   getOverdueTasks,
+  updateTaskStatus,
+  verifyTask,
 };

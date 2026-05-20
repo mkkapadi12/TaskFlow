@@ -1,13 +1,46 @@
 import callProcedure from "../config/callProcedure.js";
 import { AppError } from "../middlewares/error.middleware.js";
-import { requireMembership, requireOwner } from "../utils/requireRole.js";
+import {
+  getMembership,
+  requireMembership,
+  requireOwner,
+  requireManager,
+} from "../utils/requireRole.js";
+
+const TASK_STATUSES = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
+const ASSIGNEE_STATUSES = ["TODO", "IN_PROGRESS", "IN_REVIEW"];
+
+const ensureAssigneeIsMember = async (projectId, assigneeId) => {
+  if (assigneeId === null || assigneeId === undefined) return;
+  const membership = await getMembership(projectId, assigneeId);
+  if (!membership) {
+    throw new AppError("Assignee must be a project member", 400);
+  }
+};
+
+const loadTask = async (taskId) => {
+  const [rows] = await callProcedure("sp_GetTaskById", [taskId]);
+  if (!rows[0]) {
+    throw new AppError("Task not found", 404);
+  }
+  return rows[0];
+};
 
 const TaskModel = {
-  // Create a task (requires project membership)
+  // Create a task — only OWNER/ADMIN of the project can assign work.
   create: async (creatorId, body) => {
-    const { title, description, status, priority, deadline, projectId, assigneeId } = body;
+    const {
+      title,
+      description,
+      status,
+      priority,
+      deadline,
+      projectId,
+      assigneeId,
+    } = body;
 
-    await requireMembership(projectId, creatorId);
+    await requireManager(projectId, creatorId);
+    await ensureAssigneeIsMember(projectId, assigneeId);
 
     const [task] = await callProcedure("sp_CreateTask", [
       title,
@@ -41,35 +74,27 @@ const TaskModel = {
 
   // Get a single task by ID (requires membership on the task's project)
   getById: async (taskId, userId) => {
-    const [task] = await callProcedure("sp_GetTaskById", [taskId]);
-
-    if (!task[0]) {
-      throw new AppError("Task not found", 404);
-    }
-
-    // Verify the user is a member of the task's project
-    await requireMembership(task[0].projectId, userId);
-
-    return task[0];
+    const task = await loadTask(taskId);
+    await requireMembership(task.projectId, userId);
+    return task;
   },
 
-  // Update a task (requires membership on the task's project)
+  // Update task fields (NOT status) — OWNER/ADMIN only.
   update: async (taskId, userId, body) => {
-    // First verify the task exists and user has access
-    const [existing] = await callProcedure("sp_GetTaskById", [taskId]);
-    if (!existing[0]) {
-      throw new AppError("Task not found", 404);
+    const existing = await loadTask(taskId);
+    await requireManager(existing.projectId, userId);
+
+    const { title, description, priority, deadline, assigneeId } = body;
+
+    if (assigneeId !== undefined) {
+      await ensureAssigneeIsMember(existing.projectId, assigneeId);
     }
-
-    await requireMembership(existing[0].projectId, userId);
-
-    const { title, description, status, priority, deadline, assigneeId } = body;
 
     const [task] = await callProcedure("sp_UpdateTask", [
       taskId,
       title ?? null,
       description ?? null,
-      status ?? null,
+      null, // status — managed via updateStatus / verify
       priority ?? null,
       deadline ?? null,
       assigneeId ?? null,
@@ -77,18 +102,74 @@ const TaskModel = {
     return task[0];
   },
 
-  // Delete a task (requires OWNER of project or task creator)
-  delete: async (taskId, userId) => {
-    const [existing] = await callProcedure("sp_GetTaskById", [taskId]);
-    if (!existing[0]) {
-      throw new AppError("Task not found", 404);
+  // Change task status — assignee OR project manager can move through
+  // TODO ↔ IN_PROGRESS ↔ IN_REVIEW. DONE is reachable only via verify().
+  updateStatus: async (taskId, userId, status) => {
+    if (!TASK_STATUSES.includes(status)) {
+      throw new AppError("Invalid status", 400);
+    }
+    if (status === "DONE") {
+      throw new AppError("Use the verify endpoint to mark a task as DONE", 400);
     }
 
-    const task = existing[0];
-    
-    // Allow delete if user is the task creator
+    const existing = await loadTask(taskId);
+    const membership = await requireMembership(existing.projectId, userId);
+
+    const isAssignee = existing.assigneeId === userId;
+    const isManager =
+      membership.role === "OWNER" || membership.role === "ADMIN";
+
+    if (!isAssignee && !isManager) {
+      throw new AppError(
+        "Only the assignee or a project manager can change task status",
+        403
+      );
+    }
+
+    if (isAssignee && !isManager && !ASSIGNEE_STATUSES.includes(status)) {
+      throw new AppError(
+        "Assignees cannot move tasks out of the active workflow",
+        403
+      );
+    }
+
+    if (existing.status === "DONE" && membership.role !== "OWNER") {
+      throw new AppError(
+        "Only the project owner can reopen a completed task",
+        403
+      );
+    }
+
+    const [rows] = await callProcedure("sp_UpdateTask", [
+      taskId,
+      null,
+      null,
+      status,
+      null,
+      null,
+      null,
+    ]);
+    return rows[0];
+  },
+
+  // Verify a task that's in IN_REVIEW — owner approves (→ DONE) or
+  // rejects (→ IN_PROGRESS). SP enforces the IN_REVIEW precondition.
+  verify: async (taskId, userId, approve) => {
+    const existing = await loadTask(taskId);
+    await requireOwner(existing.projectId, userId);
+
+    const [rows] = await callProcedure("sp_VerifyTask", [
+      taskId,
+      approve ? 1 : 0,
+    ]);
+    return rows[0];
+  },
+
+  // Delete a task (creator, or project OWNER)
+  delete: async (taskId, userId) => {
+    const task = await loadTask(taskId);
+
     if (task.creatorId !== userId) {
-      // Otherwise, must be project owner
       await requireOwner(task.projectId, userId);
     }
 

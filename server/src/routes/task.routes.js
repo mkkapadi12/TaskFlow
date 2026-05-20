@@ -7,6 +7,8 @@ import {
   updateTask,
   deleteTask,
   getOverdueTasks,
+  updateTaskStatus,
+  verifyTask,
 } from "../controllers/task.controller.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
@@ -14,7 +16,7 @@ const router = Router();
 
 // ── Task CRUD ─────────────────────────────────────────────────
 
-// Create a task in a project
+// Create a task in a project (owner/admin only)
 router.post("/", protect, createTask);
 
 // Get tasks assigned to the logged-in user
@@ -29,8 +31,14 @@ router.get("/project/:projectId", protect, getTasksByProject);
 // Get a single task by ID
 router.get("/:taskId", protect, getTaskById);
 
-// Update a task
+// Update task fields (owner/admin only; cannot set status here)
 router.put("/:taskId", protect, updateTask);
+
+// Update status (assignee or owner/admin; cannot set DONE here)
+router.patch("/:taskId/status", protect, updateTaskStatus);
+
+// Verify task (owner only; approve → DONE, reject → IN_PROGRESS)
+router.patch("/:taskId/verify", protect, verifyTask);
 
 // Delete a task
 router.delete("/:taskId", protect, deleteTask);
