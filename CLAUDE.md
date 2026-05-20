@@ -1,0 +1,100 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Repository layout
+
+Two independent apps, each with its own `package.json` and `node_modules`:
+
+- `client/` — React 19 + Vite SPA (port 5173)
+- `server/` — Express 5 + MySQL API (port 5000)
+
+`taskFlow.md` at the repo root is the canonical product/architecture doc — read it for the full domain model, route map, and implementation status. No formal tests exist in either app.
+
+## Commands
+
+Run all commands from the relevant subdirectory (`client/` or `server/`). The repo root has no scripts.
+
+```bash
+# Server (server/)
+npm run dev           # nodemon index.js — http://localhost:5000, Swagger at /api/docs
+npm start             # node index.js (production)
+
+# Client (client/)
+npm run dev           # vite — http://localhost:5173
+npm run build         # vite build
+npm run lint          # eslint .
+npm run preview       # vite preview
+```
+
+Database bootstrap (MySQL must be running locally):
+
+```bash
+mysql -u root -p < server/database/create.sql
+mysql -u root -p <db_name> < server/database/users.sql
+mysql -u root -p <db_name> < server/database/project.sql
+mysql -u root -p <db_name> < server/database/tasks.sql
+```
+
+`.env` files are required in both `client/` and `server/` (templates in `.env.example`). The server validates required env vars at boot in `server/src/config/env.js` and exits if any are missing (`DATABASE_URL`, `DATABASE_NAME`, `JWT_SECRET`, `CLOUDINARY_*`). The client needs `VITE_API_URL` — Vite proxies `/api` → `VITE_API_URL` in `vite.config.js`, so client code always calls `/api/...` regardless of where the server lives.
+
+## Architecture
+
+### Server: all DB access goes through stored procedures
+
+There is no ORM and no inline SQL in JS. Every read and write goes through `callProcedure(name, params)` (`server/src/config/callProcedure.js`), which wraps `pool.query("CALL sp_X(?,?,...)", params)`. SP definitions live in `server/database/*.sql`:
+
+- `users.sql`, `project.sql`, `tasks.sql` — one file per domain
+- `create.sql` — table schema (users, projects, project_members, tasks)
+- `call.sql` — ad-hoc invocation scratch
+
+**When adding a feature, add the SP first**, then expose it via a model method. Layer order: `routes → controllers → models → callProcedure → SP`.
+
+The return shape from `callProcedure` is the raw `mysql2` result and differs by SP:
+- Single-resultset SPs: `const [rows] = await callProcedure(...)` then `rows[0]` is the first row.
+- Multi-resultset SPs (e.g. `sp_GetFullProjectDetails` returns project + members + tasks): destructure positionally — `const [projectRows, memberRows, taskRows] = await callProcedure(...)`. See `ProjectModel.getProjectDetailsById` for the pattern.
+
+SPs use `SIGNAL SQLSTATE '45000'` for business-rule errors; `globalErrorHandler` (`server/src/middlewares/error.middleware.js`) maps those to 400 with the SQL message, and maps other `ER_*` codes (e.g. `ER_DUP_ENTRY` → 409).
+
+### Server: auth and authorization
+
+- `protect` middleware (`auth.middleware.js`) verifies the `Authorization: Bearer <jwt>` header, calls `sp_GetUserById`, and attaches the full user to `req.user`.
+- `restrictTo("ADMIN", ...)` gates routes by the global `users.role` enum.
+- For project-scoped permissions, models call `requireMembership(projectId, userId)` or `requireOwner(projectId, userId)` from `server/src/utils/requireRole.js` — these check the `project_members` join table via `sp_GetMemberRole` and throw 403. Authorization checks happen in the **model layer**, not the route, because they depend on the SP result.
+- Static routes must come before dynamic ones in route files (e.g. `/profile` before `/:id` in `user.routes.js`).
+
+### Server: validation
+
+`validate(zodSchema)` middleware (`middlewares/validate.middleware.js`) parses `req.body`, **replaces it with the parsed/coerced data**, and returns 400 with a field-keyed error array on failure. Always import schemas from `server/src/schema/`.
+
+### Client: RTK Query endpoint injection
+
+`client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
+
+The base query is a custom `axiosBaseQuery` that delegates to `client/src/lib/axios.js`. That axios instance:
+- Sets `baseURL: "/api"` (relies on the Vite proxy).
+- Attaches `Authorization: Bearer <token>` from `state.auth.token` on every request (lazy-imports the store to break the circular dep `store → baseApi → axios → store`).
+- On 401 responses, dispatches `logout()` automatically.
+- Deletes the JSON `Content-Type` header when `config.data` is `FormData` so axios can set the multipart boundary (used by avatar upload).
+
+### Client: routing and layouts
+
+`client/src/App.jsx` is the single source of truth for routes. The tree is two top-level groups:
+- `<GuestRoute>` wraps public pages and the auth pages; it redirects authenticated users to `/dashboard`.
+- `<ProtectedRoute>` + `<AppLayout>` wraps every authed page.
+
+Auth state lives in `features/auth/auth.slice.js` and persists the JWT to `localStorage` under the key `token`. `AppLayout` calls `useGetProfileQuery()` once on mount to hydrate Redux from the token.
+
+### Client: feature slicing
+
+Each domain owns its folder under `client/src/features/<name>/`: `pages/`, `components/`, `*.api.js` (RTK Query injection), and optionally `*.slice.js`. Shadcn primitives live in `client/src/components/ui/`; layout shells live in `client/src/components/layouts/{app,guest}/`.
+
+Path alias: `@/*` → `client/src/*` (configured in both `jsconfig.json` and `vite.config.js` — keep them in sync).
+
+## Conventions
+
+- **Client formatting**: Prettier config (`client/.prettierrc`) — double quotes, no semicolons, 2-space indent, ES5 trailing commas. There is no Prettier config on the server; match surrounding style there.
+- **Client lint**: `npm run lint` in `client/` runs ESLint with React Hooks + React Refresh rules. The server has no lint script.
+- **Imports**: server uses ESM (`"type": "module"`); every relative import needs the `.js` extension.
+- **API response shape**: controllers return `{ success: boolean, message?: string, data?: any }`. Errors come back as `{ success: false, message }` (plus `errors: [{field, message}]` for Zod validation failures).
+- **Swagger docs**: route annotations live in `server/src/docs/*.docs.js` (separate from route files); reusable schema components are in `server/src/schema/swagger.schemas.js`. The spec is served at `/api/docs`.
