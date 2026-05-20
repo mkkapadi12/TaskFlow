@@ -35,13 +35,13 @@ const UserCalendar = () => {
   });
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-4 p-3 sm:space-y-6 sm:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Calendar</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Calendar</h1>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr]">
-        <Card className="h-fit w-fit">
+        <Card className="h-fit w-full sm:w-fit">
           <CardContent className="p-4">
             <Calendar
               mode="single"

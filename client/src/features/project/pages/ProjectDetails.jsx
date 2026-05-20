@@ -194,7 +194,7 @@ const ProjectDetails = () => {
   };
 
   return (
-    <div className="container mx-auto space-y-6 px-6 py-8">
+    <div className="container mx-auto space-y-4 px-3 py-5 sm:space-y-6 sm:px-6 sm:py-8">
       {/* Back nav */}
       <div className="flex items-center justify-between gap-3">
         <Link to="/projects">
@@ -352,7 +352,7 @@ const ProjectDetails = () => {
                 return (
                   <li
                     key={member.id}
-                    className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
+                    className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0"
                   >
                     <Avatar size="lg">
                       {member.userAvatar && (

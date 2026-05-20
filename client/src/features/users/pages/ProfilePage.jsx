@@ -32,15 +32,15 @@ const ProfilePage = () => {
   const taskCount = tasksData?.data?.length || 0;
 
   return (
-    <div className="container mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
+    <div className="container mx-auto px-3 py-5 sm:px-6 sm:py-8">
+      <div className="mb-5 sm:mb-8">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Account Settings</h1>
         <p className="text-muted-foreground mt-1">
           Manage your profile information and preferences.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:gap-8 lg:grid-cols-3">
         {/* Left Column: Summary */}
         <div className="space-y-6 lg:col-span-1">
           <Card className="border-border/50 bg-card/50 overflow-hidden shadow-xl shadow-black/5 backdrop-blur-sm">

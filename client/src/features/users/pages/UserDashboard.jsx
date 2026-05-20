@@ -17,19 +17,25 @@ import {
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
 const UserDashboard = () => {
-  const { data: projects, isLoading: projectsLoading } =
+  const { data: projectData, isLoading: projectsLoading } =
     useGetMyProjectsQuery();
   const { data: tasks, isLoading: tasksLoading } = useGetMyTasksQuery();
   const { data: overdueTasks, isLoading: overdueLoading } =
     useGetOverdueTasksQuery();
+
+  const projects = projectData?.data;
+  const tasksData = tasks?.data;
+  const overdueTasksData = overdueTasks?.data;
+
+  console.log({ tasksData, projects, overdueTasksData });
 
   if (projectsLoading || tasksLoading || overdueLoading) {
     return <div className="p-6">Loading dashboard data...</div>;
   }
 
   // Process data for chart
-  const statusCounts = Array.isArray(tasks)
-    ? tasks.reduce((acc, task) => {
+  const statusCounts = Array.isArray(tasksData)
+    ? tasksData.reduce((acc, task) => {
         acc[task.status] = (acc[task.status] || 0) + 1;
         return acc;
       }, {})
@@ -43,8 +49,8 @@ const UserDashboard = () => {
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   // Filter upcoming deadlines
-  const upcomingTasks = Array.isArray(tasks)
-    ? tasks
+  const upcomingTasks = Array.isArray(tasksData)
+    ? tasksData
         .filter((task) => {
           if (!task.deadline) return false;
           const deadline = new Date(task.deadline);
@@ -56,13 +62,13 @@ const UserDashboard = () => {
     : [];
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-4 p-3 sm:space-y-6 sm:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Dashboard</h1>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -83,7 +89,7 @@ const UserDashboard = () => {
             <DASHBOARD_ICONS.LISTCHECKS className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tasks?.length || 0}</div>
+            <div className="text-2xl font-bold">{tasks?.data?.length || 0}</div>
             <p className="text-muted-foreground text-xs">
               Tasks assigned to you
             </p>
@@ -96,7 +102,7 @@ const UserDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-destructive text-2xl font-bold">
-              {overdueTasks?.length || 0}
+              {overdueTasksData?.length || 0}
             </div>
             <p className="text-muted-foreground text-xs">
               Tasks past their deadline
@@ -106,39 +112,41 @@ const UserDashboard = () => {
       </div>
 
       {/* Charts and Lists */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-2">
         {/* Task Status Chart */}
         <Card>
           <CardHeader>
             <CardTitle>Task Status Overview</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent>
             {chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={chartData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+              <div style={{ width: '100%', height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) =>
+                        `${name} ${(percent * 100).toFixed(0)}%`
+                      }
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             ) : (
               <div className="text-muted-foreground flex h-full items-center justify-center">
                 No task data available
