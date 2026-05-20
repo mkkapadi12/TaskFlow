@@ -1,21 +1,21 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { GUEST_ICONS } from "@/lib/icons/guest.icons";
+import { Link } from 'react-router-dom';
+
+import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 const Footer = () => {
   return (
-    <footer className="relative z-10 border-t border-border/40 bg-card/30 backdrop-blur-md">
+    <footer className="border-border/40 bg-card/30 relative z-10 border-t backdrop-blur-md">
       <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+        <div className="mb-12 grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           {/* Brand Column */}
           <div className="col-span-2 lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br from-primary to-accent text-primary-foreground shadow-lg shadow-primary/20">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="from-primary to-accent text-primary-foreground shadow-primary/20 flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br shadow-lg">
                 <GUEST_ICONS.DASHBOARD size={18} strokeWidth={2.5} />
               </div>
-              <span className="font-bold text-xl tracking-tight">TaskFlow</span>
+              <span className="text-xl font-bold tracking-tight">TaskFlow</span>
             </div>
-            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+            <p className="text-muted-foreground mb-6 max-w-sm text-sm">
               Streamline your workflow, collaborate with your team, and achieve
               your goals with our professional task management platform.
             </p>
@@ -49,10 +49,10 @@ const Footer = () => {
 
           {/* Product */}
           <div>
-            <h3 className="text-sm font-semibold mb-4 text-foreground/90">
+            <h3 className="text-foreground/90 mb-4 text-sm font-semibold">
               Product
             </h3>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <ul className="text-muted-foreground space-y-3 text-sm">
               <li>
                 <Link
                   to="/"
@@ -90,10 +90,10 @@ const Footer = () => {
 
           {/* Company */}
           <div>
-            <h3 className="text-sm font-semibold mb-4 text-foreground/90">
+            <h3 className="text-foreground/90 mb-4 text-sm font-semibold">
               Company
             </h3>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <ul className="text-muted-foreground space-y-3 text-sm">
               <li>
                 <Link
                   to="/about"
@@ -131,10 +131,10 @@ const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h3 className="text-sm font-semibold mb-4 text-foreground/90">
+            <h3 className="text-foreground/90 mb-4 text-sm font-semibold">
               Legal
             </h3>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <ul className="text-muted-foreground space-y-3 text-sm">
               <li>
                 <Link
                   to="/"
@@ -163,11 +163,11 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-border/40 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="border-border/40 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
+          <p className="text-muted-foreground text-sm">
             &copy; {new Date().getFullYear()} TaskFlow. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-6 text-sm">
             <Link to="/" className="hover:text-foreground transition-colors">
               Privacy
             </Link>

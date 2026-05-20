@@ -1,18 +1,18 @@
 import {
-  X,
-  PanelLeft,
-  CircleCheck,
-  Info,
-  TriangleAlert,
-  OctagonX,
-  Loader2,
-  ChevronDown,
   Check,
-  ChevronUp,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  CircleCheck,
+  Info,
+  Loader2,
   MoreHorizontal,
-} from "lucide-react";
+  OctagonX,
+  PanelLeft,
+  TriangleAlert,
+  X,
+} from 'lucide-react';
 
 export const UI_ICONS = {
   X: X,

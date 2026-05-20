@@ -1,13 +1,14 @@
-import React from "react";
-import ProfileForm from "../components/ProfileForm";
-import { useGetProfileQuery, useUpdateProfileMutation } from "../user.api";
-import { useGetMyProjectsQuery } from "../../project/project.api";
-import { useGetMyTasksQuery } from "../../tasks/task.api";
-import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
+import { toast } from 'sonner';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+
+import { useGetMyProjectsQuery } from '../../project/project.api';
+import { useGetMyTasksQuery } from '../../tasks/task.api';
+import ProfileForm from '../components/ProfileForm';
+import { useGetProfileQuery, useUpdateProfileMutation } from '../user.api';
 
 const ProfilePage = () => {
   const { data: profileData, isLoading: isProfileLoading } =
@@ -20,9 +21,9 @@ const ProfilePage = () => {
   const handleSave = async (formData) => {
     try {
       await updateProfile(formData).unwrap();
-      toast.success("Profile updated successfully!");
+      toast.success('Profile updated successfully!');
     } catch (error) {
-      toast.error(error.message || "Failed to update profile");
+      toast.error(error.message || 'Failed to update profile');
     }
   };
 
@@ -39,13 +40,13 @@ const ProfilePage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left Column: Summary */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl shadow-black/5 overflow-hidden">
-            <div className="h-24 bg-linear-to-r from-primary/20 to-primary/5" />
-            <CardContent className="p-6 -mt-12 text-center relative">
-              <div className="inline-flex h-24 w-24 rounded-full border-4 border-background bg-muted items-center justify-center overflow-hidden shadow-lg mb-4">
+        <div className="space-y-6 lg:col-span-1">
+          <Card className="border-border/50 bg-card/50 overflow-hidden shadow-xl shadow-black/5 backdrop-blur-sm">
+            <div className="from-primary/20 to-primary/5 h-24 bg-linear-to-r" />
+            <CardContent className="relative -mt-12 p-6 text-center">
+              <div className="border-background bg-muted mb-4 inline-flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 shadow-lg">
                 {user?.avatar ? (
                   <img
                     src={user.avatar}
@@ -53,24 +54,24 @@ const ProfilePage = () => {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <span className="text-3xl font-bold text-muted-foreground">
-                    {user?.name?.charAt(0)?.toUpperCase() || "?"}
+                  <span className="text-muted-foreground text-3xl font-bold">
+                    {user?.name?.charAt(0)?.toUpperCase() || '?'}
                   </span>
                 )}
               </div>
 
               <h2 className="text-xl font-semibold">
-                {user?.name || "User Name"}
+                {user?.name || 'User Name'}
               </h2>
-              <p className="text-sm text-muted-foreground mb-3">
+              <p className="text-muted-foreground mb-3 text-sm">
                 {user?.email}
               </p>
 
-              <div className="flex justify-center gap-2 mb-4">
+              <div className="mb-4 flex justify-center gap-2">
                 {user?.role && (
                   <Badge
                     variant="secondary"
-                    className="gap-1 px-3 py-1 rounded-full"
+                    className="gap-1 rounded-full px-3 py-1"
                   >
                     <DASHBOARD_ICONS.SHIELD
                       size={12}
@@ -81,29 +82,29 @@ const ProfilePage = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
+              <div className="border-border/50 grid grid-cols-2 gap-4 border-t pt-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-primary text-2xl font-bold">
                     {isProjectsLoading ? (
-                      <Skeleton className="h-8 w-12 mx-auto" />
+                      <Skeleton className="mx-auto h-8 w-12" />
                     ) : (
                       projectCount
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                  <div className="text-muted-foreground mt-1 flex items-center justify-center gap-1 text-xs">
                     <DASHBOARD_ICONS.BRIEFCASE size={12} />
                     Projects
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-primary text-2xl font-bold">
                     {isTasksLoading ? (
-                      <Skeleton className="h-8 w-12 mx-auto" />
+                      <Skeleton className="mx-auto h-8 w-12" />
                     ) : (
                       taskCount
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
+                  <div className="text-muted-foreground mt-1 flex items-center justify-center gap-1 text-xs">
                     <DASHBOARD_ICONS.LISTCHECKS size={12} />
                     Tasks
                   </div>
@@ -115,7 +116,7 @@ const ProfilePage = () => {
 
         {/* Right Column: Form */}
         <div className="lg:col-span-2">
-          <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-xl shadow-black/5 h-full">
+          <Card className="border-border/50 bg-card/50 h-full shadow-xl shadow-black/5 backdrop-blur-sm">
             <CardHeader>
               <CardTitle>Profile Information</CardTitle>
             </CardHeader>

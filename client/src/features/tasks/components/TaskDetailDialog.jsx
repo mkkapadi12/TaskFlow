@@ -1,46 +1,47 @@
-import React, { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import {
   useUpdateTaskMutation,
   useUpdateTaskStatusMutation,
   useVerifyTaskMutation,
-} from "@/features/tasks/task.api";
-import { toast } from "sonner";
+} from '@/features/tasks/task.api';
 
 const ACTIVE_STATUSES = [
-  { value: "TODO", label: "To Do" },
-  { value: "IN_PROGRESS", label: "In Progress" },
-  { value: "IN_REVIEW", label: "In Review" },
+  { value: 'TODO', label: 'To Do' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
+  { value: 'IN_REVIEW', label: 'In Review' },
 ];
 
 const formatDeadlineForInput = (deadline) => {
-  if (!deadline) return "";
+  if (!deadline) return '';
   return new Date(deadline)
-    .toLocaleDateString("en-CA", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
+    .toLocaleDateString('en-CA', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
     })
-    .replace(/\//g, "-");
+    .replace(/\//g, '-');
 };
 
 const TaskDetailDialog = ({
@@ -51,11 +52,11 @@ const TaskDetailDialog = ({
   currentUserId,
   projectRole,
 }) => {
-  const isOwner = projectRole === "OWNER";
-  const isManager = isOwner || projectRole === "ADMIN";
+  const isOwner = projectRole === 'OWNER';
+  const isManager = isOwner || projectRole === 'ADMIN';
   const isAssignee = task && task.assigneeId === currentUserId;
   const canChangeStatus = isManager || isAssignee;
-  const canVerify = isOwner && task?.status === "IN_REVIEW";
+  const canVerify = isOwner && task?.status === 'IN_REVIEW';
 
   const { register, handleSubmit, reset, control } = useForm();
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
@@ -66,11 +67,11 @@ const TaskDetailDialog = ({
   useEffect(() => {
     if (task) {
       reset({
-        title: task.title || "",
-        description: task.description || "",
-        priority: task.priority || "MEDIUM",
+        title: task.title || '',
+        description: task.description || '',
+        priority: task.priority || 'MEDIUM',
         deadline: formatDeadlineForInput(task.deadline),
-        assigneeId: task.assigneeId ? String(task.assigneeId) : "",
+        assigneeId: task.assigneeId ? String(task.assigneeId) : '',
       });
     }
   }, [task, reset]);
@@ -88,10 +89,10 @@ const TaskDetailDialog = ({
         deadline: data.deadline || null,
         assigneeId: data.assigneeId ? Number(data.assigneeId) : null,
       }).unwrap();
-      toast.success("Task updated");
+      toast.success('Task updated');
       onClose();
     } catch (err) {
-      toast.error(err?.message || "Failed to update task");
+      toast.error(err?.message || 'Failed to update task');
     }
   };
 
@@ -103,9 +104,9 @@ const TaskDetailDialog = ({
         projectId: task.projectId,
         status,
       }).unwrap();
-      toast.success(`Status set to ${status.replace("_", " ")}`);
+      toast.success(`Status set to ${status.replace('_', ' ')}`);
     } catch (err) {
-      toast.error(err?.message || "Failed to update status");
+      toast.error(err?.message || 'Failed to update status');
     }
   };
 
@@ -117,10 +118,10 @@ const TaskDetailDialog = ({
         approve,
       }).unwrap();
       toast.success(
-        approve ? "Task approved and marked DONE" : "Task sent back",
+        approve ? 'Task approved and marked DONE' : 'Task sent back'
       );
     } catch (err) {
-      toast.error(err?.message || "Failed to verify task");
+      toast.error(err?.message || 'Failed to verify task');
     }
   };
 
@@ -129,9 +130,9 @@ const TaskDetailDialog = ({
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {isManager ? "Edit Task" : "Task"}
+            {isManager ? 'Edit Task' : 'Task'}
             <Badge variant="outline" className="text-[10px] uppercase">
-              {task.status?.replace("_", " ")}
+              {task.status?.replace('_', ' ')}
             </Badge>
           </DialogTitle>
         </DialogHeader>
@@ -141,7 +142,7 @@ const TaskDetailDialog = ({
             <Label htmlFor="title">Title</Label>
             <Input
               id="title"
-              {...register("title", { required: true })}
+              {...register('title', { required: true })}
               disabled={!isManager}
             />
           </div>
@@ -150,7 +151,7 @@ const TaskDetailDialog = ({
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              {...register("description")}
+              {...register('description')}
               disabled={!isManager}
             />
           </div>
@@ -186,7 +187,7 @@ const TaskDetailDialog = ({
               <Input
                 id="deadline"
                 type="date"
-                {...register("deadline")}
+                {...register('deadline')}
                 disabled={!isManager}
               />
             </div>
@@ -227,15 +228,15 @@ const TaskDetailDialog = ({
                 Cancel
               </Button>
               <Button type="submit" disabled={isUpdating}>
-                {isUpdating ? "Saving..." : "Save changes"}
+                {isUpdating ? 'Saving...' : 'Save changes'}
               </Button>
             </DialogFooter>
           )}
         </form>
 
         {(canChangeStatus || canVerify) && (
-          <div className="border-t border-border/50 pt-4 space-y-4">
-            {canChangeStatus && task.status !== "DONE" && (
+          <div className="border-border/50 space-y-4 border-t pt-4">
+            {canChangeStatus && task.status !== 'DONE' && (
               <div className="space-y-2">
                 <Label>Status</Label>
                 <Select
@@ -259,7 +260,7 @@ const TaskDetailDialog = ({
                   </SelectContent>
                 </Select>
                 {isAssignee && !isManager && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Move to "In Review" when you're ready for the owner to
                     verify.
                   </p>
@@ -277,7 +278,7 @@ const TaskDetailDialog = ({
                     disabled={isVerifying}
                     className="flex-1"
                   >
-                    {isVerifying ? "..." : "Approve & mark DONE"}
+                    {isVerifying ? '...' : 'Approve & mark DONE'}
                   </Button>
                   <Button
                     type="button"

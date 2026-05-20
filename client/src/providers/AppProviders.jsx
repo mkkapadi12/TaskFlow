@@ -1,8 +1,10 @@
-import { Provider } from "react-redux";
-import { Toaster } from "@/components/ui/sonner";
-import { store } from "@/app/store";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import ThemeProvider from "./ThemeProvider";
+import { Provider } from 'react-redux';
+
+import { store } from '@/app/store';
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+
+import ThemeProvider from './ThemeProvider';
 
 const AppProviders = ({ children }) => {
   return (

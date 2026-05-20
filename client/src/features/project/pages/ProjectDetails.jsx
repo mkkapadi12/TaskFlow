@@ -1,32 +1,7 @@
-import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { toast } from "sonner";
-import {
-  useGetProjectDetailsQuery,
-  useUpdateProjectMutation,
-  useAddProjectMemberMutation,
-  useUpdateMemberRoleMutation,
-  useRemoveProjectMemberMutation,
-} from "@/features/project/project.api";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,41 +11,67 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import EditProjectDialog from "@/features/project/components/EditProjectDialog";
-import AddMemberDialog from "@/features/project/components/AddMemberDialog";
-import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
-import TaskDetailDialog from "@/features/tasks/components/TaskDetailDialog";
-import { useAuth } from "@/hooks/useAuth";
-import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
-import { formatDateDisplay } from "@/lib/utils";
-import { ProjectDetailsSkeleton } from "@/skeleton/ProjectDetalsSkeleton";
+} from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import AddMemberDialog from '@/features/project/components/AddMemberDialog';
+import EditProjectDialog from '@/features/project/components/EditProjectDialog';
+import {
+  useAddProjectMemberMutation,
+  useGetProjectDetailsQuery,
+  useRemoveProjectMemberMutation,
+  useUpdateMemberRoleMutation,
+  useUpdateProjectMutation,
+} from '@/features/project/project.api';
+import CreateTaskDialog from '@/features/tasks/components/CreateTaskDialog';
+import TaskDetailDialog from '@/features/tasks/components/TaskDetailDialog';
+import { useAuth } from '@/hooks/useAuth';
+import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { formatDateDisplay } from '@/lib/utils';
+import { ProjectDetailsSkeleton } from '@/skeleton/ProjectDetalsSkeleton';
 
-const ROLE_OPTIONS = ["ADMIN", "MEMBER", "OWNER"];
+const ROLE_OPTIONS = ['ADMIN', 'MEMBER', 'OWNER'];
 
 const STATUS_STYLES = {
-  ACTIVE: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
-  INACTIVE: "bg-gray-500/10 text-gray-600 border-gray-500/30",
+  ACTIVE: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
+  INACTIVE: 'bg-gray-500/10 text-gray-600 border-gray-500/30',
 };
 
 const ROLE_STYLES = {
-  OWNER: "bg-primary/15 text-primary border-primary/30",
-  ADMIN: "bg-purple-500/10 text-purple-600 border-purple-500/30",
-  MEMBER: "bg-sky-500/10 text-sky-600 border-sky-500/30",
+  OWNER: 'bg-primary/15 text-primary border-primary/30',
+  ADMIN: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
+  MEMBER: 'bg-sky-500/10 text-sky-600 border-sky-500/30',
 };
 
 const TASK_STATUS_STYLES = {
-  TODO: "bg-muted text-muted-foreground border-muted-foreground/30",
-  IN_PROGRESS: "bg-primary/10 text-primary border-primary/30",
-  IN_REVIEW: "bg-amber-500/10 text-amber-600 border-amber-500/30",
-  DONE: "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+  TODO: 'bg-muted text-muted-foreground border-muted-foreground/30',
+  IN_PROGRESS: 'bg-primary/10 text-primary border-primary/30',
+  IN_REVIEW: 'bg-amber-500/10 text-amber-600 border-amber-500/30',
+  DONE: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
 };
 
 const TASK_PRIORITY_STYLES = {
-  LOW: "bg-blue-500/10 text-blue-500",
-  MEDIUM: "bg-yellow-500/10 text-yellow-600",
-  HIGH: "bg-orange-500/10 text-orange-600",
-  URGENT: "bg-destructive/10 text-destructive",
+  LOW: 'bg-blue-500/10 text-blue-500',
+  MEDIUM: 'bg-yellow-500/10 text-yellow-600',
+  HIGH: 'bg-orange-500/10 text-orange-600',
+  URGENT: 'bg-destructive/10 text-destructive',
 };
 
 const ProjectDetails = () => {
@@ -93,7 +94,7 @@ const ProjectDetails = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState(null);
-  const [removeReason, setRemoveReason] = useState("");
+  const [removeReason, setRemoveReason] = useState('');
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
@@ -104,12 +105,12 @@ const ProjectDetails = () => {
       <div className="container mx-auto px-6 py-8">
         <Card className="border-destructive/40 bg-destructive/5">
           <CardContent className="py-10 text-center">
-            <DASHBOARD_ICONS.ALERTTRIANGLE className="mx-auto h-10 w-10 text-destructive mb-3" />
+            <DASHBOARD_ICONS.ALERTTRIANGLE className="text-destructive mx-auto mb-3 h-10 w-10" />
             <p className="text-destructive font-medium">
               Unable to load project details.
             </p>
             <Link to="/projects">
-              <Button variant="outline" className="mt-4 border-border/50">
+              <Button variant="outline" className="border-border/50 mt-4">
                 <DASHBOARD_ICONS.ARROWLEFT className="mr-2 h-4 w-4" />
                 Back to Projects
               </Button>
@@ -128,7 +129,7 @@ const ProjectDetails = () => {
 
   const currentMembership = members.find((m) => m.userId === user?.id);
   const projectRole = currentMembership?.role;
-  const isManager = projectRole === "OWNER" || projectRole === "ADMIN";
+  const isManager = projectRole === 'OWNER' || projectRole === 'ADMIN';
   const tasksWithProjectId = tasks.map((t) => ({
     ...t,
     projectId: Number(projectId),
@@ -138,20 +139,20 @@ const ProjectDetails = () => {
   const handleSaveProject = async (payload) => {
     try {
       await updateProject({ projectId, ...payload }).unwrap();
-      toast.success("Project updated successfully");
+      toast.success('Project updated successfully');
       setIsEditOpen(false);
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to update project");
+      toast.error(err?.data?.message || 'Failed to update project');
     }
   };
 
   const handleAddMember = async ({ userId, role }) => {
     try {
       await addProjectMember({ projectId, userId, role }).unwrap();
-      toast.success("Member added successfully");
+      toast.success('Member added successfully');
       setIsAddMemberOpen(false);
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to add member");
+      toast.error(err?.data?.message || 'Failed to add member');
     }
   };
 
@@ -165,7 +166,7 @@ const ProjectDetails = () => {
       }).unwrap();
       toast.success(`Role updated to ${role}`);
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to update role");
+      toast.error(err?.data?.message || 'Failed to update role');
     }
   };
 
@@ -177,29 +178,29 @@ const ProjectDetails = () => {
         userId: memberToRemove.userId,
         reason: removeReason.trim(),
       }).unwrap();
-      toast.success("Member removed");
+      toast.success('Member removed');
       setMemberToRemove(null);
-      setRemoveReason("");
+      setRemoveReason('');
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to remove member");
+      toast.error(err?.data?.message || 'Failed to remove member');
     }
   };
 
   const handleRemoveDialogChange = (next) => {
     if (!next) {
       setMemberToRemove(null);
-      setRemoveReason("");
+      setRemoveReason('');
     }
   };
 
   return (
-    <div className="container mx-auto px-6 py-8 space-y-6">
+    <div className="container mx-auto space-y-6 px-6 py-8">
       {/* Back nav */}
       <div className="flex items-center justify-between gap-3">
         <Link to="/projects">
           <Button
             variant="ghost"
-            className="h-9 px-3 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground h-9 px-3"
           >
             <DASHBOARD_ICONS.ARROWLEFT className="mr-2 h-4 w-4" />
             Back to Projects
@@ -208,7 +209,7 @@ const ProjectDetails = () => {
         {isOwner && (
           <Button
             onClick={() => setIsEditOpen(true)}
-            className="h-10 rounded-full shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/25"
+            className="shadow-primary/20 hover:shadow-primary/25 h-10 rounded-full shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
           >
             <DASHBOARD_ICONS.PENCIL className="mr-2 h-4 w-4" />
             Edit Project
@@ -219,9 +220,9 @@ const ProjectDetails = () => {
       {/* Project header card */}
       <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="space-y-2">
-              <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex flex-wrap items-center gap-3">
                 <CardTitle className="text-3xl font-bold tracking-tight">
                   {project.title}
                 </CardTitle>
@@ -231,28 +232,28 @@ const ProjectDetails = () => {
                     STATUS_STYLES[project.status] || STATUS_STYLES.ARCHIVED
                   }
                 >
-                  {(project.status || "—").replace("_", " ")}
+                  {(project.status || '—').replace('_', ' ')}
                 </Badge>
               </div>
               <CardDescription className="text-base">
-                {project.description || "No description provided."}
+                {project.description || 'No description provided.'}
               </CardDescription>
             </div>
 
-            <div className="flex items-center gap-3 rounded-lg border border-border/50 bg-background/40 p-3">
+            <div className="border-border/50 bg-background/40 flex items-center gap-3 rounded-lg border p-3">
               <Avatar size="lg">
                 <AvatarFallback>
-                  {project.ownerName?.charAt(0).toUpperCase() || "?"}
+                  {project.ownerName?.charAt(0).toUpperCase() || '?'}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                <div className="text-muted-foreground text-xs tracking-wider uppercase">
                   Owner
                 </div>
-                <div className="text-sm font-medium truncate">
+                <div className="truncate text-sm font-medium">
                   {project.ownerName}
                 </div>
-                <div className="text-xs text-muted-foreground truncate">
+                <div className="text-muted-foreground truncate text-xs">
                   {project.ownerEmail}
                 </div>
               </div>
@@ -262,14 +263,14 @@ const ProjectDetails = () => {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-11 w-11 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="bg-primary/10 text-primary flex h-11 w-11 items-center justify-center rounded-full">
               <DASHBOARD_ICONS.USERS className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              <div className="text-muted-foreground text-xs tracking-wider uppercase">
                 Members
               </div>
               <div className="text-2xl font-semibold">
@@ -280,12 +281,12 @@ const ProjectDetails = () => {
         </Card>
 
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-11 w-11 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="bg-primary/10 text-primary flex h-11 w-11 items-center justify-center rounded-full">
               <DASHBOARD_ICONS.LISTCHECKS className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              <div className="text-muted-foreground text-xs tracking-wider uppercase">
                 Tasks
               </div>
               <div className="text-2xl font-semibold">
@@ -296,16 +297,16 @@ const ProjectDetails = () => {
         </Card>
 
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-11 w-11 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="bg-primary/10 text-primary flex h-11 w-11 items-center justify-center rounded-full">
               <DASHBOARD_ICONS.CALENDARDAYS className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              <div className="text-muted-foreground text-xs tracking-wider uppercase">
                 Created
               </div>
               <div className="text-sm font-medium">
-                {project.createdAt ? formatDateDisplay(project.createdAt) : "—"}
+                {project.createdAt ? formatDateDisplay(project.createdAt) : '—'}
               </div>
             </div>
           </CardContent>
@@ -320,8 +321,8 @@ const ProjectDetails = () => {
               <CardTitle className="text-xl">Project Members</CardTitle>
               <CardDescription>
                 {isOwner
-                  ? "Manage who has access to this project."
-                  : "People with access to this project."}
+                  ? 'Manage who has access to this project.'
+                  : 'People with access to this project.'}
               </CardDescription>
             </div>
             {isOwner && (
@@ -338,14 +339,14 @@ const ProjectDetails = () => {
         </CardHeader>
         <CardContent>
           {members.length === 0 ? (
-            <div className="text-center py-10 rounded-lg border border-dashed border-border/50">
-              <DASHBOARD_ICONS.USERS className="mx-auto h-10 w-10 text-muted-foreground/50 mb-3" />
-              <p className="text-sm text-muted-foreground">No members yet.</p>
+            <div className="border-border/50 rounded-lg border border-dashed py-10 text-center">
+              <DASHBOARD_ICONS.USERS className="text-muted-foreground/50 mx-auto mb-3 h-10 w-10" />
+              <p className="text-muted-foreground text-sm">No members yet.</p>
             </div>
           ) : (
-            <ul className="divide-y divide-border/50">
+            <ul className="divide-border/50 divide-y">
               {members.map((member) => {
-                const isMemberOwner = member.role === "OWNER";
+                const isMemberOwner = member.role === 'OWNER';
                 const canManage = isOwner && !isMemberOwner;
 
                 return (
@@ -358,13 +359,13 @@ const ProjectDetails = () => {
                         <AvatarImage src={member.userAvatar} />
                       )}
                       <AvatarFallback>
-                        {member.userName?.charAt(0).toUpperCase() || "?"}
+                        {member.userName?.charAt(0).toUpperCase() || '?'}
                       </AvatarFallback>
                     </Avatar>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium truncate">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="truncate text-sm font-medium">
                           {member.userName}
                         </span>
                         {member.userId === user?.id && (
@@ -376,7 +377,7 @@ const ProjectDetails = () => {
                           </Badge>
                         )}
                       </div>
-                      <div className="text-xs text-muted-foreground truncate">
+                      <div className="text-muted-foreground truncate text-xs">
                         {member.userEmail}
                       </div>
                     </div>
@@ -391,13 +392,13 @@ const ProjectDetails = () => {
                         >
                           <SelectTrigger
                             size="sm"
-                            className="w-[120px] border-border/50 bg-background/50"
+                            className="border-border/50 bg-background/50 w-[120px]"
                           >
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent
                             position="popper"
-                            className="bg-card/95 backdrop-blur-sm border-border/50"
+                            className="bg-card/95 border-border/50 backdrop-blur-sm"
                           >
                             {ROLE_OPTIONS.map((role) => (
                               <SelectItem key={role} value={role}>
@@ -422,7 +423,7 @@ const ProjectDetails = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => setMemberToRemove(member)}
-                          className="h-9 w-9 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-9 w-9 p-0"
                           aria-label={`Remove ${member.userName}`}
                         >
                           <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
@@ -445,8 +446,8 @@ const ProjectDetails = () => {
               <CardTitle className="text-xl">Tasks</CardTitle>
               <CardDescription>
                 {isManager
-                  ? "Assign work to members and verify completed tasks."
-                  : "Tasks in this project."}
+                  ? 'Assign work to members and verify completed tasks.'
+                  : 'Tasks in this project.'}
               </CardDescription>
             </div>
             {isManager && (
@@ -463,24 +464,23 @@ const ProjectDetails = () => {
         </CardHeader>
         <CardContent>
           {tasksWithProjectId.length === 0 ? (
-            <div className="text-center py-10 rounded-lg border border-dashed border-border/50">
-              <DASHBOARD_ICONS.LISTCHECKS className="mx-auto h-10 w-10 text-muted-foreground/50 mb-3" />
-              <p className="text-sm text-muted-foreground">No tasks yet.</p>
+            <div className="border-border/50 rounded-lg border border-dashed py-10 text-center">
+              <DASHBOARD_ICONS.LISTCHECKS className="text-muted-foreground/50 mx-auto mb-3 h-10 w-10" />
+              <p className="text-muted-foreground text-sm">No tasks yet.</p>
             </div>
           ) : (
-            <ul className="divide-y divide-border/50">
+            <ul className="divide-border/50 divide-y">
               {tasksWithProjectId.map((task) => {
-                const needsReview =
-                  isOwner && task.status === "IN_REVIEW";
+                const needsReview = isOwner && task.status === 'IN_REVIEW';
                 return (
                   <li
                     key={task.id}
                     onClick={() => setSelectedTaskId(task.id)}
-                    className="flex items-center gap-4 py-3 first:pt-0 last:pb-0 cursor-pointer hover:bg-muted/30 -mx-2 px-2 rounded-md transition-colors"
+                    className="hover:bg-muted/30 -mx-2 flex cursor-pointer items-center gap-4 rounded-md px-2 py-3 transition-colors first:pt-0 last:pb-0"
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-medium truncate">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="truncate text-sm font-medium">
                           {task.title}
                         </span>
                         {task.priority && (
@@ -495,16 +495,16 @@ const ProjectDetails = () => {
                         {needsReview && (
                           <Badge
                             variant="outline"
-                            className="border-amber-500/40 text-amber-600 text-[10px] uppercase"
+                            className="border-amber-500/40 text-[10px] text-amber-600 uppercase"
                           >
                             Needs verification
                           </Badge>
                         )}
                       </div>
-                      <div className="text-xs text-muted-foreground truncate mt-0.5">
+                      <div className="text-muted-foreground mt-0.5 truncate text-xs">
                         {task.assigneeName
                           ? `Assigned to ${task.assigneeName}`
-                          : "Unassigned"}
+                          : 'Unassigned'}
                         {task.deadline &&
                           ` · Due ${formatDateDisplay(task.deadline)}`}
                       </div>
@@ -516,7 +516,7 @@ const ProjectDetails = () => {
                         TASK_STATUS_STYLES.TODO
                       }
                     >
-                      {task.status?.replace("_", " ")}
+                      {task.status?.replace('_', ' ')}
                     </Badge>
                   </li>
                 );
@@ -568,13 +568,13 @@ const ProjectDetails = () => {
             <AlertDialogDescription>
               {memberToRemove
                 ? `${memberToRemove.userName} will lose access to this project. They'll receive an email notification.`
-                : ""}
+                : ''}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-2">
             <Label htmlFor="remove-reason" className="text-sm">
-              Reason{" "}
+              Reason{' '}
               <span className="text-muted-foreground">
                 (shared in the email)
               </span>

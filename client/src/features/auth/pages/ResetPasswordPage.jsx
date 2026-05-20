@@ -1,19 +1,19 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { toast } from "sonner";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { useResetPasswordMutation } from "@/features/auth/auth.api";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useResetPasswordMutation } from '@/features/auth/auth.api';
 
 const ResetPasswordPage = () => {
   const {
@@ -25,13 +25,13 @@ const ResetPasswordPage = () => {
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get("token");
+  const token = searchParams.get('token');
 
-  const password = watch("password");
+  const password = watch('password');
 
   const onSubmit = async (data) => {
     if (!token) {
-      toast.error("Invalid or missing token");
+      toast.error('Invalid or missing token');
       return;
     }
     try {
@@ -40,18 +40,18 @@ const ResetPasswordPage = () => {
         password: data.password,
       }).unwrap();
       toast.success(result.message);
-      navigate("/login");
+      navigate('/login');
     } catch (err) {
-      toast.error(err.data?.message || "Failed to reset password");
+      toast.error(err.data?.message || 'Failed to reset password');
     }
   };
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
+      <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-destructive">
+            <CardTitle className="text-destructive text-2xl font-bold">
               Invalid Link
             </CardTitle>
             <CardDescription>
@@ -69,7 +69,7 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
+    <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
@@ -82,16 +82,16 @@ const ResetPasswordPage = () => {
               <Input
                 id="password"
                 type="password"
-                {...register("password", {
-                  required: "Password is required",
+                {...register('password', {
+                  required: 'Password is required',
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters",
+                    message: 'Password must be at least 6 characters',
                   },
                 })}
               />
               {errors.password && (
-                <p className="text-xs text-destructive">
+                <p className="text-destructive text-xs">
                   {errors.password.message}
                 </p>
               )}
@@ -101,14 +101,14 @@ const ResetPasswordPage = () => {
               <Input
                 id="confirmPassword"
                 type="password"
-                {...register("confirmPassword", {
-                  required: "Please confirm your password",
+                {...register('confirmPassword', {
+                  required: 'Please confirm your password',
                   validate: (value) =>
-                    value === password || "Passwords do not match",
+                    value === password || 'Passwords do not match',
                 })}
               />
               {errors.confirmPassword && (
-                <p className="text-xs text-destructive">
+                <p className="text-destructive text-xs">
                   {errors.confirmPassword.message}
                 </p>
               )}
@@ -116,7 +116,7 @@ const ResetPasswordPage = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Resetting..." : "Reset Password"}
+              {isLoading ? 'Resetting...' : 'Reset Password'}
             </Button>
             <Button variant="link" asChild className="w-full">
               <Link to="/login">Back to Login</Link>

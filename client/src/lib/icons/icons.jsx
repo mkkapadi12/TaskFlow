@@ -1,4 +1,4 @@
-import { MapPin, Moon, Sun, Users, X } from "lucide-react";
+import { MapPin, Moon, Sun, Users, X } from 'lucide-react';
 
 export const ICONS = {
   USERS: Users,

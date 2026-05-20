@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import ProjectHeader from "../components/ProjectHeader";
-import ProjectList from "../components/ProjectList";
-import CreateProjectDialog from "../components/CreateProjectDialog";
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import CreateProjectDialog from '../components/CreateProjectDialog';
+import ProjectHeader from '../components/ProjectHeader';
+import ProjectList from '../components/ProjectList';
 import {
-  useGetMyProjectsQuery,
   useCreateProjectMutation,
-} from "../project.api";
-import { toast } from "sonner";
+  useGetMyProjectsQuery,
+} from '../project.api';
 
 const Projects = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -17,11 +18,11 @@ const Projects = () => {
   const handleCreateProject = async (data) => {
     try {
       await createProject(data).unwrap();
-      toast.success("Project created successfully!");
+      toast.success('Project created successfully!');
       setIsDialogOpen(false);
       refetch(); // Refresh the list
     } catch (error) {
-      toast.error(error.message || "Failed to create project");
+      toast.error(error.message || 'Failed to create project');
     }
   };
 

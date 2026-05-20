@@ -1,25 +1,26 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
-const STATUS_OPTIONS = ["ACTIVE", "INACTIVE"];
+const STATUS_OPTIONS = ['ACTIVE', 'INACTIVE'];
 
 const EditProjectDialog = ({
   open,
@@ -28,15 +29,15 @@ const EditProjectDialog = ({
   onSave,
   isSaving,
 }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("ACTIVE");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState('ACTIVE');
 
   useEffect(() => {
     if (project && open) {
-      setTitle(project.title || "");
-      setDescription(project.description || "");
-      setStatus(project.status || "ACTIVE");
+      setTitle(project.title || '');
+      setDescription(project.description || '');
+      setStatus(project.status || 'ACTIVE');
     }
   }, [project, open]);
 
@@ -47,7 +48,7 @@ const EditProjectDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] border-border/50 bg-card/95 backdrop-blur-sm">
+      <DialogContent className="border-border/50 bg-card/95 backdrop-blur-sm sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
           <DialogDescription>
@@ -82,17 +83,17 @@ const EditProjectDialog = ({
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger
                 id="edit-status"
-                className="w-full border-border/50 bg-background/50"
+                className="border-border/50 bg-background/50 w-full"
               >
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent
                 position="popper"
-                className="bg-card/95 backdrop-blur-sm border-border/50"
+                className="bg-card/95 border-border/50 backdrop-blur-sm"
               >
                 {STATUS_OPTIONS.map((option) => (
                   <SelectItem key={option} value={option}>
-                    {option.replace("_", " ")}
+                    {option.replace('_', ' ')}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -109,7 +110,7 @@ const EditProjectDialog = ({
               Cancel
             </Button>
             <Button type="submit" disabled={!title.trim() || isSaving}>
-              {isSaving ? "Saving..." : "Save Changes"}
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>
         </form>

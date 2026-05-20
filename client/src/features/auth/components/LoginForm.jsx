@@ -1,13 +1,15 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, Link } from "react-router-dom";
-import { toast } from "sonner";
-import { useLoginMutation } from "../auth.api";
-import { loginSchema } from "@/schemas/auth.schema";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { GUEST_ICONS } from "@/lib/icons/guest.icons";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { GUEST_ICONS } from '@/lib/icons/guest.icons';
+import { loginSchema } from '@/schemas/auth.schema';
+
+import { useLoginMutation } from '../auth.api';
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -22,10 +24,10 @@ const LoginForm = () => {
   const onSubmit = async (data) => {
     try {
       await login(data).unwrap();
-      toast.success("Welcome back!");
-      navigate("/dashboard");
+      toast.success('Welcome back!');
+      navigate('/dashboard');
     } catch (err) {
-      toast.error(err.message || "Login failed");
+      toast.error(err.message || 'Login failed');
     }
   };
 
@@ -37,17 +39,17 @@ const LoginForm = () => {
           Email address
         </Label>
         <div className="relative">
-          <GUEST_ICONS.MAIL className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <GUEST_ICONS.MAIL className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             id="login-email"
             type="email"
             placeholder="you@example.com"
-            className="pl-10 h-11"
-            {...register("email")}
+            className="h-11 pl-10"
+            {...register('email')}
           />
         </div>
         {errors.email && (
-          <p className="text-xs text-destructive mt-1">
+          <p className="text-destructive mt-1 text-xs">
             {errors.email.message}
           </p>
         )}
@@ -61,23 +63,23 @@ const LoginForm = () => {
           </Label>
           <Link
             to="/forgot-password"
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            className="text-primary text-sm font-medium underline-offset-4 hover:underline"
           >
             Forgot password?
           </Link>
         </div>
         <div className="relative">
-          <GUEST_ICONS.SHIELD className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <GUEST_ICONS.SHIELD className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             id="login-password"
             type="password"
             placeholder="••••••••"
-            className="pl-10 h-11"
-            {...register("password")}
+            className="h-11 pl-10"
+            {...register('password')}
           />
         </div>
         {errors.password && (
-          <p className="text-xs text-destructive mt-1">
+          <p className="text-destructive mt-1 text-xs">
             {errors.password.message}
           </p>
         )}
@@ -86,25 +88,25 @@ const LoginForm = () => {
       {/* Submit */}
       <Button
         type="submit"
-        className="w-full h-11 text-sm font-semibold rounded-lg shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
+        className="shadow-primary/20 hover:shadow-primary/30 h-11 w-full rounded-lg text-sm font-semibold shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
         disabled={isLoading}
       >
         {isLoading ? (
           <span className="flex items-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+            <span className="border-primary-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
             Signing in…
           </span>
         ) : (
-          "Sign in"
+          'Sign in'
         )}
       </Button>
 
       {/* Register link */}
-      <p className="text-sm text-center text-muted-foreground pt-2">
-        Don&apos;t have an account?{" "}
+      <p className="text-muted-foreground pt-2 text-center text-sm">
+        Don&apos;t have an account?{' '}
         <Link
           to="/register"
-          className="font-semibold text-primary underline underline-offset-4 transition-colors hover:text-primary/80"
+          className="text-primary hover:text-primary/80 font-semibold underline underline-offset-4 transition-colors"
         >
           Create one
         </Link>

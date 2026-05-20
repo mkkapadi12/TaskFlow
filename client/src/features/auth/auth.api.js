@@ -1,10 +1,11 @@
-import { baseApi } from "@/app/baseApi";
-import { setCredentials, setUser } from "./auth.slice";
+import { baseApi } from '@/app/baseApi';
+
+import { setCredentials, setUser } from './auth.slice';
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
-      query: (body) => ({ url: "/auth/register", method: "POST", data: body }),
+      query: (body) => ({ url: '/auth/register', method: 'POST', data: body }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -16,7 +17,7 @@ export const authApi = baseApi.injectEndpoints({
     }),
 
     login: builder.mutation({
-      query: (body) => ({ url: "/auth/login", method: "POST", data: body }),
+      query: (body) => ({ url: '/auth/login', method: 'POST', data: body }),
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -29,11 +30,11 @@ export const authApi = baseApi.injectEndpoints({
 
     getProfile: builder.query({
       query: (data) => ({
-        url: "/users/profile",
-        method: "GET",
+        url: '/users/profile',
+        method: 'GET',
         data,
       }),
-      providesTags: ["User"],
+      providesTags: ['User'],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
@@ -44,13 +45,27 @@ export const authApi = baseApi.injectEndpoints({
       },
     }),
     forgotPassword: builder.mutation({
-      query: (body) => ({ url: "/auth/forgot-password", method: "POST", data: body }),
+      query: (body) => ({
+        url: '/auth/forgot-password',
+        method: 'POST',
+        data: body,
+      }),
     }),
 
     resetPassword: builder.mutation({
-      query: (body) => ({ url: "/auth/reset-password", method: "POST", data: body }),
+      query: (body) => ({
+        url: '/auth/reset-password',
+        method: 'POST',
+        data: body,
+      }),
     }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useGetProfileQuery, useForgotPasswordMutation, useResetPasswordMutation } = authApi;
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useGetProfileQuery,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+} = authApi;

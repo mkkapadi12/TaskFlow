@@ -1,10 +1,11 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import axiosInstance from "@/lib/axios";
+import { createApi } from '@reduxjs/toolkit/query/react';
+
+import axiosInstance from '@/lib/axios';
 
 // custom baseQuery using our axios instance (not fetchBaseQuery)
 const axiosBaseQuery =
   () =>
-  async ({ url, method = "GET", data, params }) => {
+  async ({ url, method = 'GET', data, params }) => {
     try {
       const result = await axiosInstance({ url, method, data, params });
       return { data: result.data };
@@ -19,8 +20,8 @@ const axiosBaseQuery =
   };
 
 export const baseApi = createApi({
-  reducerPath: "api",
+  reducerPath: 'api',
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["User", "Project", "Task"],
+  tagTypes: ['User', 'Project', 'Task'],
   endpoints: () => ({}), // feature apis inject here
 });

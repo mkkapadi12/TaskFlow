@@ -1,16 +1,16 @@
-import React from "react";
+
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/select';
 
 const TaskFilters = ({ status, onStatusChange }) => {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
+    <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
       <div className="flex items-center gap-2">
         <Label htmlFor="status-filter" className="text-sm font-medium">
           Status:
@@ -18,13 +18,13 @@ const TaskFilters = ({ status, onStatusChange }) => {
         <Select value={status} onValueChange={onStatusChange}>
           <SelectTrigger
             id="status-filter"
-            className="w-[150px] bg-background/50 border-border/50"
+            className="bg-background/50 border-border/50 w-[150px]"
           >
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent
             position="popper"
-            className="bg-card/95 backdrop-blur-sm border-border/50"
+            className="bg-card/95 border-border/50 backdrop-blur-sm"
           >
             <SelectItem value="ALL">All Statuses</SelectItem>
             <SelectItem value="TODO">To Do</SelectItem>

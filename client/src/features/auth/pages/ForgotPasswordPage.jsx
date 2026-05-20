@@ -1,19 +1,19 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { toast } from "sonner";
-import { Link } from "react-router-dom";
-import { useForgotPasswordMutation } from "@/features/auth/auth.api";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useForgotPasswordMutation } from '@/features/auth/auth.api';
 
 const ForgotPasswordPage = () => {
   const {
@@ -28,15 +28,15 @@ const ForgotPasswordPage = () => {
       const result = await forgotPassword(data).unwrap();
       toast.success(result.message);
       if (result.data?.resetUrl) {
-        console.log("Reset URL (Dev mode):", result.data.resetUrl);
+        console.log('Reset URL (Dev mode):', result.data.resetUrl);
       }
     } catch (err) {
-      toast.error(err.data?.message || "Failed to send reset link");
+      toast.error(err.data?.message || 'Failed to send reset link');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/50 px-4">
+    <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
@@ -53,10 +53,10 @@ const ForgotPasswordPage = () => {
                 id="email"
                 type="email"
                 placeholder="m@example.com"
-                {...register("email", { required: "Email is required" })}
+                {...register('email', { required: 'Email is required' })}
               />
               {errors.email && (
-                <p className="text-xs text-destructive">
+                <p className="text-destructive text-xs">
                   {errors.email.message}
                 </p>
               )}
@@ -64,7 +64,7 @@ const ForgotPasswordPage = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send Reset Link"}
+              {isLoading ? 'Sending...' : 'Send Reset Link'}
             </Button>
             <Button variant="link" asChild className="w-full">
               <Link to="/login">Back to Login</Link>

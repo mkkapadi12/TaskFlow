@@ -1,11 +1,11 @@
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
 const ThemeProvider = ({ children }) => {
   return (
     <NextThemesProvider
       attribute="class"
       defaultTheme="light"
-      themes={["dark", "light"]}
+      themes={['dark', 'light']}
       enableSystem={false}
       disableTransitionOnChange
     >

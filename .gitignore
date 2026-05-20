@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
 
+
+
 # Env files
 .env
 .env.local
@@ -16,6 +18,9 @@ Thumbs.db
 .idea/
 *.suo
 *.ntvs*
+
+# Agent
+.claude/
 
 # Logs
 *.log

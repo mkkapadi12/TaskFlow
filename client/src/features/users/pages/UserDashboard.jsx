@@ -1,20 +1,20 @@
-import React from "react";
-import { useGetMyProjectsQuery } from "@/features/project/project.api";
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from 'recharts';
+
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useGetMyProjectsQuery } from '@/features/project/project.api';
 import {
   useGetMyTasksQuery,
   useGetOverdueTasksQuery,
-} from "@/features/tasks/task.api";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from "recharts";
-import { Badge } from "@/components/ui/badge";
+} from '@/features/tasks/task.api';
+import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
 const UserDashboard = () => {
   const { data: projects, isLoading: projectsLoading } =
@@ -40,7 +40,7 @@ const UserDashboard = () => {
     value,
   }));
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   // Filter upcoming deadlines
   const upcomingTasks = Array.isArray(tasks)
@@ -49,14 +49,14 @@ const UserDashboard = () => {
           if (!task.deadline) return false;
           const deadline = new Date(task.deadline);
           const now = new Date();
-          return deadline > now && task.status !== "DONE";
+          return deadline > now && task.status !== 'DONE';
         })
         .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
         .slice(0, 5)
     : [];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
       </div>
@@ -68,11 +68,11 @@ const UserDashboard = () => {
             <CardTitle className="text-sm font-medium">
               Total Projects
             </CardTitle>
-            <DASHBOARD_ICONS.BRIEFCASE className="h-4 w-4 text-muted-foreground" />
+            <DASHBOARD_ICONS.BRIEFCASE className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{projects?.length || 0}</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Active projects you are part of
             </p>
           </CardContent>
@@ -80,11 +80,11 @@ const UserDashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-            <DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4 text-muted-foreground" />
+            <DASHBOARD_ICONS.LISTCHECKS className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{tasks?.length || 0}</div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Tasks assigned to you
             </p>
           </CardContent>
@@ -92,13 +92,13 @@ const UserDashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Overdue Tasks</CardTitle>
-            <DASHBOARD_ICONS.ALERTTRIANGLE className="h-4 w-4 text-destructive" />
+            <DASHBOARD_ICONS.ALERTTRIANGLE className="text-destructive h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">
+            <div className="text-destructive text-2xl font-bold">
               {overdueTasks?.length || 0}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Tasks past their deadline
             </p>
           </CardContent>
@@ -140,7 +140,7 @@ const UserDashboard = () => {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
+              <div className="text-muted-foreground flex h-full items-center justify-center">
                 No task data available
               </div>
             )}
@@ -162,15 +162,15 @@ const UserDashboard = () => {
                   >
                     <div>
                       <p className="font-medium">{task.title}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         Due: {new Date(task.deadline).toLocaleDateString()}
                       </p>
                     </div>
                     <Badge
                       variant={
-                        task.priority === "URGENT" || task.priority === "HIGH"
-                          ? "destructive"
-                          : "secondary"
+                        task.priority === 'URGENT' || task.priority === 'HIGH'
+                          ? 'destructive'
+                          : 'secondary'
                       }
                     >
                       {task.priority}

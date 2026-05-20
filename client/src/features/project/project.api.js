@@ -1,91 +1,91 @@
-import { baseApi } from "@/app/baseApi";
+import { baseApi } from '@/app/baseApi';
 
 export const projectApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getMyProjects: builder.query({
-      query: () => ({ url: "/projects/my", method: "GET" }),
-      providesTags: ["Project"],
+      query: () => ({ url: '/projects/my', method: 'GET' }),
+      providesTags: ['Project'],
     }),
 
     getProjectDetails: builder.query({
-      query: (projectId) => ({ url: `/projects/${projectId}`, method: "GET" }),
+      query: (projectId) => ({ url: `/projects/${projectId}`, method: 'GET' }),
       providesTags: (result, error, projectId) => [
-        { type: "Project", id: projectId },
+        { type: 'Project', id: projectId },
       ],
     }),
 
     createProject: builder.mutation({
       query: (body) => ({
-        url: "/projects/create",
-        method: "POST",
+        url: '/projects/create',
+        method: 'POST',
         data: body,
       }),
-      invalidatesTags: ["Project"],
+      invalidatesTags: ['Project'],
     }),
 
     updateProject: builder.mutation({
       query: ({ projectId, ...body }) => ({
         url: `/projects/${projectId}`,
-        method: "PUT",
+        method: 'PUT',
         data: body,
       }),
       invalidatesTags: (result, error, { projectId }) => [
-        "Project",
-        { type: "Project", id: projectId },
+        'Project',
+        { type: 'Project', id: projectId },
       ],
     }),
 
     deleteProject: builder.mutation({
       query: (projectId) => ({
         url: `/projects/${projectId}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["Project"],
+      invalidatesTags: ['Project'],
     }),
 
     getProjectMembers: builder.query({
       query: (projectId) => ({
         url: `/projects/${projectId}/members`,
-        method: "GET",
+        method: 'GET',
       }),
       providesTags: (result, error, projectId) => [
-        { type: "Project", id: `${projectId}-members` },
+        { type: 'Project', id: `${projectId}-members` },
       ],
     }),
 
     addProjectMember: builder.mutation({
       query: ({ projectId, ...body }) => ({
         url: `/projects/${projectId}/add-member`,
-        method: "POST",
+        method: 'POST',
         data: body,
       }),
       invalidatesTags: (result, error, { projectId }) => [
-        { type: "Project", id: projectId },
-        { type: "Project", id: `${projectId}-members` },
+        { type: 'Project', id: projectId },
+        { type: 'Project', id: `${projectId}-members` },
       ],
     }),
 
     updateMemberRole: builder.mutation({
       query: ({ projectId, userId, role }) => ({
         url: `/projects/${projectId}/member/${userId}`,
-        method: "PATCH",
+        method: 'PATCH',
         data: { role },
       }),
       invalidatesTags: (result, error, { projectId }) => [
-        { type: "Project", id: projectId },
-        { type: "Project", id: `${projectId}-members` },
+        { type: 'Project', id: projectId },
+        { type: 'Project', id: `${projectId}-members` },
       ],
     }),
 
     removeProjectMember: builder.mutation({
       query: ({ projectId, userId, reason }) => ({
         url: `/projects/${projectId}/member/${userId}`,
-        method: "DELETE",
+        method: 'DELETE',
         data: { reason },
       }),
       invalidatesTags: (result, error, { projectId }) => [
-        { type: "Project", id: projectId },
-        { type: "Project", id: `${projectId}-members` },
+        { type: 'Project', id: projectId },
+        { type: 'Project', id: `${projectId}-members` },
       ],
     }),
   }),

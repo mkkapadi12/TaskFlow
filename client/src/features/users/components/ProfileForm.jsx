@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
+import { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
 const ProfileForm = ({ user, onSave, isLoading }) => {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [avatar, setAvatar] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState('');
 
   useEffect(() => {
     if (user) {
-      setName(user.name || "");
-      setPhone(user.phone || "");
-      setPreviewUrl(user.avatar || "");
+      setName(user.name || '');
+      setPhone(user.phone || '');
+      setPreviewUrl(user.avatar || '');
     }
   }, [user]);
 
@@ -29,10 +30,10 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("phone", phone);
+    formData.append('name', name);
+    formData.append('phone', phone);
     if (avatar) {
-      formData.append("avatar", avatar);
+      formData.append('avatar', avatar);
     }
     onSave(formData);
   };
@@ -40,8 +41,8 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Avatar Upload (Compact) */}
-      <div className="flex items-center gap-4 p-4 border border-border/50 rounded-xl bg-background/30 backdrop-blur-sm">
-        <div className="relative h-16 w-16 rounded-full overflow-hidden border border-border/50 bg-muted flex items-center justify-center">
+      <div className="border-border/50 bg-background/30 flex items-center gap-4 rounded-xl border p-4 backdrop-blur-sm">
+        <div className="border-border/50 bg-muted relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border">
           {previewUrl ? (
             <img
               src={previewUrl}
@@ -49,8 +50,8 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
               className="h-full w-full object-cover"
             />
           ) : (
-            <span className="text-xl font-bold text-muted-foreground">
-              {name.charAt(0)?.toUpperCase() || "?"}
+            <span className="text-muted-foreground text-xl font-bold">
+              {name.charAt(0)?.toUpperCase() || '?'}
             </span>
           )}
         </div>
@@ -58,7 +59,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
         <div className="flex-1">
           <Label
             htmlFor="avatar-upload"
-            className="cursor-pointer inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+            className="text-primary hover:text-primary/80 inline-flex cursor-pointer items-center gap-2 text-sm transition-colors"
           >
             <DASHBOARD_ICONS.UPLOAD size={16} />
             Change Avatar
@@ -70,7 +71,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
               onChange={handleFileChange}
             />
           </Label>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-xs">
             Only .jpg, .jpeg, .png or .webp format. Maximum file size: 5MB.
           </p>
         </div>
@@ -92,11 +93,11 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
         <Label htmlFor="email">Email Address</Label>
         <Input
           id="email"
-          value={user?.email || ""}
+          value={user?.email || ''}
           disabled
-          className="border-border/50 bg-muted/50 text-muted-foreground cursor-not-allowed h-11"
+          className="border-border/50 bg-muted/50 text-muted-foreground h-11 cursor-not-allowed"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           Email cannot be changed. Contact support if needed.
         </p>
       </div>
@@ -108,6 +109,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Your Phone Number"
+          required
           className="border-border/50 bg-background/50 h-11"
         />
       </div>
@@ -115,7 +117,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
       <Button
         type="submit"
         disabled={isLoading}
-        className="w-full h-11 rounded-full shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
+        className="shadow-primary/20 h-11 w-full rounded-full shadow-lg transition-all hover:-translate-y-0.5"
       >
         {isLoading ? (
           <>
@@ -123,7 +125,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
             Saving...
           </>
         ) : (
-          "Save Changes"
+          'Save Changes'
         )}
       </Button>
     </form>

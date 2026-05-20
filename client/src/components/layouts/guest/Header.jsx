@@ -1,35 +1,34 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { GUEST_ICONS } from "@/lib/icons/guest.icons";
-import { ThemeToggle } from "@/helper/ThemeToggle";
-import { Badge } from "@/components/ui/badge";
+import { Link, NavLink } from 'react-router-dom';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
+} from '@/components/ui/sheet';
+import { ThemeToggle } from '@/helper/ThemeToggle';
+import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 const Header = ({ navLinks }) => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/60 backdrop-blur-xl supports-backdrop-filter:bg-background/60">
+    <header className="border-border/40 bg-background/60 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
         {/* Logo */}
         <Link
           to="/"
           className="flex items-center gap-2 transition-transform hover:scale-105"
         >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-primary to-accent text-primary-foreground shadow-lg shadow-primary/20">
+          <div className="from-primary to-accent text-primary-foreground shadow-primary/20 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br shadow-lg">
             <GUEST_ICONS.DASHBOARD size={20} strokeWidth={2.5} />
           </div>
           <div className="flex flex-col">
-            <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/70">
+            <span className="from-foreground to-foreground/70 bg-linear-to-r bg-clip-text text-xl font-bold tracking-tight text-transparent">
               TaskFlow
             </span>
-            <span className="text-[10px] text-primary font-medium -mt-1 flex items-center gap-1">
+            <span className="text-primary -mt-1 flex items-center gap-1 text-[10px] font-medium">
               <GUEST_ICONS.SPARKLES size={10} />
               Next Gen
             </span>
@@ -37,17 +36,17 @@ const Header = ({ navLinks }) => {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden items-center gap-1 md:flex">
           {navLinks.map(({ to, label }) => (
             <NavLink
               key={to}
               to={to}
-              end={to === "/"}
+              end={to === '/'}
               className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                `rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                   isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    ? 'text-primary bg-primary/10'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 }`
               }
             >
@@ -57,12 +56,12 @@ const Header = ({ navLinks }) => {
 
           <a
             href="#"
-            className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all flex items-center gap-1"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted/50 flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium transition-all"
           >
             Docs
             <Badge
               variant="outline"
-              className="text-[10px] px-1 py-0 h-4 border-primary/30 text-primary"
+              className="border-primary/30 text-primary h-4 px-1 py-0 text-[10px]"
             >
               New
             </Badge>
@@ -75,14 +74,14 @@ const Header = ({ navLinks }) => {
 
           <Link
             to="/login"
-            className="hidden sm:inline-flex text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-3 py-2"
+            className="text-muted-foreground hover:text-foreground hidden px-3 py-2 text-sm font-medium transition-colors sm:inline-flex"
           >
             Log in
           </Link>
 
           <Button
             asChild
-            className="hidden sm:inline-flex rounded-full px-5 shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-primary/25"
+            className="shadow-primary/20 hover:shadow-primary/25 hidden rounded-full px-5 shadow-lg transition-all hover:-translate-y-0.5 sm:inline-flex"
           >
             <Link to="/register">Get Started</Link>
           </Button>
@@ -93,7 +92,7 @@ const Header = ({ navLinks }) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden rounded-full"
+                className="rounded-full md:hidden"
                 aria-label="Toggle menu"
               >
                 <GUEST_ICONS.MENU size={20} />
@@ -102,15 +101,15 @@ const Header = ({ navLinks }) => {
 
             <SheetContent
               side="right"
-              className="w-3/4 max-w-xs p-6 flex flex-col gap-6"
+              className="flex w-3/4 max-w-xs flex-col gap-6 p-6"
             >
               <SheetHeader className="p-0 text-left">
                 <SheetTitle>
                   <Link to="/" className="flex items-center gap-2">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br from-primary to-accent text-primary-foreground">
+                    <div className="from-primary to-accent text-primary-foreground flex h-9 w-9 items-center justify-center rounded-lg bg-linear-to-br">
                       <GUEST_ICONS.DASHBOARD size={18} strokeWidth={2.5} />
                     </div>
-                    <span className="font-bold text-lg tracking-tight">
+                    <span className="text-lg font-bold tracking-tight">
                       TaskFlow
                     </span>
                   </Link>
@@ -121,11 +120,11 @@ const Header = ({ navLinks }) => {
               <nav className="flex flex-col gap-1">
                 {navLinks.map(({ to, label }) => {
                   const Icon =
-                    label === "Home"
+                    label === 'Home'
                       ? GUEST_ICONS.HOME
-                      : label === "About"
+                      : label === 'About'
                         ? GUEST_ICONS.INFO
-                        : label === "Contact"
+                        : label === 'Contact'
                           ? GUEST_ICONS.MAIL
                           : GUEST_ICONS.DASHBOARD;
 
@@ -133,12 +132,12 @@ const Header = ({ navLinks }) => {
                     <NavLink
                       key={to}
                       to={to}
-                      end={to === "/"}
+                      end={to === '/'}
                       className={({ isActive }) =>
-                        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                        `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                           isActive
-                            ? "text-primary bg-primary/10 font-semibold"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                            ? 'text-primary bg-primary/10 font-semibold'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                         }`
                       }
                     >
@@ -148,8 +147,8 @@ const Header = ({ navLinks }) => {
                             size={18}
                             className={
                               isActive
-                                ? "text-primary"
-                                : "text-muted-foreground"
+                                ? 'text-primary'
+                                : 'text-muted-foreground'
                             }
                           />
                           {label}
@@ -161,7 +160,7 @@ const Header = ({ navLinks }) => {
 
                 <a
                   href="#"
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors justify-between"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50 flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <GUEST_ICONS.LIGHTBULB size={18} />
@@ -169,7 +168,7 @@ const Header = ({ navLinks }) => {
                   </div>
                   <Badge
                     variant="outline"
-                    className="text-[10px] border-primary/30 text-primary"
+                    className="border-primary/30 text-primary text-[10px]"
                   >
                     New
                   </Badge>
@@ -177,17 +176,17 @@ const Header = ({ navLinks }) => {
               </nav>
 
               {/* Actions */}
-              <div className="border-t border-border/40 mt-auto pt-6 flex flex-col gap-3">
+              <div className="border-border/40 mt-auto flex flex-col gap-3 border-t pt-6">
                 <Button
                   asChild
                   variant="outline"
-                  className="w-full rounded-xl h-11 justify-center"
+                  className="h-11 w-full justify-center rounded-xl"
                 >
                   <Link to="/login">Log in</Link>
                 </Button>
                 <Button
                   asChild
-                  className="w-full rounded-xl h-11 justify-center shadow-lg shadow-primary/20"
+                  className="shadow-primary/20 h-11 w-full justify-center rounded-xl shadow-lg"
                 >
                   <Link to="/register">Get Started</Link>
                 </Button>

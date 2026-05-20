@@ -1,17 +1,17 @@
-import React from "react";
+import { useTheme } from 'next-themes';
+
+import { Button } from '@/components/ui/button';
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardDescription,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useAuth } from "@/hooks/useAuth";
-import { useTheme } from "next-themes";
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { useAuth } from '@/hooks/useAuth';
 
 const SettingPage = () => {
   const { theme, setTheme } = useTheme();
@@ -19,7 +19,7 @@ const SettingPage = () => {
   const { user } = useAuth();
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
       </div>
@@ -37,15 +37,15 @@ const SettingPage = () => {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="dark-mode">Dark Mode</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Toggle between light and dark themes.
                 </p>
               </div>
               <Switch
                 id="dark-mode"
-                checked={theme === "dark"}
+                checked={theme === 'dark'}
                 onCheckedChange={(checked) =>
-                  setTheme(checked ? "dark" : "light")
+                  setTheme(checked ? 'dark' : 'light')
                 }
               />
             </div>
@@ -64,10 +64,10 @@ const SettingPage = () => {
               <Input
                 id="email"
                 type="email"
-                value={user?.email || ""}
+                value={user?.email || ''}
                 disabled
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Email cannot be changed.
               </p>
             </div>
@@ -92,7 +92,7 @@ const SettingPage = () => {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="email-notif">Email Notifications</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Receive emails about task assignments and deadlines.
                 </p>
               </div>
@@ -101,7 +101,7 @@ const SettingPage = () => {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="push-notif">Push Notifications</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Receive push notifications on your device.
                 </p>
               </div>

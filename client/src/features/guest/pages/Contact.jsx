@@ -1,14 +1,15 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { GUEST_ICONS } from "@/lib/icons/guest.icons";
-import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
-import { contactSchema } from "@/schemas/contact.schema";
-import { INFO_CARDS } from "@/constant";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { INFO_CARDS } from '@/constant';
+import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { GUEST_ICONS } from '@/lib/icons/guest.icons';
+import { contactSchema } from '@/schemas/contact.schema';
 
 const Contact = () => {
   const {
@@ -18,14 +19,14 @@ const Contact = () => {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(contactSchema),
-    defaultValues: { name: "", email: "", message: "" },
+    defaultValues: { name: '', email: '', message: '' },
   });
 
   const onSubmit = async (data) => {
     // Simulate a short delay
     await new Promise((r) => setTimeout(r, 800));
 
-    toast.success("Message sent successfully!", {
+    toast.success('Message sent successfully!', {
       description: `Thanks ${data.name}, we'll get back to you at ${data.email} soon.`,
     });
     reset();
@@ -34,16 +35,16 @@ const Contact = () => {
   return (
     <>
       {/* ── Header ── */}
-      <section className="container mx-auto px-6 pt-20 pb-10 lg:pt-28 lg:pb-14 text-center">
-        <div className="mx-auto max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 fill-mode-both">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-6">
+      <section className="container mx-auto px-6 pt-20 pb-10 text-center lg:pt-28 lg:pb-14">
+        <div className="animate-in fade-in slide-in-from-bottom-8 fill-mode-both mx-auto max-w-2xl duration-1000">
+          <div className="border-primary/20 bg-primary/10 text-primary mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
             <GUEST_ICONS.MESSAGE size={14} />
             Get in Touch
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
             We'd love to <span className="text-primary">hear from you</span>
           </h1>
-          <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+          <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
             Have a question, feedback, or just want to say hello? Fill out the
             form below and our team will get back to you promptly.
           </p>
@@ -52,24 +53,24 @@ const Contact = () => {
 
       {/* ── Info Cards + Form ── */}
       <section className="container mx-auto px-6 pb-20 lg:pb-28">
-        <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-5 gap-10">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 lg:grid-cols-5">
           {/* Left — Info cards */}
-          <div className="lg:col-span-2 flex flex-col gap-4 animate-in fade-in slide-in-from-left-8 duration-700 fill-mode-both">
+          <div className="animate-in fade-in slide-in-from-left-8 fill-mode-both flex flex-col gap-4 duration-700 lg:col-span-2">
             {INFO_CARDS.map(({ icon: Icon, title, detail, description }, i) => (
               <div
                 key={title}
-                className="group flex items-start gap-4 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm p-5 transition-all duration-300 hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/5"
+                className="group border-border/50 bg-card/50 hover:border-primary/40 hover:shadow-primary/5 flex items-start gap-4 rounded-2xl border p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
                 style={{ animationDelay: `${i * 80}ms` }}
               >
-                <div className="h-11 w-11 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary transition-colors group-hover:bg-primary/20">
+                <div className="bg-primary/10 text-primary group-hover:bg-primary/20 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors">
                   <Icon size={20} />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">{title}</p>
-                  <p className="text-primary text-sm font-medium mt-0.5">
+                  <p className="text-sm font-semibold">{title}</p>
+                  <p className="text-primary mt-0.5 text-sm font-medium">
                     {detail}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-muted-foreground mt-0.5 text-xs">
                     {description}
                   </p>
                 </div>
@@ -78,10 +79,10 @@ const Contact = () => {
           </div>
 
           {/* Right — Contact form */}
-          <div className="lg:col-span-3 animate-in fade-in slide-in-from-right-8 duration-700 delay-100 fill-mode-both">
+          <div className="animate-in fade-in slide-in-from-right-8 fill-mode-both delay-100 duration-700 lg:col-span-3">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm p-8 md:p-10 space-y-6"
+              className="border-border/50 bg-card/50 space-y-6 rounded-2xl border p-8 backdrop-blur-sm md:p-10"
             >
               <div className="space-y-5">
                 {/* Name */}
@@ -92,10 +93,10 @@ const Contact = () => {
                     placeholder="John Doe"
                     aria-invalid={!!errors.name}
                     className="h-11"
-                    {...register("name")}
+                    {...register('name')}
                   />
                   {errors.name && (
-                    <p className="text-xs text-destructive mt-1">
+                    <p className="text-destructive mt-1 text-xs">
                       {errors.name.message}
                     </p>
                   )}
@@ -110,10 +111,10 @@ const Contact = () => {
                     placeholder="john@example.com"
                     aria-invalid={!!errors.email}
                     className="h-11"
-                    {...register("email")}
+                    {...register('email')}
                   />
                   {errors.email && (
-                    <p className="text-xs text-destructive mt-1">
+                    <p className="text-destructive mt-1 text-xs">
                       {errors.email.message}
                     </p>
                   )}
@@ -128,10 +129,10 @@ const Contact = () => {
                     rows={5}
                     aria-invalid={!!errors.message}
                     className="resize-none"
-                    {...register("message")}
+                    {...register('message')}
                   />
                   {errors.message && (
-                    <p className="text-xs text-destructive mt-1">
+                    <p className="text-destructive mt-1 text-xs">
                       {errors.message.message}
                     </p>
                   )}
@@ -142,7 +143,7 @@ const Contact = () => {
                 type="submit"
                 disabled={isSubmitting}
                 size="lg"
-                className="w-full h-12 rounded-xl text-base shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30"
+                className="shadow-primary/20 hover:shadow-primary/30 h-12 w-full rounded-xl text-base shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
               >
                 {isSubmitting ? (
                   <>

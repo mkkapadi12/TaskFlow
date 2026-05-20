@@ -1,20 +1,20 @@
-import React from "react";
+import { Link } from 'react-router-dom';
+
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { DASHBOARD_ICONS } from "@/lib/icons/dashboard.icons";
-import { Link } from "react-router-dom";
+} from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
 const ProjectList = ({ projects, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {[...Array(6)].map((_, i) => (
           <Skeleton key={i} className="h-[180px] w-full rounded-xl" />
         ))}
@@ -24,8 +24,8 @@ const ProjectList = ({ projects, isLoading }) => {
 
   if (!projects || projects.length === 0) {
     return (
-      <div className="text-center py-12 rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm">
-        <DASHBOARD_ICONS.SQUARESTACK className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+      <div className="border-border/50 bg-card/50 rounded-2xl border py-12 text-center backdrop-blur-sm">
+        <DASHBOARD_ICONS.SQUARESTACK className="text-muted-foreground/50 mx-auto mb-4 h-12 w-12" />
         <h3 className="text-lg font-semibold">No projects found</h3>
         <p className="text-muted-foreground mt-1">
           Create a new project to get started.
@@ -35,20 +35,20 @@ const ProjectList = ({ projects, isLoading }) => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       {projects.map((project) => (
         <Link key={project.id} to={`/projects/${project.id}`}>
-          <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all group cursor-pointer">
+          <Card className="border-border/50 bg-card/50 hover:border-primary/30 hover:shadow-primary/5 group h-full cursor-pointer backdrop-blur-sm transition-all hover:shadow-lg">
             <CardHeader>
               <CardTitle className="group-hover:text-primary transition-colors">
                 {project.title}
               </CardTitle>
               <CardDescription className="line-clamp-2">
-                {project.description || "No description provided."}
+                {project.description || 'No description provided.'}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <DASHBOARD_ICONS.USERS size={16} />
                   <span>{project.memberCount || 0} Members</span>
@@ -59,7 +59,7 @@ const ProjectList = ({ projects, isLoading }) => {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="text-xs text-muted-foreground/70">
+            <CardFooter className="text-muted-foreground/70 text-xs">
               Created on {new Date(project.createdAt).toLocaleDateString()}
             </CardFooter>
           </Card>

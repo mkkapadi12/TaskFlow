@@ -1,36 +1,36 @@
-import React from "react";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useCreateTaskMutation } from "@/features/tasks/task.api";
-import { toast } from "sonner";
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useCreateTaskMutation } from '@/features/tasks/task.api';
 
 const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const { register, handleSubmit, control, reset } = useForm({
     defaultValues: {
-      title: "",
-      description: "",
-      priority: "MEDIUM",
-      deadline: "",
-      assigneeId: "",
+      title: '',
+      description: '',
+      priority: 'MEDIUM',
+      deadline: '',
+      assigneeId: '',
     },
   });
 
@@ -49,10 +49,10 @@ const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
         deadline: data.deadline || null,
         assigneeId: data.assigneeId ? Number(data.assigneeId) : null,
       }).unwrap();
-      toast.success("Task created");
+      toast.success('Task created');
       handleClose(false);
     } catch (err) {
-      toast.error(err?.message || "Failed to create task");
+      toast.error(err?.message || 'Failed to create task');
     }
   };
 
@@ -71,7 +71,7 @@ const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
             <Label htmlFor="title">Title</Label>
             <Input
               id="title"
-              {...register("title", { required: true })}
+              {...register('title', { required: true })}
               placeholder="What needs to be done?"
             />
           </div>
@@ -80,7 +80,7 @@ const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              {...register("description")}
+              {...register('description')}
               placeholder="Additional context (optional)"
             />
           </div>
@@ -109,7 +109,7 @@ const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
 
             <div className="space-y-2">
               <Label htmlFor="deadline">Deadline</Label>
-              <Input id="deadline" type="date" {...register("deadline")} />
+              <Input id="deadline" type="date" {...register('deadline')} />
             </div>
           </div>
 
@@ -144,7 +144,7 @@ const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Creating..." : "Create Task"}
+              {isLoading ? 'Creating...' : 'Create Task'}
             </Button>
           </DialogFooter>
         </form>
