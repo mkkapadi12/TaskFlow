@@ -78,7 +78,7 @@ All data access is funneled through **stored procedures** (called from `server/s
 
 - `database/users.sql` — `sp_CreateUser`, `sp_GetUserById`, `sp_GetUserByEmail`, `sp_GetAllUsers`, `sp_UpdateUser`, `sp_DeleteUser`, `sp_SearchUser`, `sp_GetUserCount`, `sp_GetUsersByRole`, `sp_CheckUserExists`
 - `database/project.sql` — `sp_CreateProject`, `sp_GetAllProjects`, `sp_GetProjectsByOwner`, `sp_GetProjectsByMember`, `sp_GetProjectById`, `sp_UpdateProject`, `sp_DeleteProject`, `sp_AddProjectMember`, `sp_GetProjectMembers`, `sp_UpdateMemberRole`, `sp_RemoveProjectMember`, `sp_GetMemberRole`, `sp_GetFullProjectDetails`
-- `database/tasks.sql` — `sp_CreateTask`, `sp_GetTasksByProject`, `sp_GetTasksByAssignee`, `sp_GetTaskById`, `sp_UpdateTask`, `sp_DeleteTask`, `sp_GetOverdueTasks`
+- `database/tasks.sql` — `sp_CreateTask`, `sp_GetTasksByProject`, `sp_GetTasksByAssignee`, `sp_GetTaskById`, `sp_UpdateTask`, `sp_DeleteTask`, `sp_GetOverdueTasks`, `sp_VerifyTask` (owner-only IN_REVIEW → DONE / IN_PROGRESS transition, SIGNALs 45000 if the precondition fails)
 
 ---
 
@@ -147,15 +147,17 @@ Base URL: `http://localhost:5000/api`
 | DELETE | `/:projectId/member/:userId`          | Auth   | Remove member                |
 
 #### Tasks (`/tasks`) — JWT required
-| Method | Path                       | Description                                  |
-|--------|----------------------------|----------------------------------------------|
-| POST   | `/`                        | Create task in a project                     |
-| GET    | `/my`                      | Tasks assigned to me                         |
-| GET    | `/overdue`                 | My overdue tasks                             |
-| GET    | `/project/:projectId`      | Tasks for a project (optional `?status=`)    |
-| GET    | `/:taskId`                 | Single task                                  |
-| PUT    | `/:taskId`                 | Update task                                  |
-| DELETE | `/:taskId`                 | Delete task                                  |
+| Method | Path                       | Access            | Description                                  |
+|--------|----------------------------|-------------------|----------------------------------------------|
+| POST   | `/`                        | OWNER / ADMIN     | Create task and (optionally) assign to a project member |
+| GET    | `/my`                      | Self              | Tasks assigned to me                         |
+| GET    | `/overdue`                 | Self              | My overdue tasks                             |
+| GET    | `/project/:projectId`      | Project member    | Tasks for a project (optional `?status=`)    |
+| GET    | `/:taskId`                 | Project member    | Single task                                  |
+| PUT    | `/:taskId`                 | OWNER / ADMIN     | Update task fields (title/desc/priority/deadline/assignee). Cannot set status. |
+| PATCH  | `/:taskId/status`          | Assignee or OWNER / ADMIN | Move TODO ↔ IN_PROGRESS ↔ IN_REVIEW. Cannot set DONE. |
+| PATCH  | `/:taskId/verify`          | OWNER             | Body `{ approve: bool }`. Approve → DONE, reject → IN_PROGRESS. Requires current status IN_REVIEW. |
+| DELETE | `/:taskId`                 | Creator or OWNER  | Delete task                                  |
 
 ### Required environment variables (`server/.env`)
 `PORT`, `NODE_ENV`, `CLIENT_URL`, `DATABASE_URL`, `DATABASE_NAME`, `DATABASE_HOST`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_PORT`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`.
@@ -225,7 +227,7 @@ src/
   - `auth.api.js` → `register`, `login`, `getProfile`
   - `user.api.js` → `getProfile`, `updateProfile`
   - `project.api.js` → `getMyProjects`, `getProjectDetails`, `createProject`, `updateProject`, `deleteProject`, `getProjectMembers`, `addProjectMember`
-  - `task.api.js` → `getMyTasks`, `getTasksByProject`, `getTaskById`, `createTask`, `updateTask`, `deleteTask`, `getOverdueTasks`
+  - `task.api.js` → `getMyTasks`, `getTasksByProject`, `getTaskById`, `createTask`, `updateTask`, `updateTaskStatus`, `verifyTask`, `deleteTask`, `getOverdueTasks`
 - `AppLayout` triggers `useGetProfileQuery()` once on mount to hydrate Redux with the user.
 
 ---
@@ -262,6 +264,9 @@ src/
 - [x] Overdue tasks query
 - [x] "My tasks" page with client-side status filter
 - [x] Task list cards with status/priority badges + deadlines
+- [x] Create / edit tasks restricted to project OWNER/ADMIN; assignee must be a project member
+- [x] Verify workflow: assignee moves task to IN_REVIEW; OWNER approves (→ DONE) or sends back (→ IN_PROGRESS) via `sp_VerifyTask`
+- [x] Task UI inside `ProjectDetails`: tasks list, "Needs verification" pill for owners on IN_REVIEW tasks, `CreateTaskDialog`, and `TaskDetailDialog` with role-aware controls
 
 **Infra / DX**
 - [x] Helmet + CORS configured for client origin
@@ -277,8 +282,6 @@ src/
 - [ ] `UserDashboard` — placeholder (returns `<div>UserDashboard</div>`)
 - [ ] `UserCalendar` — placeholder
 - [ ] `SettingPage` — placeholder
-- [ ] Project detail route (`/projects/:id`) — `ProjectList` links to it but no route exists in `App.jsx`
-- [ ] Task detail / edit UI — backend supports it, no frontend page
 - [ ] Password reset flow — template ready, no controller/route/UI
 - [ ] Refresh tokens / token rotation — only single access token today
 - [ ] Recent layout refactor in progress (`git status` shows new `layouts/app/`, `layouts/guest/` replacing older flat files)
@@ -291,11 +294,10 @@ Based on UI scaffolding, marketing copy on `Home`, and SPs already in the databa
 
 ### Near-term
 1. **Build out the Dashboard** — leverage `recharts`, surface counts (projects, tasks, overdue), recent activity, upcoming deadlines.
-2. **Project detail page** at `/projects/:projectId` consuming `useGetProjectDetailsQuery` — members list, task board grouped by status (Kanban), add/remove members UI.
-3. **Task detail dialog / page** with edit form (status, priority, assignee dropdown, deadline picker via `react-day-picker`).
-4. **Calendar view** that maps tasks with `deadline` onto a month grid (`react-day-picker` already installed).
-5. **Settings page** — theme toggle, notification preferences, password change.
-6. **Password reset flow** — request endpoint, `sendPasswordResetEmail` wired, token verification SP, reset UI.
+2. **Kanban board** on the project detail page — group tasks by status, drag/drop status changes (still subject to the verify rules: assignee may not drop into DONE).
+3. **Calendar view** that maps tasks with `deadline` onto a month grid (`react-day-picker` already installed).
+4. **Settings page** — theme toggle, notification preferences, password change.
+5. **Password reset flow** — request endpoint, `sendPasswordResetEmail` wired, token verification SP, reset UI.
 
 ### Mid-term
 7. **Task search & advanced filters** — by priority, assignee, deadline range.
@@ -348,3 +350,12 @@ npm run dev            # http://localhost:5173
 - **Path alias**: `@/*` → `client/src/*` (configured in `jsconfig.json` + Vite).
 - **Static routes before dynamic** — see `user.routes.js` (`/profile` before `/:id`).
 - **Auth header**: `Authorization: Bearer <jwt>`; token currently lives in `localStorage` (`token` key).
+- **Authorization tiers on a project** (defined in `server/src/utils/requireRole.js`):
+  - `requireMembership` — any row in `project_members` (OWNER / ADMIN / MEMBER).
+  - `requireManager` — `OWNER` or `ADMIN`. Used to gate task creation and edits.
+  - `requireOwner` — `OWNER` only. Used for member management and task verification.
+- **Task workflow** (enforced in `server/src/models/task.model.js` and `sp_VerifyTask`):
+  1. Owner/Admin creates a task and (optionally) assigns it to a project member.
+  2. Assignee or any manager moves status through `TODO` → `IN_PROGRESS` → `IN_REVIEW` via `PATCH /tasks/:taskId/status`.
+  3. Owner approves via `PATCH /tasks/:taskId/verify` with `{ approve: true }` (→ `DONE`) or rejects with `{ approve: false }` (→ `IN_PROGRESS`). The SP refuses if the task isn't currently `IN_REVIEW`.
+  4. `DONE` is reachable **only** through the verify endpoint; the generic `PUT /tasks/:taskId` ignores any `status` field.
