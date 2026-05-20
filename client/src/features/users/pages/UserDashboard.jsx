@@ -27,8 +27,6 @@ const UserDashboard = () => {
   const tasksData = tasks?.data;
   const overdueTasksData = overdueTasks?.data;
 
-  console.log({ tasksData, projects, overdueTasksData });
-
   if (projectsLoading || tasksLoading || overdueLoading) {
     return <div className="p-6">Loading dashboard data...</div>;
   }
