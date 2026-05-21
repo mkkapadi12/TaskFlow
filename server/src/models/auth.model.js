@@ -1,8 +1,8 @@
-import env from "../config/env.js";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { AppError } from "../middlewares/error.middleware.js";
+import jwt from "jsonwebtoken";
 import callProcedure from "../config/callProcedure.js";
+import env from "../config/env.js";
+import { AppError } from "../middlewares/error.middleware.js";
 
 //sign token
 const signToken = (payload) =>
@@ -48,6 +48,71 @@ const AuthModel = {
 
     return { user, token };
   },
+
+  //change password
+  changePassword: async ({
+    currentPassword,
+    newPassword,
+    confirmPassword,
+    id,
+    email,
+  }) => {
+
+    const [rows] = await callProcedure("sp_CheckUserExists", [email]);
+    
+    if (!rows || rows.length === 0) throw new AppError("User not found", 404);
+
+    const user = rows[0];
+
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isPasswordValid) throw new AppError("Invalid current password", 400);
+
+    if (newPassword !== confirmPassword) {
+      throw new AppError("New password and confirm password do not match", 400);
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    await callProcedure("sp_ChangePassword", [
+      id,
+      user.password,
+      hashedNewPassword,
+      hashedNewPassword,
+    ]);
+
+    return { message: "Password changed successfully" };
+  },
+
+  //forget password
+  forgotPassword : async({email})=>{
+    const [rows] = await callProcedure("sp_CheckUserExists", [email]);
+    
+    if (rows.length === 0) {
+     throw new AppError("Email is not registered", 401);
+    }
+
+    const user = rows[0];
+    const token = jwt.sign({ id: user.id }, env.jwt.secret, { expiresIn: '15m' });
+    const resetUrl = `${env.client.url}/reset-password?token=${token}`;
+    
+    return { user, resetUrl };
+  },
+
+  //reset password
+  resetPassword : async({token, password})=>{
+  let decoded;
+  try{
+    decoded=jwt.verify(token, env.jwt.secret);
+  }catch(err){
+    throw new AppError("Invalid or expired token", 400);
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await callProcedure("sp_UpdatePassword", [decoded.id, hashedPassword]);
+  return {message : "Password reset successful. You can now login." };
+  }
 };
 
 export default AuthModel;

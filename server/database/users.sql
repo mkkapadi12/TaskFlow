@@ -175,4 +175,35 @@ BEGIN
     WHERE id = p_id;
 END //
 
+-- 13. Change Password
+DROP PROCEDURE IF EXISTS sp_ChangePassword //
+CREATE PROCEDURE sp_ChangePassword(
+    IN p_id INT,
+    IN p_oldPassword VARCHAR(255),
+    IN p_newPassword VARCHAR(255),
+    IN p_confirmPassword VARCHAR(255)
+)
+BEGIN
+    DECLARE current_password VARCHAR(255);
+
+    SELECT password INTO current_password
+    FROM users
+    WHERE id = p_id;
+
+    IF current_password <> p_oldPassword THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Incorrect current password';
+    END IF;
+
+    IF p_newPassword <> p_confirmPassword THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'New password and confirm password do not match';
+    END IF;
+
+    UPDATE users
+    SET password = p_newPassword,
+        updatedAt = NOW()
+    WHERE id = p_id;
+END //
+
 DELIMITER ;

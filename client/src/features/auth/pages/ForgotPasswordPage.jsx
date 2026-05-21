@@ -14,6 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForgotPasswordMutation } from '@/features/auth/auth.api';
+import { useAuth } from '@/hooks/useAuth';
 
 const ForgotPasswordPage = () => {
   const {
@@ -21,6 +22,7 @@ const ForgotPasswordPage = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const { isAuthenticated } = useAuth();
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const onSubmit = async (data) => {
@@ -66,9 +68,15 @@ const ForgotPasswordPage = () => {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Sending...' : 'Send Reset Link'}
             </Button>
-            <Button variant="link" asChild className="w-full">
-              <Link to="/login">Back to Login</Link>
-            </Button>
+            {isAuthenticated ? (
+              <Button variant="link" asChild className="w-full">
+                <Link to="/dashboard">Back to Dashboard</Link>
+              </Button>
+            ) : (
+              <Button variant="link" asChild className="w-full">
+                <Link to="/login">Back to Login</Link>
+              </Button>
+            )}
           </CardFooter>
         </form>
       </Card>

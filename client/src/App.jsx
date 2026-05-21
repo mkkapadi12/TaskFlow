@@ -45,10 +45,15 @@ const router = createBrowserRouter([
       },
       { path: '/login', element: <LoginPage /> },
       { path: '/register', element: <RegisterPage /> },
-      { path: '/forgot-password', element: <ForgotPasswordPage /> },
-      { path: '/reset-password', element: <ResetPasswordPage /> },
     ],
   },
+
+  {
+    path: 'forgot-password',
+    element: <ForgotPasswordPage />,
+  },
+
+  { path: 'reset-password', element: <ResetPasswordPage /> },
 
   {
     element: <ProtectedRoute />,
