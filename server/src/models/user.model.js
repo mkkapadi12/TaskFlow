@@ -28,8 +28,15 @@ const UserModel = {
 
     const { name, phone } = body;
 
-    let avatar = existuser.avatar;
-    let publicId = existuser.publicId;
+    if (
+      name.trim() === user.name.trim() &&
+      Number(phone) === Number(user.phone)
+    ) {
+      throw new AppError('No changes found', 400);
+    }
+
+    let avatar = user.avatar;
+    let publicId = user.publicId;
 
     if (file) {
       if (existuser.publicId) {

@@ -37,6 +37,7 @@ const updateProfile = async (req, res, next) => {
     res.status(200).json({
       success: true,
       user,
+      message: 'Update successfully',
     });
   } catch (error) {
     next(error);
@@ -55,4 +56,4 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-export { deleteUser, getAllUsers, getProfile, getUserById,updateProfile };
+export { deleteUser, getAllUsers, getProfile, getUserById, updateProfile };

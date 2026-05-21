@@ -20,8 +20,8 @@ const ProfilePage = () => {
 
   const handleSave = async (formData) => {
     try {
-      await updateProfile(formData).unwrap();
-      toast.success('Profile updated successfully!');
+      const result = await updateProfile(formData).unwrap();
+      toast.success(result.message);
     } catch (error) {
       toast.error(error.message || 'Failed to update profile');
     }
