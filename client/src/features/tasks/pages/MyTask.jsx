@@ -7,21 +7,38 @@ import { useGetMyTasksQuery } from '../task.api';
 
 const MyTask = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: tasksData, isLoading } = useGetMyTasksQuery();
 
-  // Filter tasks on the client side if API doesn't support it directly for "my tasks"
-  // (The API route /tasks/my usually returns all tasks for the user)
   const filteredTasks = tasksData?.data?.filter((task) => {
-    if (statusFilter === 'ALL') return true;
-    return task.status === statusFilter;
+    const matchesStatus =
+      statusFilter === 'ALL' || task.status === statusFilter;
+    const matchesSearch =
+      !searchQuery ||
+      task.projectTitle
+        .toLowerCase()
+        .trim()
+        .includes(searchQuery.toLowerCase().trim()) ||
+      task.title
+        .toLowerCase()
+        .trim()
+        .includes(searchQuery.toLowerCase().trim());
+    return matchesStatus && matchesSearch;
   });
+
+  console.log(tasksData);
 
   return (
     <div className="container mx-auto px-3 py-5 sm:px-6 sm:py-8">
       <TaskHeader />
 
-      <TaskFilters status={statusFilter} onStatusChange={setStatusFilter} />
+      <TaskFilters
+        status={statusFilter}
+        searchQuery={searchQuery}
+        onStatusChange={setStatusFilter}
+        onSearchChange={setSearchQuery}
+      />
 
       <TaskList tasks={filteredTasks} isLoading={isLoading} />
     </div>

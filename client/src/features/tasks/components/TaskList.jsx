@@ -1,26 +1,22 @@
+import { Link } from 'react-router-dom';
+
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { priorityConfig, statusConfig } from '@/constant';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
-const statusColors = {
-  TODO: 'bg-muted text-muted-foreground border-muted-foreground/20',
-  IN_PROGRESS: 'bg-primary/10 text-primary border-primary/20',
-  DONE: 'bg-green-500/10 text-green-500 border-green-500/20',
-};
-
-const priorityColors = {
-  LOW: 'bg-blue-500/10 text-blue-500',
-  MEDIUM: 'bg-yellow-500/10 text-yellow-500',
-  HIGH: 'bg-destructive/10 text-destructive',
+const isOverdue = (deadline, status) => {
+  if (!deadline || status === 'DONE') return false;
+  return new Date(deadline) < new Date();
 };
 
 const TaskList = ({ tasks, isLoading }) => {
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-[80px] w-full rounded-xl" />
+          <Skeleton key={i} className="h-[88px] w-full rounded-xl" />
         ))}
       </div>
     );
@@ -28,10 +24,10 @@ const TaskList = ({ tasks, isLoading }) => {
 
   if (!tasks || tasks.length === 0) {
     return (
-      <div className="border-border/50 bg-card/50 rounded-2xl border py-12 text-center backdrop-blur-sm">
-        <DASHBOARD_ICONS.LISTCHECKS className="text-muted-foreground/50 mx-auto mb-4 h-12 w-12" />
+      <div className="border-border/50 bg-card/50 rounded-2xl border py-14 text-center backdrop-blur-sm">
+        <DASHBOARD_ICONS.LISTCHECKS className="text-muted-foreground/40 mx-auto mb-4 h-12 w-12" />
         <h3 className="text-lg font-semibold">No tasks found</h3>
-        <p className="text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-sm">
           You're all caught up! Or try changing the filters.
         </p>
       </div>
@@ -39,52 +35,104 @@ const TaskList = ({ tasks, isLoading }) => {
   }
 
   return (
-    <div className="space-y-4">
-      {tasks.map((task) => (
-        <Card
-          key={task.id}
-          className="border-border/50 bg-card/50 hover:border-primary/30 hover:shadow-primary/5 cursor-pointer backdrop-blur-sm transition-all hover:shadow-lg"
-        >
-          <CardContent className="flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-medium">{task.title}</h3>
-                {task.priority && (
-                  <Badge
-                    className={`${
-                      priorityColors[task.priority]
-                    } rounded-full border-transparent px-2 py-0.5 text-xs`}
-                  >
-                    {task.priority}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-muted-foreground line-clamp-1 text-sm">
-                {task.description || 'No description.'}
-              </p>
-            </div>
+    <div className="space-y-3">
+      {tasks.map((task) => {
+        const status = statusConfig[task.status] ?? statusConfig.TODO;
+        const priority = priorityConfig[task.priority];
+        const overdue = isOverdue(task.deadline, task.status);
 
-            <div className="text-muted-foreground flex items-center gap-4 text-sm">
-              {task.deadline && (
-                <div className="flex items-center gap-1">
-                  <DASHBOARD_ICONS.CLOCK size={14} className="text-primary" />
-                  <span>
-                    Due: {new Date(task.deadline).toLocaleDateString()}
-                  </span>
+        return (
+          <Link
+            to={`/projects/${task?.projectId}`}
+            key={task.id}
+            className="block"
+          >
+            <Card className="border-border/50 bg-card/50 hover:border-primary/30 hover:shadow-primary/5 group cursor-pointer backdrop-blur-sm transition-all duration-200 hover:shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  {/* Left: title + description */}
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Status dot + title */}
+                      <span
+                        className={`mt-0.5 inline-block h-2 w-2 shrink-0 rounded-full ${status.dot}`}
+                      />
+                      <h3 className="group-hover:text-primary text-sm font-semibold transition-colors sm:text-base">
+                        {task.title}
+                      </h3>
+
+                      {/* Priority badge */}
+                      {priority && (
+                        <Badge
+                          variant="outline"
+                          className={`${priority.className} rounded-full px-2 py-0 text-[10px] font-medium`}
+                        >
+                          {priority.label}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    {task.description && (
+                      <p className="text-muted-foreground line-clamp-1 pl-4 text-xs sm:text-sm">
+                        {task.description}
+                      </p>
+                    )}
+
+                    {/* Meta row: project + creator */}
+                    <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 pl-4 text-xs">
+                      {task.projectTitle && (
+                        <span className="flex items-center gap-1">
+                          <DASHBOARD_ICONS.BRIEFCASE className="h-3 w-3 shrink-0" />
+                          {task.projectTitle}
+                        </span>
+                      )}
+                      {task.creatorName && (
+                        <span className="flex items-center gap-1">
+                          <DASHBOARD_ICONS.USER className="h-3 w-3 shrink-0" />
+                          {task.creatorName.trim()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right: status + deadline */}
+                  <div className="flex flex-row flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:gap-2">
+                    {/* Status badge */}
+                    <Badge
+                      variant="outline"
+                      className={`${status.className} rounded-full border px-2.5 py-0.5 text-[11px] font-medium`}
+                    >
+                      {status.label}
+                    </Badge>
+
+                    {/* Deadline */}
+                    {task.deadline && (
+                      <span
+                        className={`flex items-center gap-1 text-xs ${
+                          overdue
+                            ? 'text-destructive font-medium'
+                            : 'text-muted-foreground'
+                        }`}
+                      >
+                        <DASHBOARD_ICONS.CLOCK
+                          className={`h-3 w-3 shrink-0 ${overdue ? 'text-destructive' : 'text-primary'}`}
+                        />
+                        {overdue ? 'Overdue · ' : 'Due · '}
+                        {new Date(task.deadline).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              )}
-
-              <Badge
-                className={`${
-                  statusColors[task.status] || statusColors.TODO
-                } rounded-full border px-2.5 py-0.5 text-xs`}
-              >
-                {task.status?.replace('_', ' ') || 'TO DO'}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+              </CardContent>
+            </Card>
+          </Link>
+        );
+      })}
     </div>
   );
 };

@@ -23,6 +23,7 @@ import {
   Search,
   Settings,
   Shield,
+  SlidersHorizontal,
   SquareStack,
   Trash2,
   TrendingUp,
@@ -30,6 +31,7 @@ import {
   User,
   User2,
   Users,
+  X,
 } from 'lucide-react';
 
 export const DASHBOARD_ICONS = {
@@ -64,4 +66,6 @@ export const DASHBOARD_ICONS = {
   LOADER2: Loader2,
   CLOCK: Clock,
   BRIEFCASE: Briefcase,
+  FILTER: SlidersHorizontal,
+  CLOSE: X,
 };

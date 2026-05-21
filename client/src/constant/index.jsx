@@ -185,3 +185,45 @@ export const TEAM = [
     initials: 'PP',
   },
 ];
+
+export const statusConfig = {
+  TODO: {
+    label: 'To Do',
+    className: 'bg-sky-500/10 text-sky-500 border-sky-500/20',
+    dot: 'bg-sky-500',
+  },
+  IN_PROGRESS: {
+    label: 'In Progress',
+    className: 'bg-violet-500/10 text-violet-500 border-violet-500/20',
+    dot: 'bg-violet-500',
+  },
+  IN_REVIEW: {
+    label: 'In Review',
+    className: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+    dot: 'bg-amber-500',
+  },
+  DONE: {
+    label: 'Done',
+    className: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+    dot: 'bg-emerald-500',
+  },
+};
+
+export const priorityConfig = {
+  LOW: {
+    label: 'Low',
+    className: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+  },
+  MEDIUM: {
+    label: 'Medium',
+    className: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+  },
+  HIGH: {
+    label: 'High',
+    className: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+  },
+  URGENT: {
+    label: 'Urgent',
+    className: 'bg-red-500/10 text-red-500 border-red-500/20',
+  },
+};
