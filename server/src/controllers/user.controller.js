@@ -1,8 +1,8 @@
-import UserModel from "../models/user.model.js";
+import UserModel from '../models/user.model.js';
 
 const getAllUsers = async (req, res, next) => {
   try {
-    const search = req.query.search || "";
+    const search = req.query.search || '';
     const users = await UserModel.getAll({ search });
     res.status(200).json({ success: true, users });
   } catch (error) {
@@ -47,7 +47,7 @@ const deleteUser = async (req, res, next) => {
     const deletedUser = await UserModel.delete({ id: req.params.id });
     res.status(200).json({
       success: true,
-      message: "User deleted successfully",
+      message: 'User deleted successfully',
       user: deletedUser,
     });
   } catch (error) {
@@ -55,4 +55,4 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-export { getProfile, updateProfile, deleteUser, getAllUsers, getUserById };
+export { deleteUser, getAllUsers, getProfile, getUserById,updateProfile };

@@ -1,6 +1,9 @@
-import env from "../config/env.js";
-import AuthModel from "../models/auth.model.js";
-import { sendPasswordResetEmail, sendWelcomeEmail } from "../services/email.service.js";
+import env from '../config/env.js';
+import AuthModel from '../models/auth.model.js';
+import {
+  sendPasswordResetEmail,
+  sendWelcomeEmail,
+} from '../services/email.service.js';
 
 // register controller
 const register = async (req, res, next) => {
@@ -9,7 +12,7 @@ const register = async (req, res, next) => {
     await sendWelcomeEmail({ name: user.name, email: user.email });
     res.status(201).json({
       success: true,
-      message: "Account created successfully",
+      message: 'Account created successfully',
       data: { user, token },
     });
   } catch (err) {
@@ -23,7 +26,7 @@ const login = async (req, res, next) => {
     const { user, token } = await AuthModel.login(req.body);
     res.status(200).json({
       success: true,
-      message: "Login successful",
+      message: 'Login successful',
       data: { user, token },
     });
   } catch (err) {
@@ -35,20 +38,24 @@ const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
 
-    const result = await AuthModel.forgotPassword({email});
-    const {user,resetUrl} = result;
+    const result = await AuthModel.forgotPassword({ email });
+    const { user, resetUrl } = result;
 
     try {
-      await sendPasswordResetEmail({ name: user.name, email: user.email, resetUrl });
+      await sendPasswordResetEmail({
+        name: user.name,
+        email: user.email,
+        resetUrl,
+      });
     } catch (err) {
-      console.error("Failed to send email, logging link instead:", resetUrl);
+      console.error('Failed to send email, logging link instead:', resetUrl);
     }
 
     const data = env.server.isDev ? { resetUrl } : {};
 
     res.status(200).json({
       success: true,
-      message: "If that email exists, we have sent a reset link.",
+      message: 'If that email exists, we have sent a reset link.',
       data,
     });
   } catch (err) {
@@ -59,9 +66,9 @@ const forgotPassword = async (req, res, next) => {
 const resetPassword = async (req, res, next) => {
   try {
     const { token, password } = req.body;
-    
-    const result = await AuthModel.resetPassword({token, password});
-    
+
+    const result = await AuthModel.resetPassword({ token, password });
+
     res.status(200).json({
       success: true,
       message: result.message,
@@ -74,8 +81,13 @@ const resetPassword = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
   try {
     const { currentPassword, newPassword, confirmPassword } = req.body;
-    const result = await AuthModel.changePassword({currentPassword, newPassword, confirmPassword, ...req.user})
-    
+    const result = await AuthModel.changePassword({
+      currentPassword,
+      newPassword,
+      confirmPassword,
+      ...req.user,
+    });
+
     res.status(200).json({
       success: true,
       message: result.message,
@@ -86,4 +98,3 @@ const changePassword = async (req, res, next) => {
 };
 
 export { changePassword, forgotPassword, login, register, resetPassword };
-

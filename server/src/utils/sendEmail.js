@@ -1,5 +1,5 @@
-import { transporter } from "../config/mailer.js";
-import env from "../config/env.js";
+import env from '../config/env.js';
+import { transporter } from '../config/mailer.js';
 
 export const sendEmail = async ({ to, subject, html }) => {
   const mailOptions = {

@@ -1,5 +1,6 @@
-import nodemailer from "nodemailer";
-import env from "./env.js";
+import nodemailer from 'nodemailer';
+
+import env from './env.js';
 
 export const transporter = nodemailer.createTransport({
   host: env.email.host,
@@ -13,6 +14,6 @@ export const transporter = nodemailer.createTransport({
 
 // verify connection on startup
 transporter.verify((err) => {
-  if (err) console.error("❌ Mailer error:", err);
-  else console.log("✅ Mailer ready");
+  if (err) console.error('❌ Mailer error:', err);
+  else console.log('✅ Mailer ready');
 });

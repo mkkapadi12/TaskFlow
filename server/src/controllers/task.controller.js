@@ -1,11 +1,11 @@
-import TaskModel from "../models/task.model.js";
+import TaskModel from '../models/task.model.js';
 
 const createTask = async (req, res, next) => {
   try {
     const task = await TaskModel.create(req.user.id, req.body);
     res.status(201).json({
       success: true,
-      message: "Task created successfully",
+      message: 'Task created successfully',
       data: task,
     });
   } catch (err) {
@@ -18,7 +18,7 @@ const getTasksByProject = async (req, res, next) => {
     const tasks = await TaskModel.getByProject(
       Number(req.params.projectId),
       req.user.id,
-      req.query.status || null,
+      req.query.status || null
     );
     res.status(200).json({
       success: true,
@@ -45,7 +45,7 @@ const getTaskById = async (req, res, next) => {
   try {
     const task = await TaskModel.getById(
       Number(req.params.taskId),
-      req.user.id,
+      req.user.id
     );
     res.status(200).json({
       success: true,
@@ -61,11 +61,11 @@ const updateTask = async (req, res, next) => {
     const task = await TaskModel.update(
       Number(req.params.taskId),
       req.user.id,
-      req.body,
+      req.body
     );
     res.status(200).json({
       success: true,
-      message: "Task updated successfully",
+      message: 'Task updated successfully',
       data: task,
     });
   } catch (err) {
@@ -77,7 +77,7 @@ const deleteTask = async (req, res, next) => {
   try {
     const result = await TaskModel.delete(
       Number(req.params.taskId),
-      req.user.id,
+      req.user.id
     );
     res.status(200).json({
       success: true,
@@ -105,11 +105,11 @@ const updateTaskStatus = async (req, res, next) => {
     const task = await TaskModel.updateStatus(
       Number(req.params.taskId),
       req.user.id,
-      req.body.status,
+      req.body.status
     );
     res.status(200).json({
       success: true,
-      message: "Task status updated",
+      message: 'Task status updated',
       data: task,
     });
   } catch (err) {
@@ -122,13 +122,13 @@ const verifyTask = async (req, res, next) => {
     const task = await TaskModel.verify(
       Number(req.params.taskId),
       req.user.id,
-      Boolean(req.body.approve),
+      Boolean(req.body.approve)
     );
     res.status(200).json({
       success: true,
       message: req.body.approve
-        ? "Task approved and marked DONE"
-        : "Task sent back for changes",
+        ? 'Task approved and marked DONE'
+        : 'Task sent back for changes',
       data: task,
     });
   } catch (err) {
@@ -138,12 +138,12 @@ const verifyTask = async (req, res, next) => {
 
 export {
   createTask,
-  getTasksByProject,
-  getMyTasks,
-  getTaskById,
-  updateTask,
   deleteTask,
+  getMyTasks,
   getOverdueTasks,
+  getTaskById,
+  getTasksByProject,
+  updateTask,
   updateTaskStatus,
   verifyTask,
 };

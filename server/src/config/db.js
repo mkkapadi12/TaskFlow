@@ -1,6 +1,8 @@
-import "dotenv/config";
-import mysql from "mysql2/promise";
-import env from "./env.js";
+import 'dotenv/config';
+
+import mysql from 'mysql2/promise';
+
+import env from './env.js';
 
 const pool = mysql.createPool({
   host: env.db.host,
@@ -16,11 +18,11 @@ const pool = mysql.createPool({
 pool
   .getConnection()
   .then((conn) => {
-    console.log("MySQL connected successfully");
+    console.log('MySQL connected successfully');
     conn.release();
   })
   .catch((err) => {
-    console.error("MySQL connection failed:", err.message);
+    console.error('MySQL connection failed:', err.message);
     process.exit(1);
   });
 

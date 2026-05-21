@@ -1,9 +1,9 @@
-import { sendEmail } from "../utils/sendEmail.js";
-import env from "../config/env.js";
-import { welcomeTemplate } from "../templates/emails/welcome.js";
-import { passwordResetTemplate } from "../templates/emails/passwordReset.js";
-import { addMemberTemplate } from "../templates/emails/addMember.js";
-import { removeMemberTemplate } from "../templates/emails/removeMember.js";
+import env from '../config/env.js';
+import { addMemberTemplate } from '../templates/emails/addMember.js';
+import { passwordResetTemplate } from '../templates/emails/passwordReset.js';
+import { removeMemberTemplate } from '../templates/emails/removeMember.js';
+import { welcomeTemplate } from '../templates/emails/welcome.js';
+import { sendEmail } from '../utils/sendEmail.js';
 
 export const sendWelcomeEmail = async ({ name, email }) => {
   const { subject, html } = welcomeTemplate({ name });

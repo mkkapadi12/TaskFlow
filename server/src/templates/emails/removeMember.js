@@ -22,7 +22,7 @@ export const removeMemberTemplate = ({
             Reason
           </div>
           <div style="color:#555;font-size:14px">
-            ${reason && reason.trim() ? reason : "No reason was provided."}
+            ${reason && reason.trim() ? reason : 'No reason was provided.'}
           </div>
         </div>
 

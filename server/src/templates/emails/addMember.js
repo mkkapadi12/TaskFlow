@@ -26,7 +26,7 @@ export const addMemberTemplate = ({
             ? `<div style="background:#f7f7f7;border-left:3px solid #faa432;padding:12px 14px;border-radius:4px;margin:16px 0;color:#555;font-size:14px">
                 ${projectDescription}
               </div>`
-            : ""
+            : ''
         }
         <p style="margin-top:20px">
           <a href="${projectUrl}"

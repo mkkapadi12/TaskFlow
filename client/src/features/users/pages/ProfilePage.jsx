@@ -34,7 +34,9 @@ const ProfilePage = () => {
   return (
     <div className="container mx-auto px-3 py-5 sm:px-6 sm:py-8">
       <div className="mb-5 sm:mb-8">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Account Settings</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Account Settings
+        </h1>
         <p className="text-muted-foreground mt-1">
           Manage your profile information and preferences.
         </p>

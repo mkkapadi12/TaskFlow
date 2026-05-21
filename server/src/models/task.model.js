@@ -1,27 +1,27 @@
-import callProcedure from "../config/callProcedure.js";
-import { AppError } from "../middlewares/error.middleware.js";
+import callProcedure from '../config/callProcedure.js';
+import { AppError } from '../middlewares/error.middleware.js';
 import {
   getMembership,
+  requireManager,
   requireMembership,
   requireOwner,
-  requireManager,
-} from "../utils/requireRole.js";
+} from '../utils/requireRole.js';
 
-const TASK_STATUSES = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
-const ASSIGNEE_STATUSES = ["TODO", "IN_PROGRESS", "IN_REVIEW"];
+const TASK_STATUSES = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'];
+const ASSIGNEE_STATUSES = ['TODO', 'IN_PROGRESS', 'IN_REVIEW'];
 
 const ensureAssigneeIsMember = async (projectId, assigneeId) => {
   if (assigneeId === null || assigneeId === undefined) return;
   const membership = await getMembership(projectId, assigneeId);
   if (!membership) {
-    throw new AppError("Assignee must be a project member", 400);
+    throw new AppError('Assignee must be a project member', 400);
   }
 };
 
 const loadTask = async (taskId) => {
-  const [rows] = await callProcedure("sp_GetTaskById", [taskId]);
+  const [rows] = await callProcedure('sp_GetTaskById', [taskId]);
   if (!rows[0]) {
-    throw new AppError("Task not found", 404);
+    throw new AppError('Task not found', 404);
   }
   return rows[0];
 };
@@ -42,7 +42,7 @@ const TaskModel = {
     await requireManager(projectId, creatorId);
     await ensureAssigneeIsMember(projectId, assigneeId);
 
-    const [task] = await callProcedure("sp_CreateTask", [
+    const [task] = await callProcedure('sp_CreateTask', [
       title,
       description ?? null,
       status ?? null,
@@ -59,7 +59,7 @@ const TaskModel = {
   getByProject: async (projectId, userId, status) => {
     await requireMembership(projectId, userId);
 
-    const [tasks] = await callProcedure("sp_GetTasksByProject", [
+    const [tasks] = await callProcedure('sp_GetTasksByProject', [
       projectId,
       status ?? null,
     ]);
@@ -68,7 +68,7 @@ const TaskModel = {
 
   // Get tasks assigned to the logged-in user
   getMyTasks: async (userId) => {
-    const [tasks] = await callProcedure("sp_GetTasksByAssignee", [userId]);
+    const [tasks] = await callProcedure('sp_GetTasksByAssignee', [userId]);
     return tasks;
   },
 
@@ -90,7 +90,7 @@ const TaskModel = {
       await ensureAssigneeIsMember(existing.projectId, assigneeId);
     }
 
-    const [task] = await callProcedure("sp_UpdateTask", [
+    const [task] = await callProcedure('sp_UpdateTask', [
       taskId,
       title ?? null,
       description ?? null,
@@ -106,10 +106,10 @@ const TaskModel = {
   // TODO ↔ IN_PROGRESS ↔ IN_REVIEW. DONE is reachable only via verify().
   updateStatus: async (taskId, userId, status) => {
     if (!TASK_STATUSES.includes(status)) {
-      throw new AppError("Invalid status", 400);
+      throw new AppError('Invalid status', 400);
     }
-    if (status === "DONE") {
-      throw new AppError("Use the verify endpoint to mark a task as DONE", 400);
+    if (status === 'DONE') {
+      throw new AppError('Use the verify endpoint to mark a task as DONE', 400);
     }
 
     const existing = await loadTask(taskId);
@@ -117,30 +117,30 @@ const TaskModel = {
 
     const isAssignee = existing.assigneeId === userId;
     const isManager =
-      membership.role === "OWNER" || membership.role === "ADMIN";
+      membership.role === 'OWNER' || membership.role === 'ADMIN';
 
     if (!isAssignee && !isManager) {
       throw new AppError(
-        "Only the assignee or a project manager can change task status",
+        'Only the assignee or a project manager can change task status',
         403
       );
     }
 
     if (isAssignee && !isManager && !ASSIGNEE_STATUSES.includes(status)) {
       throw new AppError(
-        "Assignees cannot move tasks out of the active workflow",
+        'Assignees cannot move tasks out of the active workflow',
         403
       );
     }
 
-    if (existing.status === "DONE" && membership.role !== "OWNER") {
+    if (existing.status === 'DONE' && membership.role !== 'OWNER') {
       throw new AppError(
-        "Only the project owner can reopen a completed task",
+        'Only the project owner can reopen a completed task',
         403
       );
     }
 
-    const [rows] = await callProcedure("sp_UpdateTask", [
+    const [rows] = await callProcedure('sp_UpdateTask', [
       taskId,
       null,
       null,
@@ -158,7 +158,7 @@ const TaskModel = {
     const existing = await loadTask(taskId);
     await requireOwner(existing.projectId, userId);
 
-    const [rows] = await callProcedure("sp_VerifyTask", [
+    const [rows] = await callProcedure('sp_VerifyTask', [
       taskId,
       approve ? 1 : 0,
     ]);
@@ -173,16 +173,16 @@ const TaskModel = {
       await requireOwner(task.projectId, userId);
     }
 
-    const [result] = await callProcedure("sp_DeleteTask", [taskId]);
+    const [result] = await callProcedure('sp_DeleteTask', [taskId]);
     if (result[0]?.deletedCount === 0) {
-      throw new AppError("Failed to delete task", 500);
+      throw new AppError('Failed to delete task', 500);
     }
-    return { message: "Task deleted successfully" };
+    return { message: 'Task deleted successfully' };
   },
 
   // Get overdue tasks for the logged-in user
   getOverdue: async (userId) => {
-    const [tasks] = await callProcedure("sp_GetOverdueTasks", [userId]);
+    const [tasks] = await callProcedure('sp_GetOverdueTasks', [userId]);
     return tasks;
   },
 };

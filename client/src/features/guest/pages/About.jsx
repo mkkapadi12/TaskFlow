@@ -1,4 +1,3 @@
-
 import { TEAM, VALUES } from '@/constant';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 

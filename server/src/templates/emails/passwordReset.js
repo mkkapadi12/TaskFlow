@@ -1,5 +1,5 @@
 export const passwordResetTemplate = ({ name, resetUrl }) => ({
-  subject: "Password Reset Request",
+  subject: 'Password Reset Request',
   html: `
     <div style="font-family:sans-serif;max-width:600px;margin:auto">
       <h2>Hi ${name},</h2>
@@ -14,4 +14,4 @@ export const passwordResetTemplate = ({ name, resetUrl }) => ({
       </p>
     </div>
   `,
-})
+});

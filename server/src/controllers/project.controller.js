@@ -1,13 +1,13 @@
-import ProjectModel from "../models/project.model.js";
-import UserModel from "../models/user.model.js";
-import callProcedure from "../config/callProcedure.js";
+import callProcedure from '../config/callProcedure.js';
+import ProjectModel from '../models/project.model.js';
+import UserModel from '../models/user.model.js';
 import {
   sendProjectMemberAddedEmail,
   sendProjectMemberRemovedEmail,
-} from "../services/email.service.js";
+} from '../services/email.service.js';
 
 const getProjectBasicInfo = async (projectId) => {
-  const [rows] = await callProcedure("sp_GetProjectById", [projectId]);
+  const [rows] = await callProcedure('sp_GetProjectById', [projectId]);
   return rows?.[0] || null;
 };
 
@@ -16,7 +16,7 @@ const createProject = async (req, res, next) => {
     const project = await ProjectModel.create(req.user.id, req.body);
     res.status(201).json({
       success: true,
-      message: "Project created successfully",
+      message: 'Project created successfully',
       data: project,
     });
   } catch (err) {
@@ -40,7 +40,7 @@ const getProject = async (req, res, next) => {
   try {
     const project = await ProjectModel.getProjectDetailsById(
       Number(req.params.projectId),
-      req.user.id,
+      req.user.id
     );
     res.status(200).json({
       success: true,
@@ -56,11 +56,11 @@ const updateProject = async (req, res, next) => {
     const project = await ProjectModel.update(
       Number(req.params.projectId),
       req.user.id,
-      req.body,
+      req.body
     );
     res.status(200).json({
       success: true,
-      message: "Project updated successfully",
+      message: 'Project updated successfully',
       data: project,
     });
   } catch (err) {
@@ -72,7 +72,7 @@ const deleteProject = async (req, res, next) => {
   try {
     const result = await ProjectModel.delete(
       Number(req.params.id),
-      req.user.id,
+      req.user.id
     );
     res.status(200).json({
       success: true,
@@ -87,7 +87,7 @@ const getMembers = async (req, res, next) => {
   try {
     const members = await ProjectModel.getMembers(
       Number(req.params.projectId),
-      req.user.id,
+      req.user.id
     );
     res.status(200).json({
       success: true,
@@ -104,7 +104,7 @@ const addProjectMember = async (req, res, next) => {
     const member = await ProjectModel.addMember(
       projectId,
       req.user.id,
-      req.body,
+      req.body
     );
 
     try {
@@ -121,12 +121,12 @@ const addProjectMember = async (req, res, next) => {
         });
       }
     } catch (emailErr) {
-      console.error("Failed to send add-member email:", emailErr.message);
+      console.error('Failed to send add-member email:', emailErr.message);
     }
 
     res.status(201).json({
       success: true,
-      message: "Member added successfully",
+      message: 'Member added successfully',
       data: member,
     });
   } catch (err) {
@@ -140,11 +140,11 @@ const updateMemberRole = async (req, res, next) => {
       Number(req.params.projectId),
       req.user.id,
       Number(req.params.userId),
-      req.body.role,
+      req.body.role
     );
     res.status(200).json({
       success: true,
-      message: "Member role updated successfully",
+      message: 'Member role updated successfully',
       data: member,
     });
   } catch (err) {
@@ -163,13 +163,13 @@ const removeMember = async (req, res, next) => {
       targetUser = await UserModel.getUserById({ id: targetUserId });
       project = await getProjectBasicInfo(projectId);
     } catch (lookupErr) {
-      console.error("Failed to look up email recipients:", lookupErr.message);
+      console.error('Failed to look up email recipients:', lookupErr.message);
     }
 
     const result = await ProjectModel.removeMember(
       projectId,
       req.user.id,
-      targetUserId,
+      targetUserId
     );
 
     try {
@@ -183,7 +183,7 @@ const removeMember = async (req, res, next) => {
         });
       }
     } catch (emailErr) {
-      console.error("Failed to send remove-member email:", emailErr.message);
+      console.error('Failed to send remove-member email:', emailErr.message);
     }
 
     res.status(200).json({
@@ -222,15 +222,15 @@ const getProjectsByOwner = async (req, res, next) => {
 };
 
 export {
-  createProject,
-  getAllProjects,
-  getProject,
-  updateProject,
-  deleteProject,
-  getMembers,
   addProjectMember,
-  updateMemberRole,
-  removeMember,
+  createProject,
+  deleteProject,
+  getAllProjects,
+  getMembers,
   getMyProjects,
+  getProject,
   getProjectsByOwner,
+  removeMember,
+  updateMemberRole,
+  updateProject,
 };

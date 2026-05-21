@@ -1,9 +1,9 @@
-import callProcedure from "../config/callProcedure.js";
-import { AppError } from "../middlewares/error.middleware.js";
+import callProcedure from '../config/callProcedure.js';
+import { AppError } from '../middlewares/error.middleware.js';
 
 // Helper: check if a user is a member of a project and return their role
 const getMembership = async (projectId, userId) => {
-  const [project] = await callProcedure("sp_GetMemberRole", [
+  const [project] = await callProcedure('sp_GetMemberRole', [
     projectId,
     userId,
   ]);
@@ -14,7 +14,7 @@ const getMembership = async (projectId, userId) => {
 const requireMembership = async (projectId, userId) => {
   const membership = await getMembership(projectId, userId);
   if (!membership) {
-    throw new AppError("You are not a member of this project", 403);
+    throw new AppError('You are not a member of this project', 403);
   }
   return membership;
 };
@@ -22,8 +22,8 @@ const requireMembership = async (projectId, userId) => {
 // Helper: require owner or admin role
 const requireOwner = async (projectId, userId) => {
   const membership = await requireMembership(projectId, userId);
-  if (membership.role !== "OWNER") {
-    throw new AppError("Only project owner can perform this action", 403);
+  if (membership.role !== 'OWNER') {
+    throw new AppError('Only project owner can perform this action', 403);
   }
   return membership;
 };
@@ -31,18 +31,13 @@ const requireOwner = async (projectId, userId) => {
 // Helper: require owner or admin (project-level managers)
 const requireManager = async (projectId, userId) => {
   const membership = await requireMembership(projectId, userId);
-  if (membership.role !== "OWNER" && membership.role !== "ADMIN") {
+  if (membership.role !== 'OWNER' && membership.role !== 'ADMIN') {
     throw new AppError(
-      "Only project owner or admin can perform this action",
-      403,
+      'Only project owner or admin can perform this action',
+      403
     );
   }
   return membership;
 };
 
-export {
-  getMembership,
-  requireMembership,
-  requireOwner,
-  requireManager,
-};
+export { getMembership, requireManager,requireMembership, requireOwner };

@@ -1,5 +1,5 @@
 export const welcomeTemplate = ({ name }) => ({
-  subject: "Welcome to Task Manager 🎉",
+  subject: 'Welcome to Task Manager 🎉',
   html: `
     <div style="font-family:sans-serif;max-width:600px;margin:auto">
       <h2>Hey ${name}, welcome aboard!</h2>
@@ -11,4 +11,4 @@ export const welcomeTemplate = ({ name }) => ({
       </a>
     </div>
   `,
-})
+});

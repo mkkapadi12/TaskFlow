@@ -1,11 +1,12 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import routes from "./routes.js";
-import { globalErrorHandler } from "./middlewares/error.middleware.js";
-import env from "./config/env.js";
-import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./config/swagger.js";
+import cors from 'cors';
+import express from 'express';
+import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
+
+import env from './config/env.js';
+import { swaggerSpec } from './config/swagger.js';
+import { globalErrorHandler } from './middlewares/error.middleware.js';
+import routes from './routes.js';
 
 const app = express();
 
@@ -13,20 +14,20 @@ app.use(helmet());
 app.use(
   cors({
     origin: env.client.url,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
-  }),
+  })
 );
 app.use(express.json());
 
 // mount after other middleware
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.get("/api", (req, res) =>
-  res.json({ status: "ok", message: "API is live!" }),
+app.get('/api', (req, res) =>
+  res.json({ status: 'ok', message: 'API is live!' })
 );
 
-app.use("/api", routes);
+app.use('/api', routes);
 
 // 404 handler — for unknown routes
 app.use((req, res, next) => {

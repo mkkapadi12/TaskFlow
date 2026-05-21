@@ -140,7 +140,7 @@ const SettingPage = () => {
                     <Label htmlFor="currentPassword">Current Password</Label>
                     <Link
                       to="/forgot-password"
-                      className="text-primary hover:underline text-xs"
+                      className="text-primary text-xs hover:underline"
                     >
                       Forgot password?
                     </Link>

@@ -37,32 +37,32 @@ export default [
       'unused-imports': unusedImports,
     },
 
-   rules: {
-  'react/react-in-jsx-scope': 'off',
-  'react/prop-types': 'off',
+    rules: {
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
 
-  ...reactHooks.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
 
-  'react-hooks/set-state-in-effect': 'off',
-  'react-hooks/incompatible-library': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/incompatible-library': 'off',
 
-  'simple-import-sort/imports': 'warn',
-  'simple-import-sort/exports': 'warn',
+      'simple-import-sort/imports': 'warn',
+      'simple-import-sort/exports': 'warn',
 
-  'unused-imports/no-unused-imports': 'warn',
+      'unused-imports/no-unused-imports': 'warn',
 
-  'no-unused-vars': [
-    'warn',
-    {
-      vars: 'all',
-      varsIgnorePattern: '^_',
-      args: 'after-used',
-      argsIgnorePattern: '^_',
+      'no-unused-vars': [
+        'warn',
+        {
+          vars: 'all',
+          varsIgnorePattern: '^_',
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+        },
+      ],
+
+      'no-console': 'off',
     },
-  ],
-
-  'no-console': 'off',
-},
 
     settings: {
       react: {

@@ -1,9 +1,9 @@
-import pool from "./db.js";
+import pool from './db.js';
 
 const callProcedure = async (procedureName, params = []) => {
   const procedureQuery = `CALL ${procedureName}(${params
-    .map(() => "?")
-    .join(",")})`;
+    .map(() => '?')
+    .join(',')})`;
 
   try {
     const [rows] = await pool.query(procedureQuery, params);

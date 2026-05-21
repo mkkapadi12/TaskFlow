@@ -1,23 +1,23 @@
-import "dotenv/config";
+import 'dotenv/config';
 
 const env = {
   server: {
     port: Number(process.env.PORT) || 5000,
-    nodeEnv: process.env.NODE_ENV || "development",
-    isDev: process.env.NODE_ENV === "development",
-    isProd: process.env.NODE_ENV === "production",
+    nodeEnv: process.env.NODE_ENV || 'development',
+    isDev: process.env.NODE_ENV === 'development',
+    isProd: process.env.NODE_ENV === 'production',
   },
 
   client: {
-    url: process.env.CLIENT_URL || "http://localhost:5173",
+    url: process.env.CLIENT_URL || 'http://localhost:5173',
   },
 
   db: {
     url: process.env.DATABASE_URL,
-    name: process.env.DATABASE_NAME || "",
-    host: process.env.DATABASE_HOST || "localhost",
-    user: process.env.DATABASE_USER || "root",
-    password: process.env.DATABASE_PASSWORD || "",
+    name: process.env.DATABASE_NAME || '',
+    host: process.env.DATABASE_HOST || 'localhost',
+    user: process.env.DATABASE_USER || 'root',
+    password: process.env.DATABASE_PASSWORD || '',
     port: process.env.DATABASE_PORT || 3306,
   },
 
@@ -29,7 +29,7 @@ const env = {
 
   jwt: {
     secret: process.env.JWT_SECRET,
-    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
 
   email: {

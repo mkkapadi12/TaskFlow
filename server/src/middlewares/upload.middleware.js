@@ -1,14 +1,15 @@
-import multer from "multer";
-import { AppError } from "./error.middleware.js";
+import multer from 'multer';
+
+import { AppError } from './error.middleware.js';
 
 const storage = multer.memoryStorage(); // buffer → Cloudinary, no disk
 
 const fileFilter = (req, file, cb) => {
-  const allowed = ["image/jpeg", "image/png", "image/webp"];
+  const allowed = ['image/jpeg', 'image/png', 'image/webp'];
   if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new AppError("Only jpeg, png, webp allowed.", 400), false);
+    cb(new AppError('Only jpeg, png, webp allowed.', 400), false);
   }
 };
 
