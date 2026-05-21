@@ -1,7 +1,56 @@
-import { TEAM, VALUES } from '@/constant';
+import { useTranslation } from 'react-i18next';
+
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 const About = () => {
+  const { t } = useTranslation('about');
+
+  const stats = [
+    { stat: '2023', label: t('mission.stats.founded') },
+    { stat: '15+', label: t('mission.stats.team') },
+    { stat: '50K+', label: t('mission.stats.happyUsers') },
+  ];
+
+  const team = [
+    { name: 'Alex Rivera', role: t('team.roles.ceo'), initials: 'AR' },
+    { name: 'Sarah Chen', role: t('team.roles.designer'), initials: 'SC' },
+    { name: 'Marcus Johnson', role: t('team.roles.engineer'), initials: 'MJ' },
+    { name: 'Priya Patel', role: t('team.roles.pm'), initials: 'PP' },
+  ];
+
+  const values = [
+    {
+      icon: GUEST_ICONS.TARGET,
+      title: t('values.list.0.title'),
+      description: t('values.list.0.description'),
+    },
+    {
+      icon: GUEST_ICONS.HEART,
+      title: t('values.list.1.title'),
+      description: t('values.list.1.description'),
+    },
+    {
+      icon: GUEST_ICONS.LIGHTBULB,
+      title: t('values.list.2.title'),
+      description: t('values.list.2.description'),
+    },
+    {
+      icon: GUEST_ICONS.SHIELD_CHECK,
+      title: t('values.list.3.title'),
+      description: t('values.list.3.description'),
+    },
+    {
+      icon: GUEST_ICONS.ROCKET,
+      title: t('values.list.4.title'),
+      description: t('values.list.4.description'),
+    },
+    {
+      icon: GUEST_ICONS.USERS,
+      title: t('values.list.5.title'),
+      description: t('values.list.5.description'),
+    },
+  ];
+
   return (
     <>
       {/* ── Mission Section ── */}
@@ -9,25 +58,20 @@ const About = () => {
         <div className="animate-in fade-in slide-in-from-bottom-8 fill-mode-both mx-auto max-w-3xl text-center duration-1000">
           <div className="border-primary/20 bg-primary/10 text-primary mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
             <GUEST_ICONS.TARGET size={14} />
-            Our Mission
+            {t('mission.badge')}
           </div>
 
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-            Making productivity <span className="text-primary">effortless</span>
+            {t('mission.title')}{' '}
+            <span className="text-primary">{t('mission.titleHighlight')}</span>
           </h1>
 
           <p className="text-muted-foreground mt-6 text-lg leading-relaxed sm:text-xl">
-            TaskFlow was born from a simple idea: managing tasks shouldn't be a
-            task itself. We believe in building tools that fade into the
-            background, letting you focus on the work that matters.
+            {t('mission.description')}
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {[
-              { stat: '2023', label: 'Founded' },
-              { stat: '15+', label: 'Team Members' },
-              { stat: '50K+', label: 'Happy Users' },
-            ].map(({ stat, label }) => (
+            {stats.map(({ stat, label }) => (
               <div
                 key={label}
                 className="border-border/50 bg-card/50 rounded-2xl border p-6 backdrop-blur-sm"
@@ -45,19 +89,19 @@ const About = () => {
         <div className="animate-in fade-in slide-in-from-bottom-6 fill-mode-both mx-auto mb-14 max-w-2xl text-center duration-700">
           <div className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
             <GUEST_ICONS.USERS size={14} />
-            Our Team
+            {t('team.badge')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            The people behind <span className="text-primary">TaskFlow</span>
+            {t('team.title')}{' '}
+            <span className="text-primary">{t('team.titleHighlight')}</span>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg">
-            A passionate crew of builders, designers, and thinkers dedicated to
-            crafting the best task management experience.
+            {t('team.description')}
           </p>
         </div>
 
         <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {TEAM.map(({ name, role, initials }, i) => (
+          {team.map(({ name, role, initials }, i) => (
             <div
               key={name}
               className="group border-border/50 bg-card/50 hover:border-primary/40 hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-8 fill-mode-both flex flex-col items-center rounded-2xl border p-6 text-center backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
@@ -81,19 +125,20 @@ const About = () => {
         <div className="animate-in fade-in slide-in-from-bottom-6 fill-mode-both mx-auto mb-14 max-w-2xl text-center duration-700">
           <div className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
             <GUEST_ICONS.HEART size={14} />
-            Our Values
+            {t('values.badge')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            What drives <span className="text-primary">everything</span> we do
+            {t('values.title')}{' '}
+            <span className="text-primary">{t('values.titleHighlight')}</span>{' '}
+            {t('values.titleEnd')}
           </h2>
           <p className="text-muted-foreground mt-4 text-lg">
-            These core principles guide every decision we make, from product
-            design to customer support.
+            {t('values.description')}
           </p>
         </div>
 
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {VALUES.map(({ icon: Icon, title, description }, i) => (
+          {values.map(({ icon: Icon, title, description }, i) => (
             <div
               key={title}
               className="group border-border/50 bg-card/50 hover:border-primary/40 hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-8 fill-mode-both rounded-2xl border p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
@@ -115,3 +160,4 @@ const About = () => {
 };
 
 export default About;
+

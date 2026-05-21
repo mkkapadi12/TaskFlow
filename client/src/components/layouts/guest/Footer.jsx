@@ -1,8 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 const Footer = () => {
+  const { t } = useTranslation();
+
   return (
     <footer className="border-border/40 bg-card/30 relative z-10 border-t backdrop-blur-md">
       <div className="container mx-auto px-6 py-12">
@@ -16,8 +19,7 @@ const Footer = () => {
               <span className="text-xl font-bold tracking-tight">TaskFlow</span>
             </div>
             <p className="text-muted-foreground mb-6 max-w-sm text-sm">
-              Streamline your workflow, collaborate with your team, and achieve
-              your goals with our professional task management platform.
+              {t('footer.description')}
             </p>
             <div className="flex items-center gap-4">
               <a
@@ -50,7 +52,7 @@ const Footer = () => {
           {/* Product */}
           <div>
             <h3 className="text-foreground/90 mb-4 text-sm font-semibold">
-              Product
+              {t('footer.product')}
             </h3>
             <ul className="text-muted-foreground space-y-3 text-sm">
               <li>
@@ -58,7 +60,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Features
+                  {t('footer.features')}
                 </Link>
               </li>
               <li>
@@ -66,7 +68,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Pricing
+                  {t('footer.pricing')}
                 </Link>
               </li>
               <li>
@@ -74,7 +76,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Roadmap
+                  {t('footer.roadmap')}
                 </Link>
               </li>
               <li>
@@ -82,7 +84,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Changelog
+                  {t('footer.changelog')}
                 </Link>
               </li>
             </ul>
@@ -91,7 +93,7 @@ const Footer = () => {
           {/* Company */}
           <div>
             <h3 className="text-foreground/90 mb-4 text-sm font-semibold">
-              Company
+              {t('footer.company')}
             </h3>
             <ul className="text-muted-foreground space-y-3 text-sm">
               <li>
@@ -99,7 +101,7 @@ const Footer = () => {
                   to="/about"
                   className="hover:text-foreground transition-colors"
                 >
-                  About Us
+                  {t('footer.aboutUs')}
                 </Link>
               </li>
               <li>
@@ -107,7 +109,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Careers
+                  {t('footer.careers')}
                 </Link>
               </li>
               <li>
@@ -115,7 +117,7 @@ const Footer = () => {
                   to="/contact"
                   className="hover:text-foreground transition-colors"
                 >
-                  Contact
+                  {t('nav.contact')}
                 </Link>
               </li>
               <li>
@@ -123,7 +125,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Blog
+                  {t('footer.blog')}
                 </Link>
               </li>
             </ul>
@@ -132,7 +134,7 @@ const Footer = () => {
           {/* Legal */}
           <div>
             <h3 className="text-foreground/90 mb-4 text-sm font-semibold">
-              Legal
+              {t('footer.legal')}
             </h3>
             <ul className="text-muted-foreground space-y-3 text-sm">
               <li>
@@ -140,7 +142,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Privacy Policy
+                  {t('footer.privacyPolicy')}
                 </Link>
               </li>
               <li>
@@ -148,7 +150,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Terms of Service
+                  {t('footer.termsOfService')}
                 </Link>
               </li>
               <li>
@@ -156,7 +158,7 @@ const Footer = () => {
                   to="/"
                   className="hover:text-foreground transition-colors"
                 >
-                  Cookie Policy
+                  {t('footer.cookiePolicy')}
                 </Link>
               </li>
             </ul>
@@ -165,17 +167,17 @@ const Footer = () => {
 
         <div className="border-border/40 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
           <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} TaskFlow. All rights reserved.
+            &copy; {new Date().getFullYear()} TaskFlow. {t('footer.allRightsReserved')}
           </p>
           <div className="text-muted-foreground flex items-center gap-6 text-sm">
             <Link to="/" className="hover:text-foreground transition-colors">
-              Privacy
+              {t('footer.privacy')}
             </Link>
             <Link to="/" className="hover:text-foreground transition-colors">
-              Terms
+              {t('footer.terms')}
             </Link>
             <Link to="/" className="hover:text-foreground transition-colors">
-              Cookies
+              {t('footer.cookies')}
             </Link>
           </div>
         </div>

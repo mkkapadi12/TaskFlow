@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "badge": "The smarter way to manage tasks",
+    "title": "Organize your work.",
+    "subtitle": "Empower your life.",
+    "description": "TaskFlow is the ultimate workspace to track projects, manage tasks, and collaborate effortlessly. Stay productive and focused on what matters most.",
+    "ctaStart": "Get Started for Free",
+    "ctaLogin": "Sign in to your account"
+  },
+  "stats": {
+    "activeUsers": "Active Users",
+    "tasksCompleted": "Tasks Completed",
+    "uptime": "Uptime",
+    "userRating": "User Rating"
+  },
+  "features": {
+    "badge": "Features",
+    "title": "Everything you need to ",
+    "titleHighlight": "stay productive",
+    "description": "Powerful tools designed to streamline your workflow and help your team deliver results faster.",
+    "list": {
+      "fast": {
+        "title": "Lightning Fast",
+        "description": "Built for speed. Navigate your tasks and projects with zero friction and instant load times."
+      },
+      "secure": {
+        "title": "Secure & Private",
+        "description": "Your data is encrypted and stored securely. We prioritize your privacy above everything else."
+      },
+      "organized": {
+        "title": "Stay Organized",
+        "description": "Powerful sorting, filtering, and categorization tools to keep your workflow crystal clear."
+      },
+      "team": {
+        "title": "Team Collaboration",
+        "description": "Invite teammates, assign tasks, and track progress together in real-time workspaces."
+      },
+      "analytics": {
+        "title": "Smart Analytics",
+        "description": "Visualize productivity trends and gain insights to optimize your work patterns."
+      },
+      "time": {
+        "title": "Time Tracking",
+        "description": "Built-in time tracking to monitor how long tasks take and improve your estimates."
+      }
+    }
+  },
+  "ctaSection": {
+    "title": "Ready to take control of your tasks?",
+    "description": "Join thousands of professionals who use TaskFlow to manage their work and boost productivity every day.",
+    "btnStart": "Start Free Trial",
+    "btnContact": "Contact Us"
+  }
+}

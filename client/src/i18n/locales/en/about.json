@@ -1,0 +1,58 @@
+{
+  "mission": {
+    "badge": "Our Mission",
+    "title": "Making productivity",
+    "titleHighlight": "effortless",
+    "description": "TaskFlow was born from a simple idea: managing tasks shouldn't be a task itself. We believe in building tools that fade into the background, letting you focus on the work that matters.",
+    "stats": {
+      "founded": "Founded",
+      "team": "Team Members",
+      "happyUsers": "Happy Users"
+    }
+  },
+  "team": {
+    "badge": "Our Team",
+    "title": "The people behind",
+    "titleHighlight": "TaskFlow",
+    "description": "A passionate crew of builders, designers, and thinkers dedicated to crafting the best task management experience.",
+    "roles": {
+      "ceo": "Founder & CEO",
+      "designer": "Lead Designer",
+      "engineer": "Full-Stack Engineer",
+      "pm": "Product Manager"
+    }
+  },
+  "values": {
+    "badge": "Our Values",
+    "title": "What drives",
+    "titleHighlight": "everything",
+    "titleEnd": "we do",
+    "description": "These core principles guide every decision we make, from product design to customer support.",
+    "list": {
+      "0": {
+        "title": "Focused Simplicity",
+        "description": "We strip away complexity so you can focus on what truly matters — getting things done."
+      },
+      "1": {
+        "title": "User First",
+        "description": "Every feature is built with empathy. We listen, iterate, and ship what our users need."
+      },
+      "2": {
+        "title": "Continuous Innovation",
+        "description": "We push boundaries to deliver cutting-edge tools that redefine task management."
+      },
+      "3": {
+        "title": "Trust & Security",
+        "description": "Your data integrity and privacy are non-negotiable. We encrypt and protect everything."
+      },
+      "4": {
+        "title": "Performance Driven",
+        "description": "Speed is a feature. We obsess over milliseconds so your workflow is never interrupted."
+      },
+      "5": {
+        "title": "Community Powered",
+        "description": "Built by the community, for the community. Your feedback shapes our roadmap."
+      }
+    }
+  }
+}

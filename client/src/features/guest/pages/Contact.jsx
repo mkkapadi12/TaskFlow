@@ -1,17 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { INFO_CARDS } from '@/constant';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 import { contactSchema } from '@/schemas/contact.schema';
 
 const Contact = () => {
+  const { t } = useTranslation('contact');
+
   const {
     register,
     handleSubmit,
@@ -26,11 +28,38 @@ const Contact = () => {
     // Simulate a short delay
     await new Promise((r) => setTimeout(r, 800));
 
-    toast.success('Message sent successfully!', {
-      description: `Thanks ${data.name}, we'll get back to you at ${data.email} soon.`,
+    toast.success(t('toast.success'), {
+      description: t('toast.description', { name: data.name, email: data.email }),
     });
     reset();
   };
+
+  const infoCards = [
+    {
+      icon: GUEST_ICONS.MAIL,
+      title: t('infoCards.list.0.title'),
+      detail: 'support@taskflow.app',
+      description: t('infoCards.list.0.description'),
+    },
+    {
+      icon: GUEST_ICONS.MAP_PIN,
+      title: t('infoCards.list.1.title'),
+      detail: 'San Francisco, CA',
+      description: t('infoCards.list.1.description'),
+    },
+    {
+      icon: GUEST_ICONS.PHONE,
+      title: t('infoCards.list.2.title'),
+      detail: '+1 (555) 123-4567',
+      description: t('infoCards.list.2.description'),
+    },
+    {
+      icon: GUEST_ICONS.CLOCK,
+      title: t('infoCards.list.3.title'),
+      detail: t('infoCards.list.3.detail'),
+      description: t('infoCards.list.3.description'),
+    },
+  ];
 
   return (
     <>
@@ -39,14 +68,13 @@ const Contact = () => {
         <div className="animate-in fade-in slide-in-from-bottom-8 fill-mode-both mx-auto max-w-2xl duration-1000">
           <div className="border-primary/20 bg-primary/10 text-primary mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
             <GUEST_ICONS.MESSAGE size={14} />
-            Get in Touch
+            {t('badge')}
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-            We'd love to <span className="text-primary">hear from you</span>
+            {t('title')} <span className="text-primary">{t('titleHighlight')}</span>
           </h1>
           <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
-            Have a question, feedback, or just want to say hello? Fill out the
-            form below and our team will get back to you promptly.
+            {t('description')}
           </p>
         </div>
       </section>
@@ -56,7 +84,7 @@ const Contact = () => {
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 lg:grid-cols-5">
           {/* Left — Info cards */}
           <div className="animate-in fade-in slide-in-from-left-8 fill-mode-both flex flex-col gap-4 duration-700 lg:col-span-2">
-            {INFO_CARDS.map(({ icon: Icon, title, detail, description }, i) => (
+            {infoCards.map(({ icon: Icon, title, detail, description }, i) => (
               <div
                 key={title}
                 className="group border-border/50 bg-card/50 hover:border-primary/40 hover:shadow-primary/5 flex items-start gap-4 rounded-2xl border p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
@@ -87,10 +115,10 @@ const Contact = () => {
               <div className="space-y-5">
                 {/* Name */}
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="name">{t('form.nameLabel')}</Label>
                   <Input
                     id="name"
-                    placeholder="John Doe"
+                    placeholder={t('form.namePlaceholder')}
                     aria-invalid={!!errors.name}
                     className="h-11"
                     {...register('name')}
@@ -104,11 +132,11 @@ const Contact = () => {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email">{t('form.emailLabel')}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="john@example.com"
+                    placeholder={t('form.emailPlaceholder')}
                     aria-invalid={!!errors.email}
                     className="h-11"
                     {...register('email')}
@@ -122,10 +150,10 @@ const Contact = () => {
 
                 {/* Message */}
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
+                  <Label htmlFor="message">{t('form.messageLabel')}</Label>
                   <Textarea
                     id="message"
-                    placeholder="Tell us how we can help..."
+                    placeholder={t('form.messagePlaceholder')}
                     rows={5}
                     aria-invalid={!!errors.message}
                     className="resize-none"
@@ -148,12 +176,12 @@ const Contact = () => {
                 {isSubmitting ? (
                   <>
                     <DASHBOARD_ICONS.LOADER2 className="mr-2 h-5 w-5 animate-spin" />
-                    Sending...
+                    {t('form.btnSending')}
                   </>
                 ) : (
                   <>
                     <GUEST_ICONS.SEND className="mr-2 h-5 w-5" />
-                    Send Message
+                    {t('form.btnSend')}
                   </>
                 )}
               </Button>
@@ -166,3 +194,4 @@ const Contact = () => {
 };
 
 export default Contact;
+

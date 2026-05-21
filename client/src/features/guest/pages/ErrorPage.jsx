@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 const ErrorPage = () => {
+  const { t } = useTranslation('error');
   const location = useLocation();
 
   return (
@@ -56,7 +58,7 @@ const ErrorPage = () => {
             <span className="bg-destructive absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
             <span className="bg-destructive relative inline-flex h-2 w-2 rounded-full" />
           </span>
-          Page Not Found
+          {t('badge')}
         </div>
 
         {/* 404 Large number */}
@@ -78,14 +80,13 @@ const ErrorPage = () => {
           <div className="mb-4 flex items-center justify-center gap-2">
             <GUEST_ICONS.SPARKLES size={18} className="text-primary" />
             <h2 className="text-xl font-bold tracking-tight">
-              Oops! Lost in space
+              {t('title')}
             </h2>
             <GUEST_ICONS.SPARKLES size={18} className="text-primary" />
           </div>
 
           <p className="text-muted-foreground mb-4 leading-relaxed">
-            The page you&apos;re looking for doesn&apos;t exist or has been
-            moved. Let&apos;s get you back on track.
+            {t('description')}
           </p>
 
           {/* Requested path display */}
@@ -104,7 +105,7 @@ const ErrorPage = () => {
           >
             <Link to="/">
               <GUEST_ICONS.HOME className="mr-2 h-5 w-5" />
-              Back to Home
+              {t('btnHome')}
             </Link>
           </Button>
           <Button
@@ -114,7 +115,7 @@ const ErrorPage = () => {
             className="border-border/50 bg-background/50 hover:bg-muted group h-13 w-full rounded-full px-8 text-base backdrop-blur-sm transition-all hover:-translate-y-1 sm:w-auto"
           >
             <Link to="/login">
-              Sign In
+              {t('btnSignIn')}
               <GUEST_ICONS.ARROW_RIGHT className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>
@@ -122,7 +123,7 @@ const ErrorPage = () => {
 
         {/* Footer text */}
         <p className="text-muted-foreground/60 animate-in fade-in fill-mode-both mt-12 text-xs delay-700 duration-1000">
-          TaskFlow &mdash; Organize your work. Empower your life.
+          {t('footer')}
         </p>
       </div>
 
@@ -138,3 +139,4 @@ const ErrorPage = () => {
 };
 
 export default ErrorPage;
+

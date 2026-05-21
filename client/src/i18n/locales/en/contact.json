@@ -1,0 +1,41 @@
+{
+  "badge": "Get in Touch",
+  "title": "We'd love to",
+  "titleHighlight": "hear from you",
+  "description": "Have a question, feedback, or just want to say hello? Fill out the form below and our team will get back to you promptly.",
+  "infoCards": {
+    "list": {
+      "0": {
+        "title": "Email Us",
+        "description": "We respond within 24 hours"
+      },
+      "1": {
+        "title": "Office",
+        "description": "123 Market Street, Suite 400"
+      },
+      "2": {
+        "title": "Phone",
+        "description": "Mon – Fri, 9 AM – 6 PM PST"
+      },
+      "3": {
+        "title": "Business Hours",
+        "detail": "Mon – Fri",
+        "description": "9:00 AM – 6:00 PM PST"
+      }
+    }
+  },
+  "form": {
+    "nameLabel": "Full Name",
+    "namePlaceholder": "John Doe",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "john@example.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us how we can help...",
+    "btnSending": "Sending...",
+    "btnSend": "Send Message"
+  },
+  "toast": {
+    "success": "Message sent successfully!",
+    "description": "Thanks {{name}}, we'll get back to you at {{email}} soon."
+  }
+}

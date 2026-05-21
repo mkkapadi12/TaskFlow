@@ -1,0 +1,172 @@
+{
+  "hero": {
+    "badge": "Documentation",
+    "title": "Build with",
+    "titleHighlight": "TaskFlow API",
+    "description": "Everything you need to integrate with TaskFlow. Explore our REST API, authentication guides, and workflow documentation to get started in minutes.",
+    "btnQuickstart": "Quick Start",
+    "btnReference": "API Reference"
+  },
+  "highlights": {
+    "rest": {
+      "label": "RESTful API",
+      "detail": "Clean, intuitive endpoints"
+    },
+    "jwt": {
+      "label": "JWT Auth",
+      "detail": "Secure token-based access"
+    },
+    "openapi": {
+      "label": "OpenAPI 3.0",
+      "detail": "Full Swagger documentation"
+    }
+  },
+  "quickstart": {
+    "badge": "Quick Start",
+    "title": "Up and running in",
+    "titleHighlight": "4 steps",
+    "description": "Follow these steps to start managing projects and tasks with the TaskFlow API.",
+    "steps": {
+      "0": {
+        "title": "Create an Account",
+        "description": "Sign up with your email and password. You'll receive a welcome email to confirm your account."
+      },
+      "1": {
+        "title": "Authenticate",
+        "description": "Log in to receive your JWT token. Include it in the Authorization header for all subsequent requests."
+      },
+      "2": {
+        "title": "Create a Project",
+        "description": "Start organizing your work by creating a project. You'll automatically become the project owner."
+      },
+      "3": {
+        "title": "Add Tasks",
+        "description": "Create tasks within your project. Assign them to team members and set priorities and deadlines."
+      }
+    }
+  },
+  "reference": {
+    "badge": "API Reference",
+    "title": "Complete",
+    "titleHighlight": "endpoint reference",
+    "description": "Explore all available endpoints organized by resource. All endpoints use the base URL /api.",
+    "sections": {
+      "auth": {
+        "title": "Authentication",
+        "description": "Register, login, and manage user sessions with JWT tokens.",
+        "endpoints": {
+          "0": "Create a new user account and receive a JWT token",
+          "1": "Authenticate and receive a JWT token"
+        }
+      },
+      "users": {
+        "title": "Users",
+        "description": "Manage user profiles, avatars, and account settings.",
+        "endpoints": {
+          "0": "Get the authenticated user's profile",
+          "1": "Update profile information and avatar",
+          "2": "Get a specific user by ID",
+          "3": "List all users (Admin only)"
+        }
+      },
+      "projects": {
+        "title": "Projects",
+        "description": "Create and manage projects, invite members with role-based access.",
+        "endpoints": {
+          "0": "Create a new project",
+          "1": "List projects you're a member of",
+          "2": "Get full project details with members and tasks",
+          "3": "Update project title, description, or status",
+          "4": "Delete a project and all associated data",
+          "5": "Add a member to the project"
+        }
+      },
+      "tasks": {
+        "title": "Tasks",
+        "description": "Create, assign, and track tasks with status workflows and priority levels.",
+        "endpoints": {
+          "0": "Create a new task in a project",
+          "1": "Get all tasks assigned to you",
+          "2": "Get your overdue tasks",
+          "3": "List all tasks for a project",
+          "4": "Update task fields (title, priority, deadline)",
+          "5": "Move task between statuses",
+          "6": "Approve or reject a task in review (Owner only)",
+          "7": "Delete a task"
+        }
+      }
+    }
+  },
+  "auth": {
+    "badge": "Authentication",
+    "title": "Secure",
+    "titleHighlight": "token-based",
+    "titleEnd": "auth",
+    "description": "TaskFlow uses JWT (JSON Web Tokens) for authentication. Include your token in every request to access protected resources.",
+    "flowTitle": "How Authentication Works",
+    "flow": {
+      "0": {
+        "title": "Register or Login",
+        "desc": "Call the auth endpoint with your credentials"
+      },
+      "1": {
+        "title": "Receive JWT Token",
+        "desc": "Server returns a signed JWT in the response"
+      },
+      "2": {
+        "title": "Include in Requests",
+        "desc": "Add the token to the Authorization header"
+      },
+      "3": {
+        "title": "Access Resources",
+        "desc": "Server validates the token and returns data"
+      }
+    },
+    "exampleRequest": "Example Request",
+    "rolesTitle": "Authorization Roles",
+    "roles": {
+      "owner": {
+        "role": "OWNER",
+        "desc": "Full control — manage members, verify tasks"
+      },
+      "admin": {
+        "role": "ADMIN",
+        "desc": "Create projects, manage tasks and members"
+      },
+      "member": {
+        "role": "MEMBER",
+        "desc": "View project, update assigned tasks"
+      }
+    }
+  },
+  "workflow": {
+    "badge": "Workflow",
+    "title": "Task",
+    "titleHighlight": "status workflow",
+    "description": "Tasks follow a structured workflow from creation to completion, with a verification step to ensure quality.",
+    "steps": {
+      "0": {
+        "title": "Task Creation",
+        "desc": "Owner or Admin creates a task and optionally assigns it to a project member. Status starts as TODO."
+      },
+      "1": {
+        "title": "Status Transitions",
+        "desc": "The assignee or any manager can move tasks through TODO → IN_PROGRESS → IN_REVIEW using the status endpoint."
+      },
+      "2": {
+        "title": "Verification",
+        "desc": "Only the project Owner can approve (→ DONE) or reject (→ IN_PROGRESS) tasks that are IN_REVIEW."
+      },
+      "3": {
+        "title": "Completion",
+        "desc": "DONE status is only reachable through the verify endpoint — it cannot be set directly."
+      }
+    }
+  },
+  "cta": {
+    "title": "Ready to start building?",
+    "description": "Create your free account and start integrating with the TaskFlow API in minutes. Full Swagger documentation available at /api/docs.",
+    "btnStart": "Get API Access",
+    "btnContact": "Contact Support"
+  }
+}

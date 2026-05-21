@@ -1,0 +1,98 @@
+{
+  "actions": {
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "add": "Add",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "back": "Back",
+    "search": "Search",
+    "view": "View",
+    "close": "Close",
+    "submit": "Submit",
+    "filter": "Filter",
+    "clear": "Clear",
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "deleting": "Deleting..."
+  },
+  "auth": {
+    "login": "Log In",
+    "register": "Register",
+    "logout": "Log Out",
+    "email": "Email Address",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "alreadyAccount": "Already have an account?",
+    "username": "Username",
+    "fullName": "Full Name"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "projects": "Projects",
+    "tasks": "Tasks",
+    "profile": "Profile",
+    "settings": "Settings",
+    "documentation": "Documentation",
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "status": {
+    "todo": "To Do",
+    "inProgress": "In Progress",
+    "inReview": "In Review",
+    "done": "Done"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent"
+  },
+  "role": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "member": "Member"
+  },
+  "messages": {
+    "error": "Something went wrong",
+    "success": "Done!",
+    "noData": "No data found",
+    "notFound": "Page not found",
+    "required": "This field is required",
+    "areYouSure": "Are you sure you want to proceed?"
+  },
+  "header": {
+    "nextGen": "Next Gen",
+    "docs": "Docs",
+    "new": "New",
+    "getStarted": "Get Started"
+  },
+  "footer": {
+    "description": "Streamline your workflow, collaborate with your team, and achieve your goals with our professional task management platform.",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "features": "Features",
+    "pricing": "Pricing",
+    "roadmap": "Roadmap",
+    "changelog": "Changelog",
+    "aboutUs": "About Us",
+    "careers": "Careers",
+    "blog": "Blog",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookiePolicy": "Cookie Policy",
+    "allRightsReserved": "All rights reserved.",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "cookies": "Cookies"
+  }
+}

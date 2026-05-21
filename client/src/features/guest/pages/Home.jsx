@@ -1,10 +1,52 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
-import { FEATURES, STATS } from '@/constant';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 const Home = () => {
+  const { t } = useTranslation('home');
+
+  const stats = [
+    { value: '50K+', label: t('stats.activeUsers') },
+    { value: '2M+', label: t('stats.tasksCompleted') },
+    { value: '99.9%', label: t('stats.uptime') },
+    { value: '4.9★', label: t('stats.userRating') },
+  ];
+
+  const features = [
+    {
+      icon: GUEST_ICONS.ZAP,
+      title: t('features.list.fast.title'),
+      description: t('features.list.fast.description'),
+    },
+    {
+      icon: GUEST_ICONS.SHIELD,
+      title: t('features.list.secure.title'),
+      description: t('features.list.secure.description'),
+    },
+    {
+      icon: GUEST_ICONS.CHECK,
+      title: t('features.list.organized.title'),
+      description: t('features.list.organized.description'),
+    },
+    {
+      icon: GUEST_ICONS.USERS,
+      title: t('features.list.team.title'),
+      description: t('features.list.team.description'),
+    },
+    {
+      icon: GUEST_ICONS.CHART,
+      title: t('features.list.analytics.title'),
+      description: t('features.list.analytics.description'),
+    },
+    {
+      icon: GUEST_ICONS.CLOCK,
+      title: t('features.list.time.title'),
+      description: t('features.list.time.description'),
+    },
+  ];
+
   return (
     <>
       {/* ── Hero Section ── */}
@@ -16,22 +58,20 @@ const Home = () => {
               <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
               <span className="bg-primary relative inline-flex h-2 w-2 rounded-full" />
             </span>
-            The smarter way to manage tasks
+            {t('hero.badge')}
           </div>
 
           {/* Heading */}
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
-            Organize your work. <br className="hidden sm:block" />
+            {t('hero.title')} <br className="hidden sm:block" />
             <span className="from-primary to-accent-foreground bg-linear-to-r bg-clip-text text-transparent">
-              Empower your life.
+              {t('hero.subtitle')}
             </span>
           </h1>
 
           {/* Sub-heading */}
           <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed sm:text-xl">
-            TaskFlow is the ultimate workspace to track projects, manage tasks,
-            and collaborate effortlessly. Stay productive and focused on what
-            matters most.
+            {t('hero.description')}
           </p>
 
           {/* CTA buttons */}
@@ -42,7 +82,7 @@ const Home = () => {
               className="shadow-primary/25 hover:shadow-primary/30 group h-14 w-full rounded-full px-8 text-lg shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl sm:w-auto"
             >
               <Link to="/register">
-                Get Started for Free
+                {t('hero.ctaStart')}
                 <GUEST_ICONS.ARROW_RIGHT className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
             </Button>
@@ -52,7 +92,7 @@ const Home = () => {
               size="lg"
               className="border-border/50 bg-background/50 hover:bg-muted h-14 w-full rounded-full px-8 text-lg backdrop-blur-sm transition-all hover:-translate-y-1 sm:w-auto"
             >
-              <Link to="/login">Sign in to your account</Link>
+              <Link to="/login">{t('hero.ctaLogin')}</Link>
             </Button>
           </div>
         </div>
@@ -60,7 +100,7 @@ const Home = () => {
         {/* Stats bar */}
         <div className="animate-in fade-in slide-in-from-bottom-12 fill-mode-both mt-20 w-full max-w-3xl delay-300 duration-1000">
           <div className="border-border/50 bg-card/50 grid grid-cols-2 gap-6 rounded-2xl border p-6 backdrop-blur-sm md:grid-cols-4">
-            {STATS.map(({ value, label }) => (
+            {stats.map(({ value, label }) => (
               <div key={label} className="text-center">
                 <p className="text-primary text-2xl font-bold sm:text-3xl">
                   {value}
@@ -79,20 +119,19 @@ const Home = () => {
         <div className="animate-in fade-in slide-in-from-bottom-6 fill-mode-both mx-auto mb-16 max-w-2xl text-center duration-700">
           <div className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
             <GUEST_ICONS.SPARKLES size={14} />
-            Features
+            {t('features.badge')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            Everything you need to{' '}
-            <span className="text-primary">stay productive</span>
+            {t('features.title')}
+            <span className="text-primary">{t('features.titleHighlight')}</span>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg">
-            Powerful tools designed to streamline your workflow and help your
-            team deliver results faster.
+            {t('features.description')}
           </p>
         </div>
 
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map(({ icon: Icon, title, description }, i) => (
+          {features.map(({ icon: Icon, title, description }, i) => (
             <div
               key={title}
               className="group border-border/50 bg-card/50 hover:border-primary/40 hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-8 fill-mode-both relative rounded-2xl border p-6 shadow-xl shadow-black/5 backdrop-blur-sm transition-all duration-700 hover:-translate-y-1 hover:shadow-2xl"
@@ -118,11 +157,10 @@ const Home = () => {
 
           <div className="relative z-10 space-y-6">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-              Ready to take control of your tasks?
+              {t('ctaSection.title')}
             </h2>
             <p className="text-muted-foreground mx-auto max-w-xl text-lg">
-              Join thousands of professionals who use TaskFlow to manage their
-              work and boost productivity every day.
+              {t('ctaSection.description')}
             </p>
             <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
               <Button
@@ -131,7 +169,7 @@ const Home = () => {
                 className="shadow-primary/25 hover:shadow-primary/30 group h-13 rounded-full px-8 text-base shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl"
               >
                 <Link to="/register">
-                  Start Free Trial
+                  {t('ctaSection.btnStart')}
                   <GUEST_ICONS.ARROW_RIGHT className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
@@ -141,7 +179,7 @@ const Home = () => {
                 size="lg"
                 className="border-border/50 hover:bg-muted h-13 rounded-full px-8 text-base transition-all hover:-translate-y-1"
               >
-                <Link to="/contact">Contact Us</Link>
+                <Link to="/contact">{t('ctaSection.btnContact')}</Link>
               </Button>
             </div>
           </div>

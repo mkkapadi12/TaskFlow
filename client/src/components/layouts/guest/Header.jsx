@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
@@ -9,10 +10,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import LanguageSwitcher from '@/helper/LanguageSwitcher';
 import { ThemeToggle } from '@/helper/ThemeToggle';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 const Header = ({ navLinks }) => {
+  const { t } = useTranslation();
+
   return (
     <header className="border-border/40 bg-background/60 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
@@ -30,7 +34,7 @@ const Header = ({ navLinks }) => {
             </span>
             <span className="text-primary -mt-1 flex items-center gap-1 text-[10px] font-medium">
               <GUEST_ICONS.SPARKLES size={10} />
-              Next Gen
+              {t('header.nextGen')}
             </span>
           </div>
         </Link>
@@ -50,7 +54,7 @@ const Header = ({ navLinks }) => {
                 }`
               }
             >
-              {label}
+              {t(`nav.${label.toLowerCase()}`)}
             </NavLink>
           ))}
 
@@ -58,32 +62,33 @@ const Header = ({ navLinks }) => {
             to="/docs"
             className="text-muted-foreground hover:text-foreground hover:bg-muted/50 flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium transition-all"
           >
-            Docs
+            {t('header.docs')}
             <Badge
               variant="outline"
               className="border-primary/30 text-primary h-4 px-1 py-0 text-[10px]"
             >
-              New
+              {t('header.new')}
             </Badge>
           </Link>
         </nav>
 
         {/* Right actions */}
         <div className="flex items-center gap-3">
+          <LanguageSwitcher compact />
           <ThemeToggle />
 
           <Link
             to="/login"
             className="text-muted-foreground hover:text-foreground hidden px-3 py-2 text-sm font-medium transition-colors sm:inline-flex"
           >
-            Log in
+            {t('auth.login')}
           </Link>
 
           <Button
             asChild
             className="shadow-primary/20 hover:shadow-primary/25 hidden rounded-full px-5 shadow-lg transition-all hover:-translate-y-0.5 sm:inline-flex"
           >
-            <Link to="/register">Get Started</Link>
+            <Link to="/register">{t('header.getStarted')}</Link>
           </Button>
 
           {/* Mobile hamburger (Sheet Trigger) */}
@@ -151,7 +156,7 @@ const Header = ({ navLinks }) => {
                                 : 'text-muted-foreground'
                             }
                           />
-                          {label}
+                          {t(`nav.${label.toLowerCase()}`)}
                         </>
                       )}
                     </NavLink>
@@ -164,31 +169,32 @@ const Header = ({ navLinks }) => {
                 >
                   <div className="flex items-center gap-3">
                     <GUEST_ICONS.LIGHTBULB size={18} />
-                    Documentation
+                    {t('nav.documentation')}
                   </div>
                   <Badge
                     variant="outline"
                     className="border-primary/30 text-primary text-[10px]"
                   >
-                    New
+                    {t('header.new')}
                   </Badge>
                 </a>
               </nav>
 
               {/* Actions */}
               <div className="border-border/40 mt-auto flex flex-col gap-3 border-t pt-6">
+                <LanguageSwitcher />
                 <Button
                   asChild
                   variant="outline"
                   className="h-11 w-full justify-center rounded-xl"
                 >
-                  <Link to="/login">Log in</Link>
+                  <Link to="/login">{t('auth.login')}</Link>
                 </Button>
                 <Button
                   asChild
                   className="shadow-primary/20 h-11 w-full justify-center rounded-xl shadow-lg"
                 >
-                  <Link to="/register">Get Started</Link>
+                  <Link to="/register">{t('header.getStarted')}</Link>
                 </Button>
               </div>
             </SheetContent>
