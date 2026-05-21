@@ -24,6 +24,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useChangePasswordMutation } from '@/features/auth/auth.api';
+import {
+  useGetNotificationSettingsQuery,
+  useUpdateNotificationSettingsMutation,
+} from '@/features/notifications/notification.api';
 import { useAuth } from '@/hooks/useAuth';
 
 const SettingPage = () => {
@@ -36,6 +40,11 @@ const SettingPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const [changePassword, { isLoading }] = useChangePasswordMutation();
+  const { data: nsData, isLoading: nsLoading } =
+    useGetNotificationSettingsQuery();
+  const [updateSettings] = useUpdateNotificationSettingsMutation();
+
+  const ns = nsData?.data;
 
   const {
     register,
@@ -67,6 +76,21 @@ const SettingPage = () => {
       toast.error(
         err?.data?.message || err?.message || 'Failed to change password'
       );
+    }
+  };
+
+  const handleToggle = async (key, value) => {
+    try {
+      await updateSettings({
+        welcome: ns?.welcome ?? 1,
+        passwordReset: ns?.passwordReset ?? 1,
+        memberAdded: ns?.memberAdded ?? 1,
+        memberRemoved: ns?.memberRemoved ?? 1,
+        [key]: value ? 1 : 0, // override only changed key
+      }).unwrap();
+      toast.success('Notification preference saved');
+    } catch {
+      toast.error('Failed to update notification preference');
     }
   };
 
@@ -291,7 +315,7 @@ const SettingPage = () => {
         </Card>
 
         {/* Notifications (Placeholder) */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Notifications</CardTitle>
             <CardDescription>
@@ -317,6 +341,84 @@ const SettingPage = () => {
               </div>
               <Switch id="push-notif" />
             </div>
+          </CardContent>
+        </Card> */}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Notifications</CardTitle>
+            <CardDescription>
+              Configure which emails you receive from TaskFlow.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {nsLoading ? (
+              <p className="text-muted-foreground text-sm">Loading...</p>
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="notif-member-added">Added to Project</Label>
+                    <p className="text-muted-foreground text-sm">
+                      Email when you're added to a project.
+                    </p>
+                  </div>
+                  <Switch
+                    id="notif-member-added"
+                    checked={ns?.memberAdded === 1}
+                    onCheckedChange={(val) => handleToggle('memberAdded', val)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="notif-member-removed">
+                      Removed from Project
+                    </Label>
+                    <p className="text-muted-foreground text-sm">
+                      Email when you're removed from a project.
+                    </p>
+                  </div>
+                  <Switch
+                    id="notif-member-removed"
+                    checked={ns?.memberRemoved === 1}
+                    onCheckedChange={(val) =>
+                      handleToggle('memberRemoved', val)
+                    }
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="notif-welcome">Welcome Email</Label>
+                    <p className="text-muted-foreground text-sm">
+                      Onboarding email on account creation.
+                    </p>
+                  </div>
+                  <Switch
+                    id="notif-welcome"
+                    checked={ns?.welcome === 1}
+                    onCheckedChange={(val) => handleToggle('welcome', val)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="notif-password-reset">Password Reset</Label>
+                    <p className="text-muted-foreground text-sm">
+                      Security emails for password changes.
+                    </p>
+                  </div>
+                  <Switch
+                    id="notif-password-reset"
+                    checked={ns?.passwordReset === 1}
+                    onCheckedChange={(val) =>
+                      handleToggle('passwordReset', val)
+                    }
+                  />
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

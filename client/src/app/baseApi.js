@@ -22,6 +22,6 @@ const axiosBaseQuery =
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery(),
-  tagTypes: ['User', 'Project', 'Task'],
+  tagTypes: ['User', 'Project', 'Task', 'NotificationSettings'],
   endpoints: () => ({}), // feature apis inject here
 });

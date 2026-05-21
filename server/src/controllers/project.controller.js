@@ -111,6 +111,7 @@ const addProjectMember = async (req, res, next) => {
       const project = await getProjectBasicInfo(projectId);
       if (project && member?.userEmail) {
         await sendProjectMemberAddedEmail({
+          memberId: Number(member.userId),
           memberName: member.userName,
           memberEmail: member.userEmail,
           projectId,
@@ -175,6 +176,7 @@ const removeMember = async (req, res, next) => {
     try {
       if (targetUser?.email && project) {
         await sendProjectMemberRemovedEmail({
+          memberId: Number(targetUser.id),
           memberName: targetUser.name,
           memberEmail: targetUser.email,
           projectTitle: project.title,

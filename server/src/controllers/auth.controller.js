@@ -9,7 +9,11 @@ import {
 const register = async (req, res, next) => {
   try {
     const { user, token } = await AuthModel.register(req.body);
-    await sendWelcomeEmail({ name: user.name, email: user.email });
+    await sendWelcomeEmail({
+      userId: user.id,
+      name: user.name,
+      email: user.email,
+    });
     res.status(201).json({
       success: true,
       message: 'Account created successfully',
@@ -43,6 +47,7 @@ const forgotPassword = async (req, res, next) => {
 
     try {
       await sendPasswordResetEmail({
+        userId: user.id,
         name: user.name,
         email: user.email,
         resetUrl,

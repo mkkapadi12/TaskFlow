@@ -55,8 +55,13 @@ CALL sp_UpdateTaskStatus(1, 'IN_REVIEW');
 CALL sp_DeleteTask(3);
 CALL sp_DeleteProject(2);
 
+-- notification
+CALL sp_GetNotificationSettings(6);
+CALL sp_UpdateNotificationSettings(7, 0, 1, 0, 1);
+
 -- ── Inspect tables ────────────────────────────────────────────
 SELECT * FROM users;
 SELECT * FROM projects;
 SELECT * FROM project_members;
 SELECT * FROM tasks;
+SELECT * FROM notification_settings;

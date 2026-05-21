@@ -82,3 +82,17 @@ CREATE TABLE IF NOT EXISTS tasks (
     INDEX idx_tasks_creatorId  (creatorId),
     INDEX idx_tasks_status     (status)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- notification_settings
+CREATE TABLE notification_settings (
+    id        INT PRIMARY KEY AUTO_INCREMENT,
+    userId    INT NOT NULL UNIQUE,
+    welcome         TINYINT(1) NOT NULL DEFAULT 1,
+    passwordReset   TINYINT(1) NOT NULL DEFAULT 1,
+    memberAdded     TINYINT(1) NOT NULL DEFAULT 1,
+    memberRemoved   TINYINT(1) NOT NULL DEFAULT 1,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_ns_user FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+);
