@@ -4,10 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useGetMyTasksQuery } from '@/features/tasks/task.api';
+import { formatDateDisplay } from '@/lib/utils';
 
 const UserCalendar = () => {
-  const { data: tasks, isLoading } = useGetMyTasksQuery();
+  const { data: tasksData, isLoading } = useGetMyTasksQuery();
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const tasks = tasksData?.data;
 
   if (isLoading) return <div className="p-6">Loading calendar...</div>;
 
@@ -37,7 +40,9 @@ const UserCalendar = () => {
   return (
     <div className="space-y-4 p-3 sm:space-y-6 sm:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Calendar</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Calendar
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr]">
@@ -59,7 +64,7 @@ const UserCalendar = () => {
             <CardTitle>
               Tasks for{' '}
               {selectedDate
-                ? selectedDate.toLocaleDateString()
+                ? formatDateDisplay(selectedDate, 'short')
                 : 'Select a date'}
             </CardTitle>
           </CardHeader>

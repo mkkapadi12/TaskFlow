@@ -44,7 +44,9 @@ const UserDashboard = () => {
     value,
   }));
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  // Colors aligned with the app's status/accent palette:
+  // emerald (DONE), sky (TODO), amber (IN_REVIEW), violet (IN_PROGRESS)
+  const COLORS = ['#10b981', '#38bdf8', '#f59e0b', '#8b5cf6'];
 
   // Filter upcoming deadlines
   const upcomingTasks = Array.isArray(tasksData)
@@ -62,7 +64,9 @@ const UserDashboard = () => {
   return (
     <div className="space-y-4 p-3 sm:space-y-6 sm:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Dashboard</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          Dashboard
+        </h1>
       </div>
 
       {/* Stats Cards */}

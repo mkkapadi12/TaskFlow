@@ -13,6 +13,7 @@ import RegisterPage from './features/auth/pages/RegisterPage';
 import ResetPasswordPage from './features/auth/pages/ResetPasswordPage';
 import About from './features/guest/pages/About';
 import Contact from './features/guest/pages/Contact';
+import Docs from './features/guest/pages/Docs';
 // ── Error Page
 import ErrorPage from './features/guest/pages/ErrorPage';
 // ── Guest Pages Components
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
           { path: '/', element: <Home /> },
           { path: '/about', element: <About /> },
           { path: '/contact', element: <Contact /> },
+          { path: '/docs', element: <Docs /> },
         ],
       },
       { path: '/login', element: <LoginPage /> },

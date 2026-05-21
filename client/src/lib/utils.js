@@ -17,15 +17,33 @@ export const formatDate = (isoString) => {
   return newDate;
 };
 
-export const formatDateDisplay = (dateString) => {
+export const formatDateDisplay = (dateString, format = 'short') => {
   if (!dateString) return '- ';
 
   const date = new Date(dateString);
   if (isNaN(date)) return dateString;
 
-  return date.toLocaleDateString('en-IN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  if (format === 'short') {
+    return date.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  if (format === 'dd/mm/yyyy') {
+    return date.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+    });
+  }
+
+  if (format === 'long') {
+    return date.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
 };
