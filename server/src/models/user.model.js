@@ -30,7 +30,8 @@ const UserModel = {
 
     if (
       name.trim() === user.name.trim() &&
-      Number(phone) === Number(user.phone)
+      Number(phone) === Number(user.phone) &&
+      !file
     ) {
       throw new AppError('No changes found', 400);
     }

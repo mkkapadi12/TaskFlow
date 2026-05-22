@@ -13,11 +13,14 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
 
   useEffect(() => {
     if (user) {
-      setName(user.name || '');
-      setPhone(user.phone || '');
-      setPreviewUrl(user.avatar || '');
+      setName(user?.name?.trim() || '');
+      setPhone(user?.phone || '');
+      setAvatar(null);
+      setPreviewUrl(user?.avatar || '');
     }
   }, [user]);
+
+  console.log(user);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

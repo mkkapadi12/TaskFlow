@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { formatDateDisplay } from '@/lib/utils';
 
 import { useGetMyProjectsQuery } from '../../project/project.api';
 import { useGetMyTasksQuery } from '../../tasks/task.api';
@@ -46,7 +47,10 @@ const ProfilePage = () => {
         {/* Left Column: Summary */}
         <div className="space-y-6 lg:col-span-1">
           <Card className="border-border/50 bg-card/50 overflow-hidden shadow-xl shadow-black/5 backdrop-blur-sm">
-            <div className="from-primary/20 to-primary/5 h-24 bg-linear-to-r" />
+            <div className="from-primary/20 to-primary/5 flex h-24 bg-linear-to-r flex-col items-center justify-center">
+              <span className="text-muted-foreground text-sm">Member since</span>{' '}
+              <span className="text-lg">{formatDateDisplay(user?.createdAt, 'long')}</span>
+            </div>
             <CardContent className="relative -mt-12 p-6 text-center">
               <div className="border-background bg-muted mb-4 inline-flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 shadow-lg">
                 {user?.avatar ? (
