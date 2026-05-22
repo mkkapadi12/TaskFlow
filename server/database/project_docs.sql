@@ -61,10 +61,10 @@ END //
 -- 4. Delete doc record
 DROP PROCEDURE IF EXISTS sp_DeleteProjectDocument //
 CREATE PROCEDURE sp_DeleteProjectDocument(
-    IN p_id INT
+    IN d_id INT
 )
 BEGIN
-    DELETE FROM project_documents WHERE id = p_id;
+    DELETE FROM project_documents WHERE id = d_id;
     SELECT ROW_COUNT() AS deletedCount;
 END //
 
