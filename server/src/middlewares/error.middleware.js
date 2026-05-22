@@ -101,4 +101,4 @@ const globalErrorHandler = (err, req, res, next) => {
   }
 };
 
-export { AppError,globalErrorHandler };
+export { AppError, globalErrorHandler };

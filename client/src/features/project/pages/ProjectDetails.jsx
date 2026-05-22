@@ -140,11 +140,11 @@ const ProjectDetails = () => {
 
   const handleSaveProject = async (payload) => {
     try {
-      await updateProject({ projectId, ...payload }).unwrap();
-      toast.success('Project updated successfully');
+      const result = await updateProject({ projectId, ...payload }).unwrap();
+      toast.success(result?.message || 'Project updated successfully');
       setIsEditOpen(false);
-    } catch (err) {
-      toast.error(err?.data?.message || 'Failed to update project');
+    } catch (error) {
+      toast.error(error.message || 'Failed to update project');
     }
   };
 

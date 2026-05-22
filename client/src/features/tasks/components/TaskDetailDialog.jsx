@@ -58,7 +58,7 @@ const TaskDetailDialog = ({
   const canChangeStatus = isManager || isAssignee;
   const canVerify = isOwner && task?.status === 'IN_REVIEW';
 
-  const { register, handleSubmit, reset, control } = useForm();
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
   const [updateStatus, { isLoading: isStatusUpdating }] =
     useUpdateTaskStatusMutation();
@@ -187,9 +187,18 @@ const TaskDetailDialog = ({
               <Input
                 id="deadline"
                 type="date"
-                {...register('deadline')}
+                min={new Date().toLocaleDateString('en-CA')}
+                {...register('deadline', {
+                  validate: (value) =>
+                    !value ||
+                    value >= new Date().toLocaleDateString('en-CA') ||
+                    'Deadline cannot be in the past',
+                })}
                 disabled={!isManager}
               />
+              {errors.deadline && (
+                <p className="text-destructive text-xs">{errors.deadline.message}</p>
+              )}
             </div>
           </div>
 

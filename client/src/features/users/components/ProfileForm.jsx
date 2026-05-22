@@ -20,8 +20,6 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
     }
   }, [user]);
 
-  console.log(user);
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {

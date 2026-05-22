@@ -24,7 +24,7 @@ import { useCreateTaskMutation } from '@/features/tasks/task.api';
 
 const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
-  const { register, handleSubmit, control, reset } = useForm({
+  const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
     defaultValues: {
       title: '',
       description: '',
@@ -109,7 +109,20 @@ const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
 
             <div className="space-y-2">
               <Label htmlFor="deadline">Deadline</Label>
-              <Input id="deadline" type="date" {...register('deadline')} />
+              <Input
+                id="deadline"
+                type="date"
+                min={new Date().toLocaleDateString('en-CA')}
+                {...register('deadline', {
+                  validate: (value) =>
+                    !value ||
+                    value >= new Date().toLocaleDateString('en-CA') ||
+                    'Deadline cannot be in the past',
+                })}
+              />
+              {errors.deadline && (
+                <p className="text-destructive text-xs">{errors.deadline.message}</p>
+              )}
             </div>
           </div>
 

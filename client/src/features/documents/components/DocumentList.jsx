@@ -1,5 +1,16 @@
+import { useState } from 'react';
 import { toast } from 'sonner';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
@@ -26,6 +37,45 @@ const EXT_COLORS = {
 };
 
 const getExt = (name) => name.split('.').pop()?.toLowerCase() || 'file';
+
+const DeleteDocumentButton = ({ doc, onDelete }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen(true)}
+        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
+        aria-label={`Delete ${doc.name}`}
+      >
+        <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
+      </Button>
+
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent className="border-border/50 bg-card/95 backdrop-blur-sm sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete document?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="text-foreground font-medium">{doc.name}</span>{' '}
+              will be permanently deleted and cannot be recovered.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => onDelete(doc.id)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+};
 
 const DocumentList = ({ projectId, isManager }) => {
   const { data, isLoading } = useGetDocumentsQuery(projectId);
@@ -78,7 +128,7 @@ const DocumentList = ({ projectId, isManager }) => {
             </div>
 
             <Badge
-              className={`${EXT_COLORS[ext] || 'bg-muted text-muted-foreground'} border-transparent text-[10px] lowecase`}
+              className={`${EXT_COLORS[ext] || 'bg-muted text-muted-foreground'} lowecase border-transparent text-[10px]`}
             >
               .{ext}
             </Badge>
@@ -90,14 +140,7 @@ const DocumentList = ({ projectId, isManager }) => {
             </a>
 
             {isManager && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleDelete(doc.id)}
-                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
-              >
-                <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
-              </Button>
+              <DeleteDocumentButton doc={doc} onDelete={handleDelete} />
             )}
           </li>
         );

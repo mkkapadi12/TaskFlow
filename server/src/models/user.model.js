@@ -33,7 +33,7 @@ const UserModel = {
       Number(phone) === Number(user.phone) &&
       !file
     ) {
-      throw new AppError('No changes found', 400);
+      throw new AppError('No changes to update', 400);
     }
 
     let avatar = user.avatar;

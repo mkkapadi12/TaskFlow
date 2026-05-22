@@ -64,6 +64,17 @@ const ProjectModel = {
   update: async (projectId, ownerId, body) => {
     await requireOwner(projectId, ownerId);
     const { title, description, status } = body;
+
+    const [row] = await callProcedure('sp_GetProjectById', [projectId]);
+    if (!row) throw new AppError('Project not found', 404);
+
+    const project = row[0];
+
+    if(project.title === title && project.description === description && project.status === status)
+    {
+      throw new AppError('No changes to update', 400);
+    }
+
     const [result] = await callProcedure('sp_UpdateProject', [
       projectId,
       title ?? null,

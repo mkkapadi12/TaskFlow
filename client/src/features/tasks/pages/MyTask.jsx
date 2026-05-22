@@ -27,8 +27,6 @@ const MyTask = () => {
     return matchesStatus && matchesSearch;
   });
 
-  console.log(tasksData);
-
   return (
     <div className="container mx-auto px-3 py-5 sm:px-6 sm:py-8">
       <TaskHeader />
