@@ -86,6 +86,11 @@ export const NAV_ITEMS = [
     label: 'Projects',
     icon: DASHBOARD_ICONS.SQUARESTACK,
   },
+  {
+    to: '/documents',
+    label: 'Requirements',
+    icon: DASHBOARD_ICONS.FILETEXT,
+  },
   { to: '/tasks', label: 'Tasks', icon: DASHBOARD_ICONS.LISTCHECKS },
   { to: '/profile', label: 'Profile', icon: DASHBOARD_ICONS.USER },
   { to: '/settings', label: 'Settings', icon: DASHBOARD_ICONS.SETTINGS },
@@ -116,6 +121,11 @@ export const PAGE_TITLES = [
     path: '/projects',
     title: 'Projects',
     description: 'View and manage your projects',
+  },
+  {
+    path: '/documents',
+    title: 'Documents',
+    description: 'View and manage your documents',
   },
   {
     path: '/tasks',

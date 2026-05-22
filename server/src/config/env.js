@@ -9,7 +9,7 @@ const env = {
   },
 
   client: {
-    url: process.env.CLIENT_URL || 'http://localhost:5173',
+    url: process.env.CLIENT_URL || `http://${process.env.IP_ADDRESS}:5173`,
   },
 
   db: {

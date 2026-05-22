@@ -40,4 +40,4 @@ const requireManager = async (projectId, userId) => {
   return membership;
 };
 
-export { getMembership, requireManager,requireMembership, requireOwner };
+export { getMembership, requireManager, requireMembership, requireOwner };

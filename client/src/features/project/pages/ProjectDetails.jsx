@@ -31,6 +31,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import DocumentList from '@/features/documents/components/DocumentList';
+import DocumentUploader from '@/features/documents/components/DocumentUploader';
 import AddMemberDialog from '@/features/project/components/AddMemberDialog';
 import EditProjectDialog from '@/features/project/components/EditProjectDialog';
 import {
@@ -523,6 +525,25 @@ const ProjectDetails = () => {
               })}
             </ul>
           )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-xl">Documents</CardTitle>
+              <CardDescription>
+                {isManager
+                  ? 'Upload and manage project files.'
+                  : 'Project files and resources.'}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {isManager && <DocumentUploader projectId={projectId} />}
+          <DocumentList projectId={projectId} isManager={isManager} />
         </CardContent>
       </Card>
 

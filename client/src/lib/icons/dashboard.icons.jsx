@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Download,
   Eye,
   FilePen,
   FileText,
@@ -68,4 +69,5 @@ export const DASHBOARD_ICONS = {
   BRIEFCASE: Briefcase,
   FILTER: SlidersHorizontal,
   CLOSE: X,
+  DOWNLOAD: Download,
 };

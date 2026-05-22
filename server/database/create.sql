@@ -96,3 +96,25 @@ CREATE TABLE notification_settings (
 
     CONSTRAINT fk_ns_user FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- project documents
+
+CREATE TABLE IF NOT EXISTS project_documents (
+    id          INT          PRIMARY KEY AUTO_INCREMENT,
+    projectId   INT          NOT NULL,
+    uploadedBy  INT          NOT NULL,
+    name        VARCHAR(255) NOT NULL,
+    url         VARCHAR(500) NOT NULL,
+    publicId    VARCHAR(255) NOT NULL,
+    size        INT          NOT NULL,
+    mimeType    VARCHAR(100) NOT NULL,
+    createdAt   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_doc_project
+        FOREIGN KEY (projectId)  REFERENCES projects(id) ON DELETE CASCADE,
+    CONSTRAINT fk_doc_uploader
+        FOREIGN KEY (uploadedBy) REFERENCES users(id)    ON DELETE CASCADE,
+
+    INDEX idx_doc_projectId (projectId),
+    INDEX idx_doc_uploadedBy (uploadedBy)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

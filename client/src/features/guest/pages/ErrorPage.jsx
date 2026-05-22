@@ -2,10 +2,12 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 const ErrorPage = () => {
   const { t } = useTranslation('error');
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
 
   return (
@@ -79,9 +81,7 @@ const ErrorPage = () => {
         <div className="border-border/50 bg-card/50 animate-in fade-in slide-in-from-bottom-12 fill-mode-both mb-8 w-full max-w-lg rounded-2xl border p-8 shadow-xl shadow-black/5 backdrop-blur-sm delay-200 duration-1000">
           <div className="mb-4 flex items-center justify-center gap-2">
             <GUEST_ICONS.SPARKLES size={18} className="text-primary" />
-            <h2 className="text-xl font-bold tracking-tight">
-              {t('title')}
-            </h2>
+            <h2 className="text-xl font-bold tracking-tight">{t('title')}</h2>
             <GUEST_ICONS.SPARKLES size={18} className="text-primary" />
           </div>
 
@@ -103,9 +103,9 @@ const ErrorPage = () => {
             size="lg"
             className="shadow-primary/25 hover:shadow-primary/30 group h-13 w-full rounded-full px-8 text-base shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl sm:w-auto"
           >
-            <Link to="/">
+            <Link to={isAuthenticated ? '/dashboard' : '/'}>
               <GUEST_ICONS.HOME className="mr-2 h-5 w-5" />
-              {t('btnHome')}
+              {isAuthenticated ? t('btnDashboard') : t('btnHome')}
             </Link>
           </Button>
           <Button
@@ -139,4 +139,3 @@ const ErrorPage = () => {
 };
 
 export default ErrorPage;
-

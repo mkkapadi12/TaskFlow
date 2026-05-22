@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import authRoutes from './routes/auth.routes.js';
+import documentRoutes from './routes/document.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import projectRoutes from './routes/project.routes.js';
 import taskRoutes from './routes/task.routes.js';
@@ -13,5 +14,6 @@ router.use('/users', userRoutes);
 router.use('/projects', projectRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/notifications/settings', notificationRoutes);
+router.use('/projects/:projectId/documents', documentRoutes);
 
 export default router;
