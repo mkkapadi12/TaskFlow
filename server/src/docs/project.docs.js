@@ -121,6 +121,10 @@
  * /projects/{projectId}:
  *   get:
  *     summary: Get a single project's details (members + tasks)
+ *     description: |
+ *       Returns the project record plus its members list and task list in a single
+ *       call via the multi-resultset `sp_GetFullProjectDetails`. Caller must be a
+ *       project member.
  *     tags: [Projects]
  *     parameters:
  *       - in: path
@@ -140,9 +144,19 @@
  *                 success:
  *                   type: boolean
  *                 data:
- *                   $ref: '#/components/schemas/Project'
+ *                   $ref: '#/components/schemas/ProjectDetails'
+ *       403:
+ *         description: Not a member of this project
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Project not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 
 /**
@@ -315,7 +329,11 @@
  * @swagger
  * /projects/{projectId}/member/{userId}:
  *   delete:
- *     summary: Remove a member from a project
+ *     summary: Remove a member from a project (owner only)
+ *     description: |
+ *       The optional `reason` in the request body is forwarded to the
+ *       member-removed email template (subject to the recipient's
+ *       `memberRemoved` notification preference).
  *     tags: [Project Members]
  *     parameters:
  *       - in: path
@@ -330,6 +348,12 @@
  *         schema:
  *           type: integer
  *         description: User ID of the member
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RemoveMemberInput'
  *     responses:
  *       200:
  *         description: Member removed
@@ -337,4 +361,16 @@
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/SuccessResponse'
+ *       403:
+ *         description: Caller is not the project owner
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Member not found in project
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */

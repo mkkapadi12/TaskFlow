@@ -68,21 +68,17 @@
  * /users/profile:
  *   put:
  *     summary: Update the logged-in user's profile
+ *     description: |
+ *       Multipart form. `avatar` is a single image file (jpeg/png/webp, max 5 MB)
+ *       and is uploaded to Cloudinary. The server replaces the previous Cloudinary
+ *       asset when a new file is supplied. The endpoint rejects with 400 if no
+ *       fields have actually changed.
  *     tags: [Users]
  *     requestBody:
  *       content:
  *         multipart/form-data:
  *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               role:
- *                 type: string
- *                 enum: [USER, ADMIN]
- *               avatar:
- *                 type: string
- *                 format: binary
+ *             $ref: '#/components/schemas/UpdateUserInput'
  *     responses:
  *       200:
  *         description: Profile updated
@@ -95,6 +91,12 @@
  *                   type: boolean
  *                 user:
  *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: No changes to update, or invalid file type
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       401:
  *         description: Unauthorized
  */

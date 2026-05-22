@@ -34,7 +34,11 @@ mysql -u root -p < server/database/create.sql
 mysql -u root -p <db_name> < server/database/users.sql
 mysql -u root -p <db_name> < server/database/project.sql
 mysql -u root -p <db_name> < server/database/tasks.sql
+mysql -u root -p <db_name> < server/database/notification.sql
+mysql -u root -p <db_name> < server/database/project_docs.sql
 ```
+
+`server/database/call.sql` is a scratch file for ad-hoc SP invocation — not part of bootstrap.
 
 `.env` files are required in both `client/` and `server/` (templates in `.env.example`). The server validates required env vars at boot in `server/src/config/env.js` and exits if any are missing (`DATABASE_URL`, `DATABASE_NAME`, `JWT_SECRET`, `CLOUDINARY_*`). The client needs `VITE_API_URL` — Vite proxies `/api` → `VITE_API_URL` in `vite.config.js`, so client code always calls `/api/...` regardless of where the server lives.
 
@@ -60,12 +64,28 @@ SPs use `SIGNAL SQLSTATE '45000'` for business-rule errors; `globalErrorHandler`
 
 - `protect` middleware (`auth.middleware.js`) verifies the `Authorization: Bearer <jwt>` header, calls `sp_GetUserById`, and attaches the full user to `req.user`.
 - `restrictTo("ADMIN", ...)` gates routes by the global `users.role` enum.
-- For project-scoped permissions, models call `requireMembership(projectId, userId)` or `requireOwner(projectId, userId)` from `server/src/utils/requireRole.js` — these check the `project_members` join table via `sp_GetMemberRole` and throw 403. Authorization checks happen in the **model layer**, not the route, because they depend on the SP result.
+- For project-scoped permissions, models call one of three helpers from `server/src/utils/requireRole.js` — each checks the `project_members` join table via `sp_GetMemberRole` and throws 403 on failure:
+  - `requireMembership` — any role (`OWNER` / `ADMIN` / `MEMBER`). Used for reads.
+  - `requireManager` — `OWNER` or `ADMIN`. Used to gate task creation/edits.
+  - `requireOwner` — `OWNER` only. Used for member management and task verification.
+  Authorization checks happen in the **model layer**, not the route, because they depend on the SP result.
 - Static routes must come before dynamic ones in route files (e.g. `/profile` before `/:id` in `user.routes.js`).
 
 ### Server: validation
 
 `validate(zodSchema)` middleware (`middlewares/validate.middleware.js`) parses `req.body`, **replaces it with the parsed/coerced data**, and returns 400 with a field-keyed error array on failure. Always import schemas from `server/src/schema/`.
+
+### Server: task workflow rules
+
+The task status machine is enforced in the model layer and in `sp_VerifyTask`:
+
+- `PUT /tasks/:taskId` (update) **ignores any `status` field** — fields like title, description, priority, deadline, and assignee only.
+- `PATCH /tasks/:taskId/status` moves `TODO ↔ IN_PROGRESS ↔ IN_REVIEW` and is callable by the assignee or any project manager. It **cannot set `DONE`**.
+- `PATCH /tasks/:taskId/verify` is the only path to `DONE`: owner-only, requires current status `IN_REVIEW`, body `{ approve: bool }`. Approve → `DONE`, reject → `IN_PROGRESS`. The SP `SIGNAL`s if the precondition fails.
+
+### Server: emails and notifications
+
+Email delivery is in `services/email.service.js` (SMTP via Nodemailer; HTML in `templates/emails/`). In-app notification settings live in `services/notification.service.js` and `database/notification.sql`. Respect the per-user `notification_settings` toggles before sending any email triggered by a user-facing event.
 
 ### Client: RTK Query endpoint injection
 
@@ -87,9 +107,13 @@ Auth state lives in `features/auth/auth.slice.js` and persists the JWT to `local
 
 ### Client: feature slicing
 
-Each domain owns its folder under `client/src/features/<name>/`: `pages/`, `components/`, `*.api.js` (RTK Query injection), and optionally `*.slice.js`. Shadcn primitives live in `client/src/components/ui/`; layout shells live in `client/src/components/layouts/{app,guest}/`.
+Each domain owns its folder under `client/src/features/<name>/`: `pages/`, `components/`, `*.api.js` (RTK Query injection), and optionally `*.slice.js`. Current domains: `auth`, `users`, `project`, `tasks`, `documents`, `notifications`, `admin`, `guest`. Shadcn primitives live in `client/src/components/ui/`; layout shells live in `client/src/components/layouts/{app,guest}/`; loading skeletons live in `client/src/skeleton/`.
 
 Path alias: `@/*` → `client/src/*` (configured in both `jsconfig.json` and `vite.config.js` — keep them in sync).
+
+### Client: i18n
+
+Translations live in `client/src/i18n/` (`index.js` configures i18next; `locales/` holds per-language JSON; `languages.js` enumerates supported languages). Guest-facing pages are localized; consult the existing keys before adding new strings.
 
 ## Conventions
 
