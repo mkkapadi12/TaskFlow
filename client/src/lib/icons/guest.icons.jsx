@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   BarChart3,
+  Bell,
   BookOpen,
   CheckCircle,
   ChevronRight,
@@ -9,7 +10,7 @@ import {
   Copy,
   ExternalLink,
   FileCode,
-  GitBranch,
+  FileText,
   Hash,
   Heart,
   Home,
@@ -41,6 +42,14 @@ import {
   X,
   Zap,
 } from 'lucide-react';
+import {
+  FaFacebook,
+  FaGithub,
+  FaInstagram,
+  FaLinkedin,
+  FaTelegram,
+  FaTwitter,
+} from 'react-icons/fa';
 
 export const GUEST_ICONS = {
   HOME: Home,
@@ -70,7 +79,6 @@ export const GUEST_ICONS = {
   CLOCK: Clock,
   CHART: BarChart3,
   SPARKLES: Sparkles,
-  GITHUB: GitBranch,
   BOOK_OPEN: BookOpen,
   CODE: Code,
   TERMINAL: Terminal,
@@ -84,4 +92,14 @@ export const GUEST_ICONS = {
   HASH: Hash,
   LOCK: Lock,
   SERVER: Server,
+  BELL: Bell,
+  FILE_TEXT: FileText,
+
+  // Social Icons
+  TWITTER: FaTwitter,
+  INSTAGRAM: FaInstagram,
+  LINKEDIN: FaLinkedin,
+  TELEGRAM: FaTelegram,
+  FACEBOOK: FaFacebook,
+  GITHUB: FaGithub,
 };

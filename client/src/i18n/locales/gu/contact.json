@@ -2,7 +2,40 @@
   "badge": "સંપર્ક કરો",
   "title": "અમે તમારી પાસેથી સાંભળવા",
   "titleHighlight": "ઈચ્છીએ છીએ",
-  "description": "કોઈ પ્રશ્ન, પ્રતિસાદ છે, અથવા ફક્ત હેલો કહેવા માંગો છો? નીચે આપેલ ફોર્મ ભરો અને અમારી ટીમ તમને તરત જ વળતો જવાબ આપશે.",
+  "description": "કોઈ પ્રશ્ન છે, બગ મળ્યો, કે કંઈક સૂચવવા માંગો છો? GitHub પર ઇશ્યૂ ખોલો અથવા અમને ઇમેઇલ કરો — જાળવણીકારો બધું જ વાંચે છે.",
+  "channels": {
+    "badge": "ચૅનલ્સ",
+    "title": "જાળવણીકારો સાથે વાત કરો",
+    "description": "TaskFlow પાછળના લોકો સુધી પહોંચવાના વાસ્તવિક રસ્તા આ રહ્યા.",
+    "list": {
+      "github": {
+        "title": "GitHub ઇશ્યૂ",
+        "detail": "github.com/your-username/taskflow/issues",
+        "description": "બગ રિપોર્ટ અને ફીચર સૂચનો માટે સૌથી ઝડપી રસ્તો — જાહેર અને ટ્રેક કરી શકાય તેવો."
+      },
+      "email": {
+        "title": "ઇમેઇલ",
+        "detail": "mayurkapadi12@gmail.com",
+        "description": "જે કંઈ જાહેર ઇશ્યૂ માટે યોગ્ય ન હોય તેવી કોઈ પણ બાબત માટે."
+      }
+    }
+  },
+  "form": {
+    "title": "અથવા અમને એક નોટ મોકલો",
+    "demoNote": "ધ્યાનમાં લો — જ્યાં સુધી SMTP કનેક્ટ ન થાય ત્યાં સુધી આ ફોર્મ એક UI ડેમો છે. વાસ્તવિક પ્રતિસાદ માટે કૃપા કરીને ડાબી બાજુની ચૅનલ્સનો ઉપયોગ કરો.",
+    "nameLabel": "પૂરું નામ",
+    "namePlaceholder": "જેન ડો",
+    "emailLabel": "ઇમેઇલ સરનામું",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "સંદેશ",
+    "messagePlaceholder": "અમને જણાવો તમારા મનમાં શું છે…",
+    "btnSending": "મોકલી રહ્યું છે…",
+    "btnSend": "સંદેશ મોકલો"
+  },
+  "toast": {
+    "success": "ફોર્મ સબમિટ થયું (ડેમો)",
+    "description": "આભાર {{name}} — વાસ્તવિક પ્રતિસાદ માટે કૃપા કરીને GitHub ઇશ્યૂ ખોલો અથવા ઇમેઇલ કરો."
+  },
   "infoCards": {
     "list": {
       "0": {
@@ -23,19 +56,5 @@
         "description": "સવારે 9:00 – સાંજે 6:00 PST"
       }
     }
-  },
-  "form": {
-    "nameLabel": "પૂરું નામ",
-    "namePlaceholder": "જ્હોન ડો",
-    "emailLabel": "ઇમેઇલ સરનામું",
-    "emailPlaceholder": "john@example.com",
-    "messageLabel": "સંદેશ",
-    "messagePlaceholder": "અમને જણાવો કે અમે તમને કેવી રીતે મદદ કરી શકીએ...",
-    "btnSending": "મોકલી રહ્યું છે...",
-    "btnSend": "સંદેશ મોકલો"
-  },
-  "toast": {
-    "success": "સંદેશ સફળતાપૂર્વક મોકલવામાં આવ્યો!",
-    "description": "આભાર {{name}}, અમે ટૂંક સમયમાં {{email}} પર તમારો સંપર્ક કરીશું."
   }
 }

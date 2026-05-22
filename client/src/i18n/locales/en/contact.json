@@ -1,8 +1,41 @@
 {
-  "badge": "Get in Touch",
+  "badge": "Get in touch",
   "title": "We'd love to",
   "titleHighlight": "hear from you",
-  "description": "Have a question, feedback, or just want to say hello? Fill out the form below and our team will get back to you promptly.",
+  "description": "Have a question, found a bug, or want to suggest something? Open an issue on GitHub or send us an email — the maintainers read everything.",
+  "channels": {
+    "badge": "Channels",
+    "title": "Talk to the maintainers",
+    "description": "These are the real ways to reach the people behind TaskFlow.",
+    "list": {
+      "github": {
+        "title": "GitHub Issues",
+        "detail": "github.com/your-username/taskflow/issues",
+        "description": "The fastest path for bug reports and feature ideas — public and trackable."
+      },
+      "email": {
+        "title": "Email",
+        "detail": "mayurkapadi12@gmail.com",
+        "description": "For anything not appropriate for a public issue."
+      }
+    }
+  },
+  "form": {
+    "title": "Or drop us a note",
+    "demoNote": "Heads up — this form is a UI demo until SMTP is wired up. For a real response, please use one of the channels on the left.",
+    "nameLabel": "Full name",
+    "namePlaceholder": "Jane Doe",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Tell us what's on your mind…",
+    "btnSending": "Sending…",
+    "btnSend": "Send message"
+  },
+  "toast": {
+    "success": "Form submitted (demo)",
+    "description": "Thanks {{name}} — for a real reply please open a GitHub issue or email us."
+  },
   "infoCards": {
     "list": {
       "0": {
@@ -23,19 +56,5 @@
         "description": "9:00 AM – 6:00 PM PST"
       }
     }
-  },
-  "form": {
-    "nameLabel": "Full Name",
-    "namePlaceholder": "John Doe",
-    "emailLabel": "Email Address",
-    "emailPlaceholder": "john@example.com",
-    "messageLabel": "Message",
-    "messagePlaceholder": "Tell us how we can help...",
-    "btnSending": "Sending...",
-    "btnSend": "Send Message"
-  },
-  "toast": {
-    "success": "Message sent successfully!",
-    "description": "Thanks {{name}}, we'll get back to you at {{email}} soon."
   }
 }

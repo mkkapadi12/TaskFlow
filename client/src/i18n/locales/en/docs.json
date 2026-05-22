@@ -56,7 +56,10 @@
         "description": "Register, login, and manage user sessions with JWT tokens.",
         "endpoints": {
           "0": "Create a new user account and receive a JWT token",
-          "1": "Authenticate and receive a JWT token"
+          "1": "Authenticate and receive a JWT token",
+          "2": "Email a 15-minute password-reset link",
+          "3": "Submit a new password with the emailed token",
+          "4": "Change password from settings (auth required)"
         }
       },
       "users": {
@@ -93,6 +96,23 @@
           "5": "Move task between statuses",
           "6": "Approve or reject a task in review (Owner only)",
           "7": "Delete a task"
+        }
+      },
+      "documents": {
+        "title": "Documents",
+        "description": "Upload and manage per-project documents stored on Cloudinary.",
+        "endpoints": {
+          "0": "List all documents on a project",
+          "1": "Upload up to 5 documents (Manager only)",
+          "2": "Delete a document (Manager only)"
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Per-user email preference toggles.",
+        "endpoints": {
+          "0": "Get notification preferences",
+          "1": "Update notification preferences (partial)"
         }
       }
     }
@@ -167,6 +187,6 @@
     "title": "Ready to start building?",
     "description": "Create your free account and start integrating with the TaskFlow API in minutes. Full Swagger documentation available at /api/docs.",
     "btnStart": "Get API Access",
-    "btnContact": "Contact Support"
+    "btnDocs": "View Swagger Docs"
   }
 }

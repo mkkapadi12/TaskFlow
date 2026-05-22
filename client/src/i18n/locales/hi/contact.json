@@ -1,8 +1,41 @@
 {
-  "badge": "संपर्क में रहें",
+  "badge": "संपर्क करें",
   "title": "हम आपसे सुनना",
   "titleHighlight": "पसंद करेंगे",
-  "description": "कोई प्रश्न, प्रतिक्रिया है, या बस नमस्ते कहना चाहते हैं? नीचे दिया गया फॉर्म भरें और हमारी टीम आपसे तुरंत संपर्क करेगी।",
+  "description": "कोई प्रश्न है, बग मिला है, या कुछ सुझाना चाहते हैं? GitHub पर इश्यू खोलें या हमें ईमेल करें — रखरखावकर्ता सब कुछ पढ़ते हैं।",
+  "channels": {
+    "badge": "चैनल",
+    "title": "रखरखावकर्ताओं से बात करें",
+    "description": "TaskFlow बनाने वालों तक पहुँचने के असली रास्ते ये हैं।",
+    "list": {
+      "github": {
+        "title": "GitHub इश्यू",
+        "detail": "github.com/your-username/taskflow/issues",
+        "description": "बग रिपोर्ट और फीचर सुझावों के लिए सबसे तेज़ रास्ता — सार्वजनिक और ट्रैक करने योग्य।"
+      },
+      "email": {
+        "title": "ईमेल",
+        "detail": "mayurkapadi12@gmail.com",
+        "description": "ऐसी किसी भी बात के लिए जो सार्वजनिक इश्यू के लिए उपयुक्त नहीं है।"
+      }
+    }
+  },
+  "form": {
+    "title": "या हमें एक नोट भेजें",
+    "demoNote": "ध्यान दें — जब तक SMTP कनेक्ट नहीं होता, यह फ़ॉर्म एक UI डेमो है। असली जवाब के लिए कृपया बाईं ओर के चैनलों का उपयोग करें।",
+    "nameLabel": "पूरा नाम",
+    "namePlaceholder": "जेन डो",
+    "emailLabel": "ईमेल पता",
+    "emailPlaceholder": "you@example.com",
+    "messageLabel": "संदेश",
+    "messagePlaceholder": "हमें बताएं आपके मन में क्या है…",
+    "btnSending": "भेजा जा रहा है…",
+    "btnSend": "संदेश भेजें"
+  },
+  "toast": {
+    "success": "फ़ॉर्म सबमिट हुआ (डेमो)",
+    "description": "धन्यवाद {{name}} — असली जवाब के लिए कृपया GitHub इश्यू खोलें या ईमेल करें।"
+  },
   "infoCards": {
     "list": {
       "0": {
@@ -23,19 +56,5 @@
         "description": "9:00 सुबह – 6:00 शाम PST"
       }
     }
-  },
-  "form": {
-    "nameLabel": "पूरा नाम",
-    "namePlaceholder": "जॉन डो",
-    "emailLabel": "ईमेल पता",
-    "emailPlaceholder": "john@example.com",
-    "messageLabel": "संदेश",
-    "messagePlaceholder": "हमें बताएं कि हम आपकी कैसे मदद कर सकते हैं...",
-    "btnSending": "भेजा जा रहा है...",
-    "btnSend": "संदेश भेजें"
-  },
-  "toast": {
-    "success": "संदेश सफलतापूर्वक भेजा गया!",
-    "description": "धन्यवाद {{name}}, हम जल्द ही आपसे {{email}} पर संपर्क करेंगे।"
   }
 }

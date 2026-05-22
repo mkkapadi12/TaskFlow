@@ -1,17 +1,64 @@
 {
   "mission": {
-    "badge": "Our Mission",
+    "badge": "Our mission",
     "title": "Making productivity",
     "titleHighlight": "effortless",
-    "description": "TaskFlow was born from a simple idea: managing tasks shouldn't be a task itself. We believe in building tools that fade into the background, letting you focus on the work that matters.",
-    "stats": {
-      "founded": "Founded",
-      "team": "Team Members",
-      "happyUsers": "Happy Users"
+    "description": "TaskFlow was born from a simple idea: managing tasks shouldn't be a task itself. We're building tools that fade into the background, so you can focus on the work that actually matters."
+  },
+  "facts": {
+    "badge": "Built in the open",
+    "title": "Honest about where we are",
+    "description": "TaskFlow isn't a SaaS company with a marketing team. It's a working app you can run, read, and improve.",
+    "list": {
+      "opensource": {
+        "title": "Open source",
+        "body": "The full client and server source code lives in this repository. Inspect it, fork it, send improvements."
+      },
+      "solo": {
+        "title": "Solo-built",
+        "body": "Designed, written, and maintained by a single developer. No team page, because that would be fiction."
+      },
+      "feedback": {
+        "title": "Feedback-driven",
+        "body": "The roadmap is shaped by real issues from real users — not surveys or quarterly OKRs."
+      }
+    }
+  },
+  "values": {
+    "badge": "Our values",
+    "title": "What drives",
+    "titleHighlight": "everything",
+    "titleEnd": "we do",
+    "description": "These core principles guide every decision — from data model down to UI copy.",
+    "list": {
+      "0": {
+        "title": "Focused simplicity",
+        "description": "Strip away complexity so the user can focus on what truly matters — getting things done."
+      },
+      "1": {
+        "title": "User first",
+        "description": "Every feature is built with empathy. Listen, iterate, and ship what users actually need."
+      },
+      "2": {
+        "title": "Continuous improvement",
+        "description": "Small, steady changes that compound — not flashy redesigns that break workflows."
+      },
+      "3": {
+        "title": "Trust & security",
+        "description": "Your data integrity and privacy are non-negotiable. Hashed passwords, role-based access, JWT auth."
+      },
+      "4": {
+        "title": "Performance matters",
+        "description": "Speed is a feature. The stack is tuned so the UI never blocks on a request."
+      },
+      "5": {
+        "title": "Community powered",
+        "description": "Built with the community in mind. Your feedback shapes the roadmap, your PRs ship in releases."
+      }
     }
   },
   "team": {
-    "badge": "Our Team",
+    "badge": "Our team",
     "title": "The people behind",
     "titleHighlight": "TaskFlow",
     "description": "A passionate crew of builders, designers, and thinkers dedicated to crafting the best task management experience.",
@@ -20,39 +67,6 @@
       "designer": "Lead Designer",
       "engineer": "Full-Stack Engineer",
       "pm": "Product Manager"
-    }
-  },
-  "values": {
-    "badge": "Our Values",
-    "title": "What drives",
-    "titleHighlight": "everything",
-    "titleEnd": "we do",
-    "description": "These core principles guide every decision we make, from product design to customer support.",
-    "list": {
-      "0": {
-        "title": "Focused Simplicity",
-        "description": "We strip away complexity so you can focus on what truly matters — getting things done."
-      },
-      "1": {
-        "title": "User First",
-        "description": "Every feature is built with empathy. We listen, iterate, and ship what our users need."
-      },
-      "2": {
-        "title": "Continuous Innovation",
-        "description": "We push boundaries to deliver cutting-edge tools that redefine task management."
-      },
-      "3": {
-        "title": "Trust & Security",
-        "description": "Your data integrity and privacy are non-negotiable. We encrypt and protect everything."
-      },
-      "4": {
-        "title": "Performance Driven",
-        "description": "Speed is a feature. We obsess over milliseconds so your workflow is never interrupted."
-      },
-      "5": {
-        "title": "Community Powered",
-        "description": "Built by the community, for the community. Your feedback shapes our roadmap."
-      }
     }
   }
 }

@@ -26,7 +26,7 @@ const Footer = () => {
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                {/* <Twitter size={18} /> */}
+                <GUEST_ICONS.TWITTER size={18} />
               </a>
               <a
                 href="#"
@@ -38,13 +38,13 @@ const Footer = () => {
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                {/* <Linkedin size={18} /> */}
+                <GUEST_ICONS.LINKEDIN size={18} />
               </a>
               <a
                 href="#"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                {/* <Facebook size={18} /> */}
+                <GUEST_ICONS.FACEBOOK size={18} />
               </a>
             </div>
           </div>

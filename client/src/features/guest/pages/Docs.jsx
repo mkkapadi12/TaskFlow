@@ -4,33 +4,66 @@ import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
+import { cn } from '@/lib/utils';
 
-// ── Documentation data constants ──
+// ── Color palettes (MASTER §4 — dual light/dark) ──
+
+const TASK_STATUS_STYLES = {
+  TODO: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  IN_PROGRESS: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300',
+  IN_REVIEW:
+    'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+  DONE: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
+};
 
 const TASK_STATUSES = [
-  { label: 'TODO', color: 'bg-blue-500/20 text-blue-400' },
-  { label: 'IN_PROGRESS', color: 'bg-amber-500/20 text-amber-400' },
-  { label: 'IN_REVIEW', color: 'bg-purple-500/20 text-purple-400' },
-  { label: 'DONE', color: 'bg-emerald-500/20 text-emerald-400' },
+  { label: 'TODO', style: TASK_STATUS_STYLES.TODO },
+  { label: 'IN_PROGRESS', style: TASK_STATUS_STYLES.IN_PROGRESS },
+  { label: 'IN_REVIEW', style: TASK_STATUS_STYLES.IN_REVIEW },
+  { label: 'DONE', style: TASK_STATUS_STYLES.DONE },
 ];
 
-const METHOD_COLORS = {
-  GET: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  POST: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
-  PUT: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
-  PATCH: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
-  DELETE: 'bg-red-500/15 text-red-400 border-red-500/30',
+const METHOD_STYLES = {
+  GET: 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-900',
+  POST: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-900',
+  PUT: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-900',
+  PATCH:
+    'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300 dark:border-purple-900',
+  DELETE:
+    'bg-red-100 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900',
 };
 
 // ── Sub-components ──
 
 const MethodBadge = ({ method }) => (
   <span
-    className={`inline-flex min-w-[60px] items-center justify-center rounded-md border px-2 py-0.5 text-[11px] font-bold tracking-wider ${METHOD_COLORS[method]}`}
+    className={cn(
+      'inline-flex min-w-[60px] items-center justify-center rounded-md border px-2 py-0.5 text-[11px] font-bold tracking-wider',
+      METHOD_STYLES[method]
+    )}
   >
     {method}
   </span>
 );
+
+const ChipBadge = ({ tone, icon: Icon, children }) => {
+  const toneClasses = {
+    amber: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
+    red: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300',
+  };
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-medium',
+        toneClasses[tone]
+      )}
+    >
+      <Icon size={10} aria-hidden="true" />
+      {children}
+    </span>
+  );
+};
 
 const CodeBlock = ({ children }) => {
   const [copied, setCopied] = useState(false);
@@ -43,18 +76,18 @@ const CodeBlock = ({ children }) => {
 
   return (
     <div className="group/code relative">
-      <pre className="bg-background/80 border-border/50 overflow-x-auto rounded-xl border p-4 text-sm leading-relaxed">
-        <code className="text-muted-foreground">{children}</code>
+      <pre className="border-border bg-muted overflow-x-auto rounded-xl border p-4 text-sm leading-relaxed">
+        <code className="text-foreground">{children}</code>
       </pre>
       <button
         onClick={handleCopy}
-        className="bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground absolute top-3 right-3 rounded-lg p-1.5 opacity-0 backdrop-blur-sm transition-all group-hover/code:opacity-100"
+        className="text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:ring-ring/50 absolute top-2 right-2 rounded-md p-1.5 opacity-0 group-hover/code:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 motion-safe:transition-opacity"
         aria-label="Copy code"
       >
         {copied ? (
-          <GUEST_ICONS.CHECK size={14} />
+          <GUEST_ICONS.CHECK size={14} aria-hidden="true" />
         ) : (
-          <GUEST_ICONS.COPY size={14} />
+          <GUEST_ICONS.COPY size={14} aria-hidden="true" />
         )}
       </button>
     </div>
@@ -140,6 +173,24 @@ Authorization: Bearer <token>
           path: '/api/auth/login',
           description: t('reference.sections.auth.endpoints.1'),
           auth: false,
+        },
+        {
+          method: 'POST',
+          path: '/api/auth/forgot-password',
+          description: t('reference.sections.auth.endpoints.2'),
+          auth: false,
+        },
+        {
+          method: 'POST',
+          path: '/api/auth/reset-password',
+          description: t('reference.sections.auth.endpoints.3'),
+          auth: false,
+        },
+        {
+          method: 'POST',
+          path: '/api/auth/change-password',
+          description: t('reference.sections.auth.endpoints.4'),
+          auth: true,
         },
       ],
     },
@@ -278,6 +329,54 @@ Authorization: Bearer <token>
         },
       ],
     },
+    {
+      id: 'notifications',
+      icon: GUEST_ICONS.BELL,
+      title: t('reference.sections.notifications.title'),
+      description: t('reference.sections.notifications.description'),
+      endpoints: [
+        {
+          method: 'GET',
+          path: '/api/notifications/settings',
+          description: t('reference.sections.notifications.endpoints.0'),
+          auth: true,
+        },
+        {
+          method: 'PATCH',
+          path: '/api/notifications/settings',
+          description: t('reference.sections.notifications.endpoints.1'),
+          auth: true,
+        },
+      ],
+    },
+    {
+      id: 'documents',
+      icon: GUEST_ICONS.FILE_TEXT,
+      title: t('reference.sections.documents.title'),
+      description: t('reference.sections.documents.description'),
+      endpoints: [
+        {
+          method: 'GET',
+          path: '/api/projects/:projectId/documents',
+          description: t('reference.sections.documents.endpoints.0'),
+          auth: true,
+        },
+        {
+          method: 'POST',
+          path: '/api/projects/:projectId/documents',
+          description: t('reference.sections.documents.endpoints.1'),
+          auth: true,
+          admin: true,
+        },
+        {
+          method: 'DELETE',
+          path: '/api/projects/:projectId/documents/:documentId',
+          description: t('reference.sections.documents.endpoints.2'),
+          auth: true,
+          admin: true,
+        },
+      ],
+    },
   ];
 
   const authRoles = [
@@ -298,10 +397,10 @@ Authorization: Bearer <token>
   return (
     <>
       {/* ── Hero Section ── */}
-      <section className="container mx-auto px-6 py-20 lg:py-28">
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="animate-in fade-in slide-in-from-bottom-8 fill-mode-both mx-auto max-w-3xl text-center duration-1000">
           <div className="border-primary/20 bg-primary/10 text-primary mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
-            <GUEST_ICONS.BOOK_OPEN size={14} />
+            <GUEST_ICONS.BOOK_OPEN size={14} aria-hidden="true" />
             {t('hero.badge')}
           </div>
 
@@ -318,10 +417,10 @@ Authorization: Bearer <token>
             <Button
               asChild
               size="lg"
-              className="shadow-primary/25 hover:shadow-primary/30 group h-13 rounded-full px-8 text-base shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl"
+              className="group h-13 rounded-full px-8 text-base"
             >
               <a href="#quickstart">
-                <GUEST_ICONS.PLAY className="mr-2 h-4 w-4" />
+                <GUEST_ICONS.PLAY className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t('hero.btnQuickstart')}
               </a>
             </Button>
@@ -329,10 +428,10 @@ Authorization: Bearer <token>
               asChild
               variant="outline"
               size="lg"
-              className="border-border/50 bg-background/50 hover:bg-muted h-13 rounded-full px-8 text-base backdrop-blur-sm transition-all hover:-translate-y-1"
+              className="border-border bg-card hover:bg-accent/40 h-13 rounded-full px-8 text-base motion-safe:transition-colors"
             >
               <a href="#api-reference">
-                <GUEST_ICONS.CODE className="mr-2 h-4 w-4" />
+                <GUEST_ICONS.CODE className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t('hero.btnReference')}
               </a>
             </Button>
@@ -360,10 +459,10 @@ Authorization: Bearer <token>
           ].map(({ icon: Icon, label, detail }) => (
             <div
               key={label}
-              className="border-border/50 bg-card/50 flex items-center gap-4 rounded-2xl border p-5 backdrop-blur-sm"
+              className="border-border bg-card flex items-center gap-4 rounded-2xl border p-5"
             >
               <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-                <Icon size={20} />
+                <Icon size={20} aria-hidden="true" />
               </div>
               <div>
                 <p className="text-sm font-semibold">{label}</p>
@@ -377,16 +476,18 @@ Authorization: Bearer <token>
       {/* ── Quick Start Section ── */}
       <section
         id="quickstart"
-        className="container mx-auto scroll-mt-20 px-6 py-20 lg:py-28"
+        className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 lg:px-8 lg:py-28"
       >
         <div className="animate-in fade-in slide-in-from-bottom-6 fill-mode-both mx-auto mb-14 max-w-2xl text-center duration-700">
           <div className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
-            <GUEST_ICONS.ROCKET size={14} />
+            <GUEST_ICONS.ROCKET size={14} aria-hidden="true" />
             {t('quickstart.badge')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             {t('quickstart.title')}{' '}
-            <span className="text-primary">{t('quickstart.titleHighlight')}</span>
+            <span className="text-primary">
+              {t('quickstart.titleHighlight')}
+            </span>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg">
             {t('quickstart.description')}
@@ -398,16 +499,23 @@ Authorization: Bearer <token>
             ({ step, icon: Icon, title, description, code }, i) => (
               <div
                 key={step}
-                className="group border-border/50 bg-card/50 hover:border-primary/40 hover:shadow-primary/5 animate-in fade-in slide-in-from-bottom-8 fill-mode-both rounded-2xl border backdrop-blur-sm transition-all duration-500 hover:shadow-xl"
-                style={{ animationDelay: `${i * 100}ms` }}
+                className="animate-in fade-in slide-in-from-bottom-8 fill-mode-both group border-border bg-card hover:bg-accent/40 rounded-2xl border motion-safe:transition-colors"
+                style={{
+                  animationDelay: `${i * 100}ms`,
+                  animationDuration: '500ms',
+                }}
               >
                 <div className="flex flex-col gap-6 p-6 md:flex-row md:p-8">
                   {/* Step indicator */}
                   <div className="flex shrink-0 items-start gap-4 md:flex-col md:items-center">
-                    <div className="from-primary/20 to-accent/20 border-primary/30 group-hover:border-primary/60 flex h-14 w-14 items-center justify-center rounded-2xl border bg-linear-to-br transition-colors">
-                      <Icon size={24} className="text-primary" />
+                    <div className="border-border bg-muted group-hover:border-primary/40 flex h-14 w-14 items-center justify-center rounded-2xl border motion-safe:transition-colors">
+                      <Icon
+                        size={24}
+                        className="text-primary"
+                        aria-hidden="true"
+                      />
                     </div>
-                    <span className="text-muted-foreground/40 text-3xl font-black">
+                    <span className="text-muted-foreground text-3xl font-black">
                       {step}
                     </span>
                   </div>
@@ -432,16 +540,18 @@ Authorization: Bearer <token>
       {/* ── API Reference Section ── */}
       <section
         id="api-reference"
-        className="container mx-auto scroll-mt-20 px-6 py-20 lg:py-28"
+        className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 lg:px-8 lg:py-28"
       >
         <div className="animate-in fade-in slide-in-from-bottom-6 fill-mode-both mx-auto mb-14 max-w-2xl text-center duration-700">
           <div className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
-            <GUEST_ICONS.CODE size={14} />
+            <GUEST_ICONS.CODE size={14} aria-hidden="true" />
             {t('reference.badge')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             {t('reference.title')}{' '}
-            <span className="text-primary">{t('reference.titleHighlight')}</span>
+            <span className="text-primary">
+              {t('reference.titleHighlight')}
+            </span>
           </h2>
           <p className="text-muted-foreground mt-4 text-lg">
             {t('reference.description')}{' '}
@@ -457,13 +567,14 @@ Authorization: Bearer <token>
               <button
                 key={id}
                 onClick={() => setActiveSection(id)}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                className={cn(
+                  'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium motion-safe:transition-colors',
                   activeSection === id
-                    ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                    : 'bg-card/50 text-muted-foreground hover:text-foreground border-border/50 hover:bg-muted/50 border'
-                }`}
+                    ? 'bg-primary text-primary-foreground'
+                    : 'border-border bg-card text-muted-foreground hover:bg-accent/40 hover:text-foreground border'
+                )}
               >
-                <Icon size={16} />
+                <Icon size={16} aria-hidden="true" />
                 {title}
               </button>
             ))}
@@ -477,10 +588,10 @@ Authorization: Bearer <token>
                 className="animate-in fade-in slide-in-from-bottom-4 fill-mode-both duration-500"
               >
                 {/* Section header card */}
-                <div className="border-border/50 bg-card/50 mb-4 rounded-2xl border p-6 backdrop-blur-sm">
+                <div className="border-border bg-card mb-4 rounded-2xl border p-6">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-xl">
-                      <Icon size={20} />
+                      <Icon size={20} aria-hidden="true" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold">{title}</h3>
@@ -497,7 +608,7 @@ Authorization: Bearer <token>
                     ({ method, path, description: desc, auth, admin }) => (
                       <div
                         key={`${method}-${path}`}
-                        className="group border-border/50 bg-card/30 hover:bg-card/60 hover:border-primary/30 flex flex-col gap-3 rounded-xl border p-4 backdrop-blur-sm transition-all sm:flex-row sm:items-center sm:gap-4"
+                        className="group border-border bg-card hover:bg-accent/40 flex flex-col gap-3 rounded-xl border p-4 motion-safe:transition-colors sm:flex-row sm:items-center sm:gap-4"
                       >
                         <div className="flex items-center gap-3 sm:min-w-[280px]">
                           <MethodBadge method={method} />
@@ -510,16 +621,14 @@ Authorization: Bearer <token>
                         </p>
                         <div className="flex items-center gap-2">
                           {auth && (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
-                              <GUEST_ICONS.LOCK size={10} />
+                            <ChipBadge tone="amber" icon={GUEST_ICONS.LOCK}>
                               Auth
-                            </span>
+                            </ChipBadge>
                           )}
                           {admin && (
-                            <span className="inline-flex items-center gap-1 rounded-md bg-red-500/10 px-2 py-0.5 text-[10px] font-medium text-red-400">
-                              <GUEST_ICONS.SHIELD size={10} />
+                            <ChipBadge tone="red" icon={GUEST_ICONS.SHIELD}>
                               Admin
-                            </span>
+                            </ChipBadge>
                           )}
                         </div>
                       </div>
@@ -533,10 +642,10 @@ Authorization: Bearer <token>
       </section>
 
       {/* ── Authentication Guide Section ── */}
-      <section className="container mx-auto px-6 py-20 lg:py-28">
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="animate-in fade-in slide-in-from-bottom-6 fill-mode-both mx-auto mb-14 max-w-2xl text-center duration-700">
           <div className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
-            <GUEST_ICONS.SHIELD_CHECK size={14} />
+            <GUEST_ICONS.SHIELD_CHECK size={14} aria-hidden="true" />
             {t('auth.badge')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -551,7 +660,7 @@ Authorization: Bearer <token>
 
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Auth flow card */}
-          <div className="animate-in fade-in slide-in-from-left-8 fill-mode-both border-border/50 bg-card/50 rounded-2xl border p-6 backdrop-blur-sm duration-700 md:p-8">
+          <div className="animate-in fade-in slide-in-from-left-8 fill-mode-both border-border bg-card rounded-2xl border p-6 duration-700 md:p-8">
             <h3 className="mb-6 text-lg font-bold">{t('auth.flowTitle')}</h3>
             <div className="space-y-4">
               {[
@@ -577,7 +686,7 @@ Authorization: Bearer <token>
                 },
               ].map(({ num, title, desc }) => (
                 <div key={num} className="flex items-start gap-4">
-                  <div className="from-primary/20 to-primary/5 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br text-sm font-bold">
+                  <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold">
                     {num}
                   </div>
                   <div>
@@ -591,8 +700,10 @@ Authorization: Bearer <token>
 
           {/* Code example card */}
           <div className="animate-in fade-in slide-in-from-right-8 fill-mode-both delay-100 duration-700">
-            <div className="border-border/50 bg-card/50 rounded-2xl border p-6 backdrop-blur-sm md:p-8">
-              <h3 className="mb-4 text-lg font-bold">{t('auth.exampleRequest')}</h3>
+            <div className="border-border bg-card rounded-2xl border p-6 md:p-8">
+              <h3 className="mb-4 text-lg font-bold">
+                {t('auth.exampleRequest')}
+              </h3>
               <CodeBlock>
                 {`// Include the JWT token in headers
 fetch('/api/projects/my', {
@@ -614,7 +725,7 @@ fetch('/api/projects/my', {
                   {authRoles.map(({ role, desc }) => (
                     <div
                       key={role}
-                      className="bg-muted/30 flex items-center gap-3 rounded-lg p-2.5"
+                      className="bg-muted flex items-center gap-3 rounded-lg p-2.5"
                     >
                       <span className="bg-primary/15 text-primary rounded-md px-2 py-0.5 text-xs font-bold">
                         {role}
@@ -632,10 +743,10 @@ fetch('/api/projects/my', {
       </section>
 
       {/* ── Task Workflow Section ── */}
-      <section className="container mx-auto px-6 py-20 lg:py-28">
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="animate-in fade-in slide-in-from-bottom-6 fill-mode-both mx-auto mb-14 max-w-2xl text-center duration-700">
           <div className="border-primary/20 bg-primary/10 text-primary mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
-            <GUEST_ICONS.TERMINAL size={14} />
+            <GUEST_ICONS.TERMINAL size={14} aria-hidden="true" />
             {t('workflow.badge')}
           </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -649,19 +760,23 @@ fetch('/api/projects/my', {
 
         <div className="mx-auto max-w-4xl">
           {/* Status flow */}
-          <div className="animate-in fade-in slide-in-from-bottom-8 fill-mode-both border-border/50 bg-card/50 rounded-2xl border p-6 backdrop-blur-sm duration-700 md:p-8">
+          <div className="animate-in fade-in slide-in-from-bottom-8 fill-mode-both border-border bg-card rounded-2xl border p-6 duration-700 md:p-8">
             <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
-              {TASK_STATUSES.map(({ label, color }, i) => (
+              {TASK_STATUSES.map(({ label, style }, i) => (
                 <div key={label} className="flex items-center gap-3">
                   <span
-                    className={`rounded-lg px-3 py-1.5 text-xs font-bold ${color}`}
+                    className={cn(
+                      'rounded-lg px-3 py-1.5 text-xs font-bold',
+                      style
+                    )}
                   >
                     {label}
                   </span>
                   {i < TASK_STATUSES.length - 1 && (
                     <GUEST_ICONS.CHEVRON_RIGHT
                       size={16}
-                      className="text-muted-foreground/40"
+                      className="text-muted-foreground"
+                      aria-hidden="true"
                     />
                   )}
                 </div>
@@ -693,10 +808,10 @@ fetch('/api/projects/my', {
               ].map(({ title, desc, icon: Icon }, i) => (
                 <div
                   key={i}
-                  className="hover:bg-muted/20 flex items-start gap-4 rounded-xl p-3 transition-colors"
+                  className="hover:bg-accent/40 flex items-start gap-4 rounded-xl p-3 motion-safe:transition-colors"
                 >
                   <div className="bg-primary/10 text-primary flex h-9 w-9 shrink-0 items-center justify-center rounded-xl">
-                    <Icon size={18} />
+                    <Icon size={18} aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold">{title}</p>
@@ -712,11 +827,8 @@ fetch('/api/projects/my', {
       </section>
 
       {/* ── CTA Section ── */}
-      <section className="container mx-auto px-6 py-20 lg:py-28">
-        <div className="border-primary/20 from-primary/10 via-card/80 to-accent/10 relative mx-auto max-w-4xl overflow-hidden rounded-3xl border bg-linear-to-br p-12 text-center md:p-16">
-          {/* Glow effect */}
-          <div className="from-primary/5 pointer-events-none absolute inset-0 rounded-3xl bg-linear-to-br to-transparent" />
-
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        <div className="border-border bg-card relative mx-auto max-w-4xl overflow-hidden rounded-3xl border p-12 text-center md:p-16">
           <div className="relative z-10 space-y-6">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
               {t('cta.title')}
@@ -728,23 +840,29 @@ fetch('/api/projects/my', {
               <Button
                 asChild
                 size="lg"
-                className="shadow-primary/25 hover:shadow-primary/30 group h-13 rounded-full px-8 text-base shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl"
+                className="group h-13 rounded-full px-8 text-base"
               >
                 <Link to="/register">
                   {t('cta.btnStart')}
-                  <GUEST_ICONS.ARROW_RIGHT className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <GUEST_ICONS.ARROW_RIGHT
+                    className="ml-2 h-5 w-5 group-hover:translate-x-1 motion-safe:transition-transform"
+                    aria-hidden="true"
+                  />
                 </Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-border/50 hover:bg-muted h-13 rounded-full px-8 text-base transition-all hover:-translate-y-1"
+                className="border-border hover:bg-accent/40 h-13 rounded-full px-8 text-base motion-safe:transition-colors"
               >
-                <Link to="/contact">
-                  <GUEST_ICONS.MESSAGE className="mr-2 h-4 w-4" />
-                  {t('cta.btnContact')}
-                </Link>
+                <a href="/api/docs" target="_blank" rel="noopener noreferrer">
+                  <GUEST_ICONS.EXTERNAL_LINK
+                    className="mr-2 h-4 w-4"
+                    aria-hidden="true"
+                  />
+                  {t('cta.btnDocs')}
+                </a>
               </Button>
             </div>
           </div>

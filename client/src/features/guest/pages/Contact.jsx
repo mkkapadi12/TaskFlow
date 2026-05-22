@@ -11,6 +11,22 @@ import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 import { contactSchema } from '@/schemas/contact.schema';
 
+const CHANNELS = [
+  {
+    key: 'github',
+    icon: GUEST_ICONS.GITHUB,
+    hrefFromDetail: (detail) =>
+      detail.startsWith('http') ? detail : `https://${detail}`,
+    external: true,
+  },
+  {
+    key: 'email',
+    icon: GUEST_ICONS.MAIL,
+    hrefFromDetail: (detail) => `mailto:${detail}`,
+    external: false,
+  },
+];
+
 const Contact = () => {
   const { t } = useTranslation('contact');
 
@@ -25,94 +41,110 @@ const Contact = () => {
   });
 
   const onSubmit = async (data) => {
-    // Simulate a short delay
-    await new Promise((r) => setTimeout(r, 800));
-
+    await new Promise((r) => setTimeout(r, 600));
     toast.success(t('toast.success'), {
-      description: t('toast.description', { name: data.name, email: data.email }),
+      description: t('toast.description', { name: data.name }),
     });
     reset();
   };
 
-  const infoCards = [
-    {
-      icon: GUEST_ICONS.MAIL,
-      title: t('infoCards.list.0.title'),
-      detail: 'support@taskflow.app',
-      description: t('infoCards.list.0.description'),
-    },
-    {
-      icon: GUEST_ICONS.MAP_PIN,
-      title: t('infoCards.list.1.title'),
-      detail: 'San Francisco, CA',
-      description: t('infoCards.list.1.description'),
-    },
-    {
-      icon: GUEST_ICONS.PHONE,
-      title: t('infoCards.list.2.title'),
-      detail: '+1 (555) 123-4567',
-      description: t('infoCards.list.2.description'),
-    },
-    {
-      icon: GUEST_ICONS.CLOCK,
-      title: t('infoCards.list.3.title'),
-      detail: t('infoCards.list.3.detail'),
-      description: t('infoCards.list.3.description'),
-    },
-  ];
-
   return (
     <>
-      {/* ── Header ── */}
-      <section className="container mx-auto px-6 pt-20 pb-10 text-center lg:pt-28 lg:pb-14">
-        <div className="animate-in fade-in slide-in-from-bottom-8 fill-mode-both mx-auto max-w-2xl duration-1000">
-          <div className="border-primary/20 bg-primary/10 text-primary mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium">
-            <GUEST_ICONS.MESSAGE size={14} />
+      {/* ── Header ─────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 pt-20 pb-10 sm:px-6 md:pt-28 md:pb-14 lg:px-8">
+        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 mx-auto max-w-2xl text-center motion-safe:duration-700">
+          <span className="border-border bg-card/60 text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium backdrop-blur-sm">
+            <GUEST_ICONS.MESSAGE
+              className="text-primary h-3.5 w-3.5"
+              aria-hidden="true"
+            />
             {t('badge')}
-          </div>
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-            {t('title')} <span className="text-primary">{t('titleHighlight')}</span>
+          </span>
+          <h1 className="mt-6 text-4xl leading-[1.05] font-bold tracking-tight sm:text-5xl md:text-6xl">
+            {t('title')}{' '}
+            <span className="from-primary to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+              {t('titleHighlight')}
+            </span>
           </h1>
-          <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
+          <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-base leading-relaxed sm:text-lg">
             {t('description')}
           </p>
         </div>
       </section>
 
-      {/* ── Info Cards + Form ── */}
-      <section className="container mx-auto px-6 pb-20 lg:pb-28">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 lg:grid-cols-5">
-          {/* Left — Info cards */}
-          <div className="animate-in fade-in slide-in-from-left-8 fill-mode-both flex flex-col gap-4 duration-700 lg:col-span-2">
-            {infoCards.map(({ icon: Icon, title, detail, description }, i) => (
-              <div
-                key={title}
-                className="group border-border/50 bg-card/50 hover:border-primary/40 hover:shadow-primary/5 flex items-start gap-4 rounded-2xl border p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <div className="bg-primary/10 text-primary group-hover:bg-primary/20 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors">
-                  <Icon size={20} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">{title}</p>
-                  <p className="text-primary mt-0.5 text-sm font-medium">
-                    {detail}
-                  </p>
-                  <p className="text-muted-foreground mt-0.5 text-xs">
-                    {description}
-                  </p>
-                </div>
-              </div>
-            ))}
+      {/* ── Channels + Form ────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6 md:pb-28 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+          {/* Left — Channels */}
+          <div className="flex flex-col gap-4 lg:col-span-2">
+            <div>
+              <span className="border-border bg-card/60 text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium backdrop-blur-sm">
+                <GUEST_ICONS.SPARKLES
+                  className="text-primary h-3.5 w-3.5"
+                  aria-hidden="true"
+                />
+                {t('channels.badge')}
+              </span>
+              <h2 className="mt-3 text-2xl font-bold tracking-tight">
+                {t('channels.title')}
+              </h2>
+              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                {t('channels.description')}
+              </p>
+            </div>
+
+            {CHANNELS.map(({ key, icon: Icon, hrefFromDetail, external }) => {
+              const detail = t(`channels.list.${key}.detail`);
+              return (
+                <a
+                  key={key}
+                  href={hrefFromDetail(detail)}
+                  target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener noreferrer' : undefined}
+                  className="group border-border bg-card hover:bg-accent/40 flex items-start gap-4 rounded-2xl border p-5 motion-safe:transition-colors motion-safe:duration-200"
+                >
+                  <div className="bg-primary/10 text-primary group-hover:bg-primary/15 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl motion-safe:transition-colors">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold">
+                      {t(`channels.list.${key}.title`)}
+                    </p>
+                    <p className="text-primary mt-1 text-sm font-medium break-all">
+                      {detail}
+                    </p>
+                    <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                      {t(`channels.list.${key}.description`)}
+                    </p>
+                  </div>
+                </a>
+              );
+            })}
           </div>
 
-          {/* Right — Contact form */}
-          <div className="animate-in fade-in slide-in-from-right-8 fill-mode-both delay-100 duration-700 lg:col-span-3">
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="border-border/50 bg-card/50 space-y-6 rounded-2xl border p-8 backdrop-blur-sm md:p-10"
-            >
-              <div className="space-y-5">
+          {/* Right — Form */}
+          <div className="lg:col-span-3">
+            <div className="border-border bg-card rounded-2xl border p-6 md:p-8">
+              <h2 className="text-lg font-semibold">{t('form.title')}</h2>
+
+              <div
+                role="status"
+                className="mt-4 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4"
+              >
+                <GUEST_ICONS.INFO
+                  className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+                  aria-hidden="true"
+                />
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {t('form.demoNote')}
+                </p>
+              </div>
+
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="mt-6 space-y-5"
+                noValidate
+              >
                 {/* Name */}
                 <div className="space-y-2">
                   <Label htmlFor="name">{t('form.nameLabel')}</Label>
@@ -120,11 +152,15 @@ const Contact = () => {
                     id="name"
                     placeholder={t('form.namePlaceholder')}
                     aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? 'name-error' : undefined}
                     className="h-11"
                     {...register('name')}
                   />
                   {errors.name && (
-                    <p className="text-destructive mt-1 text-xs">
+                    <p
+                      id="name-error"
+                      className="text-destructive mt-1 text-xs"
+                    >
                       {errors.name.message}
                     </p>
                   )}
@@ -138,11 +174,15 @@ const Contact = () => {
                     type="email"
                     placeholder={t('form.emailPlaceholder')}
                     aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? 'email-error' : undefined}
                     className="h-11"
                     {...register('email')}
                   />
                   {errors.email && (
-                    <p className="text-destructive mt-1 text-xs">
+                    <p
+                      id="email-error"
+                      className="text-destructive mt-1 text-xs"
+                    >
                       {errors.email.message}
                     </p>
                   )}
@@ -156,36 +196,48 @@ const Contact = () => {
                     placeholder={t('form.messagePlaceholder')}
                     rows={5}
                     aria-invalid={!!errors.message}
+                    aria-describedby={
+                      errors.message ? 'message-error' : undefined
+                    }
                     className="resize-none"
                     {...register('message')}
                   />
                   {errors.message && (
-                    <p className="text-destructive mt-1 text-xs">
+                    <p
+                      id="message-error"
+                      className="text-destructive mt-1 text-xs"
+                    >
                       {errors.message.message}
                     </p>
                   )}
                 </div>
-              </div>
 
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                size="lg"
-                className="shadow-primary/20 hover:shadow-primary/30 h-12 w-full rounded-xl text-base shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
-              >
-                {isSubmitting ? (
-                  <>
-                    <DASHBOARD_ICONS.LOADER2 className="mr-2 h-5 w-5 animate-spin" />
-                    {t('form.btnSending')}
-                  </>
-                ) : (
-                  <>
-                    <GUEST_ICONS.SEND className="mr-2 h-5 w-5" />
-                    {t('form.btnSend')}
-                  </>
-                )}
-              </Button>
-            </form>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  size="lg"
+                  className="h-12 w-full rounded-xl text-base"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <DASHBOARD_ICONS.LOADER2
+                        className="mr-2 h-4 w-4 motion-safe:animate-spin"
+                        aria-hidden="true"
+                      />
+                      {t('form.btnSending')}
+                    </>
+                  ) : (
+                    <>
+                      <GUEST_ICONS.SEND
+                        className="mr-2 h-4 w-4"
+                        aria-hidden="true"
+                      />
+                      {t('form.btnSend')}
+                    </>
+                  )}
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </section>
@@ -194,4 +246,3 @@ const Contact = () => {
 };
 
 export default Contact;
-

@@ -2,53 +2,74 @@
   "hero": {
     "badge": "The smarter way to manage tasks",
     "title": "Organize your work.",
-    "subtitle": "Empower your life.",
-    "description": "TaskFlow is the ultimate workspace to track projects, manage tasks, and collaborate effortlessly. Stay productive and focused on what matters most.",
-    "ctaStart": "Get Started for Free",
-    "ctaLogin": "Sign in to your account"
-  },
-  "stats": {
-    "activeUsers": "Active Users",
-    "tasksCompleted": "Tasks Completed",
-    "uptime": "Uptime",
-    "userRating": "User Rating"
+    "subtitle": "Empower your team.",
+    "description": "TaskFlow is the workspace to track projects, manage tasks, and ship work together with role-based control and verified approvals.",
+    "ctaStart": "Get Started Free",
+    "ctaLogin": "Sign in"
   },
   "features": {
     "badge": "Features",
     "title": "Everything you need to ",
-    "titleHighlight": "stay productive",
-    "description": "Powerful tools designed to streamline your workflow and help your team deliver results faster.",
+    "titleHighlight": "ship great work",
+    "description": "Built around the way modern teams actually deliver — clear ownership, focused workflows, and accountable outcomes.",
     "list": {
       "fast": {
-        "title": "Lightning Fast",
-        "description": "Built for speed. Navigate your tasks and projects with zero friction and instant load times."
+        "title": "Lightning fast",
+        "description": "Built on Vite and React 19. Navigation, search, and updates feel instant."
       },
       "secure": {
-        "title": "Secure & Private",
-        "description": "Your data is encrypted and stored securely. We prioritize your privacy above everything else."
+        "title": "Secure & private",
+        "description": "JWT auth, hashed passwords, and role-based access on every project. Your data stays yours."
       },
       "organized": {
-        "title": "Stay Organized",
-        "description": "Powerful sorting, filtering, and categorization tools to keep your workflow crystal clear."
+        "title": "Stay organized",
+        "description": "Group work into projects, filter by status and priority, and keep deadlines in one place."
       },
       "team": {
-        "title": "Team Collaboration",
-        "description": "Invite teammates, assign tasks, and track progress together in real-time workspaces."
+        "title": "Team collaboration",
+        "description": "Invite teammates as owners, admins, or members. Everyone sees the work that's theirs."
+      },
+      "documents": {
+        "title": "Centralized documents",
+        "description": "Upload PDFs, docs, and decks to a project so the team always works from the same source."
+      },
+      "verify": {
+        "title": "Verified by the owner",
+        "description": "Tasks reach DONE only after the project owner approves. Quality stays high without slowing the team down."
       },
       "analytics": {
-        "title": "Smart Analytics",
+        "title": "Smart analytics",
         "description": "Visualize productivity trends and gain insights to optimize your work patterns."
       },
       "time": {
-        "title": "Time Tracking",
+        "title": "Time tracking",
         "description": "Built-in time tracking to monitor how long tasks take and improve your estimates."
+      }
+    }
+  },
+  "howItWorks": {
+    "badge": "How it works",
+    "title": "From idea to done in three steps",
+    "description": "TaskFlow models the real workflow your team already follows.",
+    "steps": {
+      "create": {
+        "title": "Create a project",
+        "description": "Set up a workspace, invite your team, and assign roles — owner, admin, or member."
+      },
+      "assign": {
+        "title": "Assign the work",
+        "description": "Break work into tasks with priorities and deadlines, and route them to the right people."
+      },
+      "verify": {
+        "title": "Review & verify",
+        "description": "Assignees submit for review. The owner approves to mark it done, or sends it back with feedback."
       }
     }
   },
   "ctaSection": {
     "title": "Ready to take control of your tasks?",
-    "description": "Join thousands of professionals who use TaskFlow to manage their work and boost productivity every day.",
-    "btnStart": "Start Free Trial",
-    "btnContact": "Contact Us"
+    "description": "Join the teams using TaskFlow to plan their projects, ship their work, and stay in sync.",
+    "btnStart": "Get Started Free",
+    "btnDocs": "Read the Docs"
   }
 }
