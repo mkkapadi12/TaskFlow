@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import AppLayout from './components/layouts/app/AppLayout';
@@ -76,6 +77,11 @@ const router = createBrowserRouter([
   { path: '*', element: <ErrorPage /> },
 ]);
 
-const App = () => <RouterProvider router={router} />;
+const App = () => (
+  <>
+    <RouterProvider router={router} />
+    <Analytics />
+  </>
+);
 
 export default App;
