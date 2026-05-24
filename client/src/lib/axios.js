@@ -7,7 +7,9 @@ import { logout } from '@/features/auth/auth.slice';
 const getStore = () => import('@/app/store').then((m) => m.store);
 
 const axiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.PROD
+    ? `${import.meta.env.VITE_API_URL}/api`
+    : '/api',
   headers: { 'Content-Type': 'application/json' },
 });
 
