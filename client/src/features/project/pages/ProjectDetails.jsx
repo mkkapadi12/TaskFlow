@@ -45,6 +45,8 @@ import {
 import CreateTaskDialog from '@/features/tasks/components/CreateTaskDialog';
 import KanbanBoard from '@/features/tasks/components/KanbanBoard';
 import TaskDetailDialog from '@/features/tasks/components/TaskDetailDialog';
+import { useDeleteTaskMutation } from '@/features/tasks/task.api';
+import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { cn, formatDateDisplay } from '@/lib/utils';
@@ -93,6 +95,8 @@ const ProjectDetails = () => {
     useAddProjectMemberMutation();
   const [updateMemberRole] = useUpdateMemberRoleMutation();
   const [removeProjectMember] = useRemoveProjectMemberMutation();
+  const [deleteTask] = useDeleteTaskMutation();
+  const confirm = useAlertDialog();
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
@@ -215,9 +219,9 @@ const ProjectDetails = () => {
           <Link to={`/projects/${projectId}/analytics`}>
             <Button
               variant="outline"
-              className="border-border/50 h-10 rounded-full hover:bg-muted/50"
+              className="border-border/50 hover:bg-muted/50 h-10 rounded-full"
             >
-              <DASHBOARD_ICONS.TRENDINGUP className="mr-2 h-4 w-4 text-primary" />
+              <DASHBOARD_ICONS.TRENDINGUP className="text-primary mr-2 h-4 w-4" />
               Analytics
             </Button>
           </Link>
@@ -404,7 +408,7 @@ const ProjectDetails = () => {
               <Button
                 onClick={() => setIsAddMemberOpen(true)}
                 variant="outline"
-                className="border-border/50 w-full sm:w-auto shrink-0"
+                className="border-border/50 w-full shrink-0 sm:w-auto"
                 size="sm"
               >
                 <DASHBOARD_ICONS.PLUS className="mr-1.5 h-3.5 w-3.5" />
@@ -430,7 +434,7 @@ const ProjectDetails = () => {
                     key={member.id}
                     className="flex flex-col gap-2.5 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                   >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
                       <Avatar className="h-10 w-10 shrink-0">
                         {member.userAvatar && (
                           <AvatarImage src={member.userAvatar} />
@@ -441,27 +445,29 @@ const ProjectDetails = () => {
                       </Avatar>
 
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="truncate text-sm font-semibold max-w-[150px] sm:max-w-none">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="max-w-37.5 truncate text-sm font-semibold sm:max-w-none">
                             {member.userName}
                           </span>
                           {member.userId === user?.id && (
                             <Badge
                               variant="secondary"
-                              className="text-[9px] uppercase tracking-wider px-1.5 py-0 rounded shrink-0 font-medium"
+                              className="shrink-0 rounded px-1.5 py-0 text-[9px] font-medium tracking-wider uppercase"
                             >
                               You
                             </Badge>
                           )}
                         </div>
-                        <div className="text-muted-foreground truncate text-[11px] mt-0.5 max-w-[200px] sm:max-w-none">
+                        <div className="text-muted-foreground mt-0.5 max-w-50 truncate text-[11px] sm:max-w-none">
                           {member.userEmail}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-2 border-t border-border/5 pt-2 sm:border-t-0 sm:pt-0 sm:justify-end shrink-0 w-full sm:w-auto">
-                      <span className="sm:hidden text-xs text-muted-foreground font-medium">Role</span>
+                    <div className="border-border/5 flex w-full shrink-0 items-center justify-between gap-2 border-t pt-2 sm:w-auto sm:justify-end sm:border-t-0 sm:pt-0">
+                      <span className="text-muted-foreground text-xs font-medium sm:hidden">
+                        Role
+                      </span>
                       <div className="flex items-center gap-1.5">
                         {canManage ? (
                           <Select
@@ -472,7 +478,7 @@ const ProjectDetails = () => {
                           >
                             <SelectTrigger
                               size="sm"
-                              className="border-border/50 bg-background/50 w-[110px] text-xs px-2 h-8"
+                              className="border-border/50 bg-background/50 h-8 w-27.5 px-2 text-xs"
                             >
                               <SelectValue />
                             </SelectTrigger>
@@ -492,7 +498,7 @@ const ProjectDetails = () => {
                             variant="outline"
                             className={cn(
                               ROLE_STYLES[member.role] || ROLE_STYLES.MEMBER,
-                              "border-none text-[9px] sm:text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-0.5"
+                              'rounded-full border-none px-2.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase sm:text-xs'
                             )}
                           >
                             {member.role}
@@ -504,7 +510,7 @@ const ProjectDetails = () => {
                             variant="ghost"
                             size="sm"
                             onClick={() => setMemberToRemove(member)}
-                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 shrink-0"
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 shrink-0 p-0"
                             aria-label={`Remove ${member.userName}`}
                           >
                             <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
@@ -537,7 +543,7 @@ const ProjectDetails = () => {
                   : 'Tasks in this project.'}
               </CardDescription>
             </div>
-            <div className="flex items-center justify-between gap-2 w-full sm:w-auto shrink-0">
+            <div className="flex w-full shrink-0 items-center justify-between gap-2 sm:w-auto">
               <div className="bg-background/50 border-border/50 flex items-center rounded-lg border p-0.5">
                 <Button
                   variant={viewMode === 'list' ? 'secondary' : 'ghost'}
@@ -560,10 +566,10 @@ const ProjectDetails = () => {
                 <Button
                   onClick={() => setIsCreateTaskOpen(true)}
                   variant="outline"
-                  className="border-border/50 h-8 text-xs shrink-0"
+                  className="border-border/50 h-8 shrink-0 text-xs"
                   size="sm"
                 >
-                  <DASHBOARD_ICONS.PLUS className="h-3.5 w-3.5 mr-1" />
+                  <DASHBOARD_ICONS.PLUS className="mr-1 h-3.5 w-3.5" />
                   <span>Create Task</span>
                 </Button>
               )}
@@ -592,19 +598,19 @@ const ProjectDetails = () => {
                   <li
                     key={task.id}
                     onClick={() => setSelectedTaskId(task.id)}
-                    className="hover:bg-muted/30 -mx-2 flex flex-col gap-2 rounded-lg px-2.5 py-3.5 cursor-pointer transition-all sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                    className="hover:bg-muted/30 -mx-2 flex cursor-pointer flex-col gap-2 rounded-lg px-2.5 py-3.5 transition-all sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                   >
                     <div className="min-w-0 flex-1">
                       {/* Row 1: Title + Badges (Priority, Verification) */}
                       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <span className="text-sm font-semibold truncate max-w-[200px] sm:max-w-none">
+                        <span className="max-w-50 truncate text-sm font-semibold sm:max-w-none">
                           {task.title}
                         </span>
                         {task.priority && (
                           <Badge
                             className={cn(
                               TASK_PRIORITY_STYLES[task.priority],
-                              "border-none rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider shrink-0"
+                              'shrink-0 rounded-full border-none px-2 py-0.5 text-[9px] font-semibold tracking-wider uppercase'
                             )}
                           >
                             {task.priority}
@@ -613,7 +619,7 @@ const ProjectDetails = () => {
                         {needsReview && (
                           <Badge
                             variant="outline"
-                            className="bg-amber-500/10 text-amber-600 border-none rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider shrink-0"
+                            className="shrink-0 rounded-full border-none bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-semibold tracking-wider text-amber-600 uppercase"
                           >
                             Review
                           </Badge>
@@ -621,15 +627,15 @@ const ProjectDetails = () => {
                       </div>
 
                       {/* Row 2: Metadata (Assignee, Due Date) */}
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground mt-1">
+                      <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px]">
                         <span className="truncate">
-                          {task.assigneeName ? task.assigneeName.split(' ')[0] : 'Unassigned'}
+                          {task.assigneeName ? task.assigneeName : 'Unassigned'}
                         </span>
                         {task.deadline && (
                           <>
                             <span className="opacity-40">•</span>
                             <span className="flex items-center gap-1">
-                              <DASHBOARD_ICONS.CLOCK className="h-3 w-3 opacity-60 text-primary" />
+                              <DASHBOARD_ICONS.CLOCK className="text-primary h-3 w-3 opacity-60" />
                               {formatDateDisplay(task.deadline, 'short')}
                             </span>
                           </>
@@ -638,17 +644,68 @@ const ProjectDetails = () => {
                     </div>
 
                     {/* Row 3 on mobile / Right Column on desktop: Status Badge */}
-                    <div className="flex items-center justify-between border-t border-border/5 pt-2 sm:border-t-0 sm:pt-0 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
-                      <span className="sm:hidden text-xs text-muted-foreground font-medium">Status</span>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          TASK_STATUS_STYLES[task.status] || TASK_STATUS_STYLES.TODO,
-                          "rounded-full border-none px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider shrink-0"
+                    <div className="border-border/5 mt-1 flex w-full shrink-0 items-center justify-between border-t pt-2 sm:mt-0 sm:w-auto sm:border-t-0 sm:pt-0">
+                      <span className="text-muted-foreground text-xs font-medium sm:hidden">
+                        Status
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            TASK_STATUS_STYLES[task.status] ||
+                              TASK_STATUS_STYLES.TODO,
+                            'shrink-0 rounded-full border-none px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase'
+                          )}
+                        >
+                          {task.status?.replace('_', ' ')}
+                        </Badge>
+                        {isManager && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              const isConfirmed = await confirm({
+                                title: 'Delete task?',
+                                description: (
+                                  <span>
+                                    Are you sure you want to permanently delete task{' '}
+                                    <span className="text-foreground font-medium">
+                                      {task.title}
+                                    </span>
+                                    ? This action cannot be undone.
+                                  </span>
+                                ),
+                                confirmText: 'Delete',
+                                cancelText: 'Cancel',
+                                media: (
+                                  <DASHBOARD_ICONS.TRASH2 className="text-destructive h-6 w-6" />
+                                ),
+                                mediaClassName: 'bg-destructive/10 text-destructive',
+                                variant: 'destructive',
+                              });
+                              if (isConfirmed) {
+                                try {
+                                  await deleteTask({
+                                    taskId: task.id,
+                                    projectId: Number(projectId),
+                                  }).unwrap();
+                                  if (selectedTaskId === task.id) {
+                                    setSelectedTaskId(null);
+                                  }
+                                  toast.success('Task deleted');
+                                } catch (err) {
+                                  toast.error(err?.message || 'Failed to delete task');
+                                }
+                              }
+                            }}
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-7 w-7 p-0 shrink-0 rounded-lg transition-colors"
+                            aria-label={`Delete task ${task.title}`}
+                          >
+                            <DASHBOARD_ICONS.TRASH2 className="h-3.5 w-3.5" />
+                          </Button>
                         )}
-                      >
-                        {task.status?.replace('_', ' ')}
-                      </Badge>
+                      </div>
                     </div>
                   </li>
                 );
@@ -740,7 +797,7 @@ const ProjectDetails = () => {
               value={removeReason}
               onChange={(e) => setRemoveReason(e.target.value)}
               placeholder="Why are you removing this member?"
-              className="border-border/50 bg-background/50 min-h-[88px]"
+              className="border-border/50 bg-background/50 min-h-22"
             />
           </div>
 

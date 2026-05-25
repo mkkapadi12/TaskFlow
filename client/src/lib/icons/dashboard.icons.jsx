@@ -19,9 +19,11 @@ import {
   Loader2,
   LogOut,
   Menu,
+  MessageSquare,
   Pencil,
   Plus,
   Search,
+  Send,
   Settings,
   Shield,
   SlidersHorizontal,
@@ -70,4 +72,6 @@ export const DASHBOARD_ICONS = {
   FILTER: SlidersHorizontal,
   CLOSE: X,
   DOWNLOAD: Download,
+  SEND: Send,
+  MESSAGESQUARE: MessageSquare,
 };

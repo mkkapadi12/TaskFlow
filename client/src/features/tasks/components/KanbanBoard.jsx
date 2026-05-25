@@ -154,7 +154,7 @@ const KanbanBoard = ({
               const sourceStatus = e.dataTransfer.getData('sourceStatus');
               handleDrop(taskId, sourceStatus, columnId);
             }}
-            className="border-border/40 bg-card/20 min-h-[500px] rounded-xl border p-3 transition-colors duration-200"
+            className="border-border/40 bg-card/20 min-h-125 rounded-xl border p-3 transition-colors duration-200"
           >
             {/* Column Header */}
             <div className="mb-3 flex items-center justify-between">
@@ -185,7 +185,7 @@ const KanbanBoard = ({
                         e.dataTransfer.setData('taskId', task.id.toString());
                         e.dataTransfer.setData('sourceStatus', task.status);
                         e.currentTarget.style.opacity = '0.4';
-                      }}  
+                      }}
                       onDragEnd={(e) => {
                         e.currentTarget.style.opacity = '1';
                       }}
@@ -262,8 +262,8 @@ const KanbanBoard = ({
                               </AvatarFallback>
                             </Avatar>
                             {task.assigneeName && (
-                              <span className="text-muted-foreground max-w-[60px] truncate text-[10px]">
-                                {task.assigneeName.split(' ')[0]}
+                              <span className="text-muted-foreground max-w-15 truncate text-[10px]">
+                                {task.assigneeName}
                               </span>
                             )}
                           </div>
@@ -273,7 +273,7 @@ const KanbanBoard = ({
                   );
                 })
               ) : (
-                <div className="border-border/20 text-muted-foreground/30 flex h-[100px] items-center justify-center rounded-xl border-2 border-dashed text-xs">
+                <div className="border-border/20 text-muted-foreground/30 flex h-25 items-center justify-center rounded-xl border-2 border-dashed text-xs">
                   Empty column
                 </div>
               )}
@@ -297,7 +297,7 @@ const KanbanBoard = ({
               reject it and send it back to the active board?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2">
+          <AlertDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
             <AlertDialogCancel className="border-border/50 mt-0 sm:mr-auto">
               Cancel
             </AlertDialogCancel>

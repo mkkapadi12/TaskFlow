@@ -1,6 +1,11 @@
 import { Router } from 'express';
 
 import {
+  createComment,
+  deleteComment,
+  getComments,
+} from '../controllers/comment.controller.js';
+import {
   createTask,
   deleteTask,
   getMyTasks,
@@ -43,5 +48,10 @@ router.patch('/:taskId/verify', protect, verifyTask);
 
 // Delete a task
 router.delete('/:taskId', protect, deleteTask);
+
+// ── Task Comments ──────────────────────────────────────────
+router.post('/:taskId/comments', protect, createComment);
+router.get('/:taskId/comments', protect, getComments);
+router.delete('/:taskId/comments/:commentId', protect, deleteComment);
 
 export default router;

@@ -6,6 +6,7 @@ import {
   requireMembership,
   requireOwner,
 } from '../utils/requireRole.js';
+import CommentModel from './comment.model.js';
 
 const TASK_STATUSES = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'];
 const ASSIGNEE_STATUSES = ['TODO', 'IN_PROGRESS', 'IN_REVIEW'];
@@ -149,6 +150,19 @@ const TaskModel = {
       null,
       null,
     ]);
+
+    if (existing.status !== status) {
+      try {
+        await CommentModel.logActivity(
+          taskId,
+          userId,
+          `changed status from ${existing.status} to ${status}`
+        );
+      } catch (err) {
+        console.error('Failed to log status change activity:', err);
+      }
+    }
+
     return rows[0];
   },
 
@@ -162,6 +176,16 @@ const TaskModel = {
       taskId,
       approve ? 1 : 0,
     ]);
+
+    try {
+      const action = approve
+        ? 'approved task and marked it as DONE'
+        : 'rejected task and sent it back to IN_PROGRESS';
+      await CommentModel.logActivity(taskId, userId, action);
+    } catch (err) {
+      console.error('Failed to log verification activity:', err);
+    }
+
     return rows[0];
   },
 

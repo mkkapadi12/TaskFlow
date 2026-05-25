@@ -61,6 +61,7 @@ export const tasksApi = baseApi.injectEndpoints({
         { type: 'Task', id: taskId },
         { type: 'Task', id: `project-${projectId}` },
         { type: 'Project', id: String(projectId) },
+        { type: 'Comment', id: taskId },
       ],
     }),
 
@@ -75,6 +76,7 @@ export const tasksApi = baseApi.injectEndpoints({
         { type: 'Task', id: taskId },
         { type: 'Task', id: `project-${projectId}` },
         { type: 'Project', id: String(projectId) },
+        { type: 'Comment', id: taskId },
       ],
     }),
 
