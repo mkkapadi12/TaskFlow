@@ -19,8 +19,8 @@ app.use(
 
       const allowedOrigins = [
         env.client.url,
-        ...(process.env.ADDITIONAL_CLIENT_URLS
-          ? process.env.ADDITIONAL_CLIENT_URLS.split(',').map((u) => u.trim())
+        ...(env.client.additional
+          ? env.client.additional.split(',').map((u) => u.trim())
           : []),
       ].filter(Boolean);
 

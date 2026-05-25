@@ -58,7 +58,13 @@ const TaskDetailDialog = ({
   const canChangeStatus = isManager || isAssignee;
   const canVerify = isOwner && task?.status === 'IN_REVIEW';
 
-  const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors },
+  } = useForm();
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
   const [updateStatus, { isLoading: isStatusUpdating }] =
     useUpdateTaskStatusMutation();
@@ -197,7 +203,9 @@ const TaskDetailDialog = ({
                 disabled={!isManager}
               />
               {errors.deadline && (
-                <p className="text-destructive text-xs">{errors.deadline.message}</p>
+                <p className="text-destructive text-xs">
+                  {errors.deadline.message}
+                </p>
               )}
             </div>
           </div>

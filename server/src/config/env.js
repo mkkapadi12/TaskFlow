@@ -10,6 +10,7 @@ const env = {
 
   client: {
     url: process.env.CLIENT_URL || `http://${process.env.IP_ADDRESS}:5173`,
+    additional: process.env.ADDITIONAL_CLIENT_URLS,
   },
 
   db: {

@@ -24,7 +24,13 @@ import { useCreateTaskMutation } from '@/features/tasks/task.api';
 
 const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
-  const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       title: '',
       description: '',
@@ -121,7 +127,9 @@ const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
                 })}
               />
               {errors.deadline && (
-                <p className="text-destructive text-xs">{errors.deadline.message}</p>
+                <p className="text-destructive text-xs">
+                  {errors.deadline.message}
+                </p>
               )}
             </div>
           </div>

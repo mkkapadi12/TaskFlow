@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { PAGE_TITLES } from '@/constant';
 import { logout } from '@/features/auth/auth.slice';
 import { ThemeToggle } from '@/helper/ThemeToggle';
+import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
@@ -15,6 +16,7 @@ const Topbar = ({ onMenuClick }) => {
   const location = useLocation();
   const { user } = useAuth();
   const dispatch = useDispatch();
+  const confirm = useAlertDialog();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -102,9 +104,23 @@ const Topbar = ({ onMenuClick }) => {
                 </p>
               </div>
               <button
-                onClick={() => {
+                onClick={async () => {
                   setDropdownOpen(false);
-                  dispatch(logout());
+                  const isConfirmed = await confirm({
+                    title: 'Sign Out',
+                    description:
+                      'Are you sure you want to sign out of your TaskFlow account?',
+                    confirmText: 'Sign Out',
+                    cancelText: 'Cancel',
+                    media: (
+                      <DASHBOARD_ICONS.LOGOUT className="text-destructive h-6 w-6" />
+                    ),
+                    mediaClassName: 'bg-destructive/10 text-destructive',
+                    variant: 'destructive',
+                  });
+                  if (isConfirmed) {
+                    dispatch(logout());
+                  }
                 }}
                 className="text-destructive hover:bg-destructive/10 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
               >

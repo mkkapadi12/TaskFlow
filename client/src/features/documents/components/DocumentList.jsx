@@ -1,18 +1,8 @@
-import { useState } from 'react';
 import { toast } from 'sonner';
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
 import {
@@ -38,48 +28,10 @@ const EXT_COLORS = {
 
 const getExt = (name) => name.split('.').pop()?.toLowerCase() || 'file';
 
-const DeleteDocumentButton = ({ doc, onDelete }) => {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setOpen(true)}
-        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
-        aria-label={`Delete ${doc.name}`}
-      >
-        <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
-      </Button>
-
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent className="border-border/50 bg-card/95 backdrop-blur-sm sm:max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete document?</AlertDialogTitle>
-            <AlertDialogDescription>
-              <span className="text-foreground font-medium">{doc.name}</span>{' '}
-              will be permanently deleted and cannot be recovered.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => onDelete(doc.id)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  );
-};
-
 const DocumentList = ({ projectId, isManager }) => {
   const { data, isLoading } = useGetDocumentsQuery(projectId);
   const [deleteDocument] = useDeleteDocumentMutation();
+  const confirm = useAlertDialog();
 
   const handleDelete = async (documentId) => {
     try {
@@ -140,7 +92,37 @@ const DocumentList = ({ projectId, isManager }) => {
             </a>
 
             {isManager && (
-              <DeleteDocumentButton doc={doc} onDelete={handleDelete} />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  const isConfirmed = await confirm({
+                    title: 'Delete document?',
+                    description: (
+                      <span>
+                        <span className="text-foreground font-medium">
+                          {doc.name}
+                        </span>{' '}
+                        will be permanently deleted and cannot be recovered.
+                      </span>
+                    ),
+                    confirmText: 'Delete',
+                    cancelText: 'Cancel',
+                    media: (
+                      <DASHBOARD_ICONS.TRASH2 className="text-destructive h-6 w-6" />
+                    ),
+                    mediaClassName: 'bg-destructive/10 text-destructive',
+                    variant: 'destructive',
+                  });
+                  if (isConfirmed) {
+                    handleDelete(doc.id);
+                  }
+                }}
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
+                aria-label={`Delete ${doc.name}`}
+              >
+                <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
+              </Button>
             )}
           </li>
         );

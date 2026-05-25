@@ -4,6 +4,7 @@ import { store } from '@/app/store';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
+import { AlertDialogProvider } from './AlertDialogProvider';
 import ThemeProvider from './ThemeProvider';
 
 const AppProviders = ({ children }) => {
@@ -11,8 +12,10 @@ const AppProviders = ({ children }) => {
     <Provider store={store}>
       <ThemeProvider>
         <TooltipProvider>
-          {children}
-          <Toaster position="top-right" />
+          <AlertDialogProvider>
+            {children}
+            <Toaster position="top-right" />
+          </AlertDialogProvider>
         </TooltipProvider>
       </ThemeProvider>
     </Provider>

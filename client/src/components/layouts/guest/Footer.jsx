@@ -167,7 +167,8 @@ const Footer = () => {
 
         <div className="border-border/40 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
           <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} TaskFlow. {t('footer.allRightsReserved')}
+            &copy; {new Date().getFullYear()} TaskFlow.{' '}
+            {t('footer.allRightsReserved')}
           </p>
           <div className="text-muted-foreground flex items-center gap-6 text-sm">
             <Link to="/" className="hover:text-foreground transition-colors">

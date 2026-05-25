@@ -47,9 +47,13 @@ const ProfilePage = () => {
         {/* Left Column: Summary */}
         <div className="space-y-6 lg:col-span-1">
           <Card className="border-border/50 bg-card/50 overflow-hidden shadow-xl shadow-black/5 backdrop-blur-sm">
-            <div className="from-primary/20 to-primary/5 flex h-24 bg-linear-to-r flex-col items-center justify-center">
-              <span className="text-muted-foreground text-sm">Member since</span>{' '}
-              <span className="text-lg">{formatDateDisplay(user?.createdAt, 'long')}</span>
+            <div className="from-primary/20 to-primary/5 flex h-24 flex-col items-center justify-center bg-linear-to-r">
+              <span className="text-muted-foreground text-sm">
+                Member since
+              </span>{' '}
+              <span className="text-lg">
+                {formatDateDisplay(user?.createdAt, 'long')}
+              </span>
             </div>
             <CardContent className="relative -mt-12 p-6 text-center">
               <div className="border-background bg-muted mb-4 inline-flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-4 shadow-lg">
