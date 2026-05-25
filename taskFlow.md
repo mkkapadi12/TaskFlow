@@ -84,6 +84,7 @@ Defined in `server/database/create.sql`. Tables:
 | `tasks`                 | Tasks scoped to a project. Fields: `id`, `title`, `description`, `status` (`TODO`/`IN_PROGRESS`/`IN_REVIEW`/`DONE`), `priority` (`LOW`/`MEDIUM`/`HIGH`/`URGENT`), `deadline`, `projectId`, `assigneeId`, `creatorId`. |
 | `notification_settings` | Per-user email preference toggles. Fields: `userId` (unique), `welcome`, `passwordReset`, `memberAdded`, `memberRemoved` (all `TINYINT(1)`, default 1). |
 | `project_documents`     | Per-project file metadata. Fields: `id`, `projectId`, `uploadedBy`, `name`, `url`, `publicId`, `size`, `mimeType`, `createdAt`. Actual files live on Cloudinary. |
+| `task_comments`         | Task comments and activity logs. Fields: `id`, `taskId`, `userId`, `content`, `type` (`COMMENT`/`ACTIVITY`), `createdAt`. |
 
 All data access is funneled through **stored procedures** (called from `server/src/config/callProcedure.js`), organized per domain:
 
@@ -92,6 +93,7 @@ All data access is funneled through **stored procedures** (called from `server/s
 - `database/tasks.sql` — `sp_CreateTask`, `sp_GetTasksByProject`, `sp_GetTasksByAssignee`, `sp_GetTaskById`, `sp_UpdateTask`, `sp_DeleteTask`, `sp_GetOverdueTasks`, `sp_VerifyTask` (owner-only `IN_REVIEW` → `DONE` / `IN_PROGRESS` transition, SIGNALs 45000 if precondition fails)
 - `database/notification.sql` — `sp_GetNotificationSettings` (returns a virtual default row when no record exists yet), `sp_UpdateNotificationSettings` (upsert)
 - `database/project_docs.sql` — `sp_CreateProjectDocument`, `sp_GetProjectDocuments`, `sp_GetProjectDocumentById`, `sp_DeleteProjectDocument`
+- `database/task_comments.sql` — `sp_CreateTaskComment`, `sp_GetTaskComments`, `sp_DeleteTaskComment`, `sp_GetTaskCommentById`, `sp_CreateTaskActivity` (convenience activity logging)
 - `database/call.sql` — ad-hoc invocation scratch (not part of bootstrap)
 
 ---
@@ -191,6 +193,9 @@ Base URL: `http://localhost:5000/api`
 | PATCH  | `/:taskId/status`          | Assignee or OWNER / ADMIN | Move `TODO ↔ IN_PROGRESS ↔ IN_REVIEW`. **Cannot set `DONE`.** |
 | PATCH  | `/:taskId/verify`          | OWNER             | Body `{ approve: bool }`. Approve → `DONE`, reject → `IN_PROGRESS`. Requires current status `IN_REVIEW`. |
 | DELETE | `/:taskId`                 | Creator or OWNER  | Delete task                                  |
+| POST   | `/:taskId/comments`        | Project member    | Add a comment to a task                      |
+| GET    | `/:taskId/comments`        | Project member    | List all comments and activity logs for a task|
+| DELETE | `/:taskId/comments/:commentId` | Author or OWNER / ADMIN | Delete a comment (system activity entries cannot be deleted)|
 
 #### Notifications (`/notifications/settings`) — JWT required
 | Method | Path | Description                                                                |
@@ -305,6 +310,7 @@ src/
   - `project.api.js` → `getMyProjects`, `getProjectDetails`, `createProject`, `updateProject`, `deleteProject`, `getProjectMembers`, `addProjectMember`, `updateMemberRole`, `removeProjectMember`
   - `task.api.js` → `getMyTasks`, `getTasksByProject`, `getTaskById`, `createTask`, `updateTask`, `updateTaskStatus`, `verifyTask`, `deleteTask`, `getOverdueTasks`
   - `document.api.js` → `getDocuments`, `uploadDocuments` (FormData), `deleteDocument`
+  - `comment.api.js` → `getTaskComments`, `createTaskComment`, `deleteTaskComment`
   - `notification.api.js` → `getNotificationSettings`, `updateNotificationSettings`
 - `AppLayout` triggers `useGetProfileQuery()` once on mount to hydrate Redux with the user.
 
@@ -353,7 +359,11 @@ src/
 - [x] Task list cards with status/priority badges + deadlines
 - [x] Create / edit tasks restricted to project OWNER/ADMIN; assignee must be a project member
 - [x] Verify workflow: assignee moves task to `IN_REVIEW`; OWNER approves (→ `DONE`) or sends back (→ `IN_PROGRESS`) via `sp_VerifyTask`
-- [x] Task UI inside `ProjectDetails`: tasks list, "Needs verification" pill for owners on `IN_REVIEW` tasks, `CreateTaskDialog`, `TaskDetailDialog` with role-aware controls
+- [x] Task UI inside `ProjectDetails`: tasks list, "Needs verification" pill for owners on `IN_REVIEW` tasks, `CreateTaskDialog`, `TaskDetailDialog` with role-aware controls and redesigned split-pane workspace
+- [x] **Kanban board** on the project detail page — group tasks by status, drag/drop status changes (still subject to the verify rules: assignee may not drop into `DONE`)
+- [x] **Task comments & activity log** — threaded discussion and automated system action logging (deadline/assignee changes, etc.) per task
+- [x] **Task Deletion** — conditional task deletion (owner/admin only) next to status badges in ProjectDetails, integrated with `useDeleteTaskMutation` and `useAlertDialog` confirmation hook
+
 
 **Documents**
 - [x] Per-project document upload (multer memory storage → Cloudinary `resource_type: raw`)
@@ -370,6 +380,10 @@ src/
 - [x] English / Hindi / Gujarati locales for guest-facing pages with `i18next` + browser detector
 - [x] Language preference persisted to `localStorage`
 
+**Dashboard & Calendar**
+- [x] **UserDashboard**: Custom stat counters (projects, tasks, overdue tasks), visual Recharts Pie Chart representing task status metrics, and an upcoming deadlines feed
+- [x] **UserCalendar**: Fully interactive calendar view mapping task deadlines onto a month grid with custom priority indicator dots, and list details sidebar displaying tasks for selected dates
+
 **Infra / DX**
 - [x] Helmet + CORS configured for `CLIENT_URL`
 - [x] Global error handler (`AppError` + `globalErrorHandler`) maps `SIGNAL 45000` → 400 and `ER_DUP_ENTRY` → 409
@@ -382,8 +396,6 @@ src/
 
 ### Partially implemented / placeholders
 
-- [ ] `UserDashboard` — basic page exists; richer analytics (Recharts pie, upcoming-deadlines feed) is partial
-- [ ] `UserCalendar` — placeholder, no task-deadline overlay yet
 - [ ] `admin/` feature folder — reserved for future admin tooling, currently empty
 - [ ] i18n for authed pages — only guest pages have translations today
 
@@ -392,28 +404,21 @@ src/
 ## 7. Future / Planned Implementation
 
 ### Near-term
-1. **Kanban board** on the project detail page — group tasks by status, drag/drop status changes (still subject to the verify rules: assignee may not drop into `DONE`).
-2. **Calendar view** that maps tasks with `deadline` onto a month grid (`react-day-picker` already installed).
-3. **Dashboard charts** — surface project / task / overdue counts and trend charts via Recharts.
-4. **Task search & advanced filters** — by priority, assignee, deadline range.
-5. **Project status toggle** (`ACTIVE` / `INACTIVE`) from the UI.
-6. **Member role management UI** — backend ready; needs the visual control on members panel.
+1. **Advanced Task Filters**: Extend task filtering on the project details page and "My Tasks" dashboard to support filtering by Priority, Assignee, and Deadline ranges.
 
 ### Mid-term
-7. **Task comments & activity log** — threaded discussion per task.
-8. **Deadline reminder emails** — notify assignees before tasks become overdue (extend `email.service.js`).
-9. **Task file attachments** — reuse the Cloudinary raw-upload path from documents.
-10. **Time tracking** — `Home` markets this; would require a `task_time_entries` table + SPs.
-11. **Analytics page** — productivity trends, completion rates, team performance.
-12. **i18n coverage** for authed pages (currently only guest pages are translated).
+2. **Deadline Reminder Emails**: Systematically notify assignees via SMTP before their tasks become overdue (extending `email.service.js`).
+3. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
+4. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
+5. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
 
 ### Long-term / nice-to-have
-13. **Real-time collaboration** (Socket.IO) — live task moves, presence indicators.
-14. **Refresh tokens + httpOnly cookies** instead of JWT in `localStorage`.
-15. **Audit log table** for admin actions.
-16. **Rate limiting** (`express-rate-limit`) on auth endpoints.
-17. **Test suite** — neither client nor server has tests yet.
-18. **CI / deployment pipelines** — no workflow files present.
+6. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
+7. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
+8. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
+9. **Rate Limiting**: Add rate-limiting middleware (`express-rate-limit`) to prevent brute-force attacks on auth and password reset endpoints.
+10. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
+11. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
 
 ---
 
@@ -426,6 +431,7 @@ mysql -u root -p <db_name> < server/database/users.sql
 mysql -u root -p <db_name> < server/database/project.sql
 mysql -u root -p <db_name> < server/database/tasks.sql
 mysql -u root -p <db_name> < server/database/notification.sql
+mysql -u root -p <db_name> < server/database/task_comments.sql
 mysql -u root -p <db_name> < server/database/project_docs.sql
 
 # 2. Backend

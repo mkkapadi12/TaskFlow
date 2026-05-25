@@ -327,3 +327,108 @@
  *       403:
  *         description: Not authorized to delete
  */
+
+/**
+ * @swagger
+ * /tasks/{taskId}/comments:
+ *   post:
+ *     summary: Add a comment to a task
+ *     description: Any project member can comment on a task.
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Task ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateCommentInput'
+ *     responses:
+ *       201:
+ *         description: Comment added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/TaskComment'
+ *       403:
+ *         description: Not a member of the project
+ *       404:
+ *         description: Task not found
+ * 
+ *   get:
+ *     summary: Get all comments and activity logs for a task
+ *     description: Requires project membership. Returns all comments and system activity records.
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Task ID
+ *     responses:
+ *       200:
+ *         description: List of comments and activity logs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/TaskComment'
+ *       403:
+ *         description: Not a member of the project
+ *       404:
+ *         description: Task not found
+ */
+
+/**
+ * @swagger
+ * /tasks/{taskId}/comments/{commentId}:
+ *   delete:
+ *     summary: Delete a comment (author or project manager only)
+ *     description: The comment author can delete their own comment. Project owners/admins can delete any comment. System-generated activity entries cannot be deleted.
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: taskId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Task ID
+ *       - in: path
+ *         name: commentId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Comment ID
+ *     responses:
+ *       200:
+ *         description: Comment deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ *       400:
+ *         description: Attempted to delete a system activity log
+ *       403:
+ *         description: Not authorized to delete this comment
+ *       404:
+ *         description: Comment or task not found
+ */

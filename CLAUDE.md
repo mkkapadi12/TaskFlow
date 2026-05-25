@@ -35,6 +35,7 @@ mysql -u root -p <db_name> < server/database/users.sql
 mysql -u root -p <db_name> < server/database/project.sql
 mysql -u root -p <db_name> < server/database/tasks.sql
 mysql -u root -p <db_name> < server/database/notification.sql
+mysql -u root -p <db_name> < server/database/task_comments.sql
 mysql -u root -p <db_name> < server/database/project_docs.sql
 ```
 
@@ -90,7 +91,7 @@ Email delivery is in `services/email.service.js` (SMTP via Nodemailer; HTML in `
 
 ### Client: RTK Query endpoint injection
 
-`client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
+`client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task", "NotificationSettings", "Document", "Comment"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
 
 The base query is a custom `axiosBaseQuery` that delegates to `client/src/lib/axios.js`. That axios instance:
 

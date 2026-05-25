@@ -390,6 +390,44 @@
  *             false → task transitions IN_REVIEW → IN_PROGRESS
  *           example: true
  *
+ *     TaskComment:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           example: 1
+ *         taskId:
+ *           type: integer
+ *           example: 10
+ *         userId:
+ *           type: integer
+ *           example: 2
+ *         content:
+ *           type: string
+ *           example: I have finished the initial sketches.
+ *         type:
+ *           type: string
+ *           enum: [COMMENT, ACTIVITY]
+ *           example: COMMENT
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         userName:
+ *           type: string
+ *           example: John Doe
+ *         userAvatar:
+ *           type: string
+ *           nullable: true
+ *           example: https://res.cloudinary.com/...
+ *
+ *     CreateCommentInput:
+ *       type: object
+ *       required: [content]
+ *       properties:
+ *         content:
+ *           type: string
+ *           example: This is a comment on the task.
+ *
  *     # ── Documents ───────────────────────────────────────
  *     Document:
  *       type: object
