@@ -8,6 +8,16 @@ import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
 
 export default [
+  {
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
+      '.vite/**',
+      'build/**',
+    ],
+  },
+
   js.configs.recommended,
 
   {
@@ -70,6 +80,7 @@ export default [
       },
     },
   },
+
   {
     files: ['vite.config.js', 'eslint.config.js'],
     languageOptions: {

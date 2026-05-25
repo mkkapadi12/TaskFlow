@@ -17,14 +17,14 @@ Run all commands from the relevant subdirectory (`client/` or `server/`). The re
 
 ```bash
 # Server (server/)
-npm run dev           # nodemon index.js — http://localhost:5000, Swagger at /api/docs
-npm start             # node index.js (production)
+bun run dev           # nodemon index.js — http://localhost:5000, Swagger at /api/docs
+bun start             # node index.js (production)
 
 # Client (client/)
-npm run dev           # vite — http://localhost:5173
-npm run build         # vite build
-npm run lint          # eslint .
-npm run preview       # vite preview
+bun run dev           # vite — http://localhost:5173
+bun run build         # vite build
+bun run lint          # eslint .
+bun run preview       # vite preview
 ```
 
 Database bootstrap (MySQL must be running locally):
@@ -55,6 +55,7 @@ There is no ORM and no inline SQL in JS. Every read and write goes through `call
 **When adding a feature, add the SP first**, then expose it via a model method. Layer order: `routes → controllers → models → callProcedure → SP`.
 
 The return shape from `callProcedure` is the raw `mysql2` result and differs by SP:
+
 - Single-resultset SPs: `const [rows] = await callProcedure(...)` then `rows[0]` is the first row.
 - Multi-resultset SPs (e.g. `sp_GetFullProjectDetails` returns project + members + tasks): destructure positionally — `const [projectRows, memberRows, taskRows] = await callProcedure(...)`. See `ProjectModel.getProjectDetailsById` for the pattern.
 
@@ -68,7 +69,7 @@ SPs use `SIGNAL SQLSTATE '45000'` for business-rule errors; `globalErrorHandler`
   - `requireMembership` — any role (`OWNER` / `ADMIN` / `MEMBER`). Used for reads.
   - `requireManager` — `OWNER` or `ADMIN`. Used to gate task creation/edits.
   - `requireOwner` — `OWNER` only. Used for member management and task verification.
-  Authorization checks happen in the **model layer**, not the route, because they depend on the SP result.
+    Authorization checks happen in the **model layer**, not the route, because they depend on the SP result.
 - Static routes must come before dynamic ones in route files (e.g. `/profile` before `/:id` in `user.routes.js`).
 
 ### Server: validation
@@ -92,6 +93,7 @@ Email delivery is in `services/email.service.js` (SMTP via Nodemailer; HTML in `
 `client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
 
 The base query is a custom `axiosBaseQuery` that delegates to `client/src/lib/axios.js`. That axios instance:
+
 - Sets `baseURL: "/api"` (relies on the Vite proxy).
 - Attaches `Authorization: Bearer <token>` from `state.auth.token` on every request (lazy-imports the store to break the circular dep `store → baseApi → axios → store`).
 - On 401 responses, dispatches `logout()` automatically.
@@ -100,6 +102,7 @@ The base query is a custom `axiosBaseQuery` that delegates to `client/src/lib/ax
 ### Client: routing and layouts
 
 `client/src/App.jsx` is the single source of truth for routes. The tree is two top-level groups:
+
 - `<GuestRoute>` wraps public pages and the auth pages; it redirects authenticated users to `/dashboard`.
 - `<ProtectedRoute>` + `<AppLayout>` wraps every authed page.
 
@@ -118,7 +121,7 @@ Translations live in `client/src/i18n/` (`index.js` configures i18next; `locales
 ## Conventions
 
 - **Client formatting**: Prettier config (`client/.prettierrc`) — double quotes, no semicolons, 2-space indent, ES5 trailing commas. There is no Prettier config on the server; match surrounding style there.
-- **Client lint**: `npm run lint` in `client/` runs ESLint with React Hooks + React Refresh rules. The server has no lint script.
+- **Client lint**: `bun run lint` in `client/` runs ESLint with React Hooks + React Refresh rules. The server has no lint script.
 - **Imports**: server uses ESM (`"type": "module"`); every relative import needs the `.js` extension.
 - **API response shape**: controllers return `{ success: boolean, message?: string, data?: any }`. Errors come back as `{ success: false, message }` (plus `errors: [{field, message}]` for Zod validation failures).
 - **Swagger docs**: route annotations live in `server/src/docs/*.docs.js` (separate from route files); reusable schema components are in `server/src/schema/swagger.schemas.js`. The spec is served at `/api/docs`.

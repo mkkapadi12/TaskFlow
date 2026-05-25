@@ -124,7 +124,7 @@ git clone https://github.com/your-username/taskflow.git
 cd taskflow
 
 # Install root workspace dependencies
-npm install
+bun install
 ```
 
 ### 2. Set Up the Database
@@ -160,11 +160,11 @@ cp .env.example .env
 ```bash
 # Terminal 1 — Backend (http://localhost:5000)
 cd server
-npm run dev
+bun run dev
 
 # Terminal 2 — Frontend (http://localhost:5173)
 cd client
-npm run dev
+bun run dev
 ```
 
 Visit `http://localhost:5173` to open the app.  

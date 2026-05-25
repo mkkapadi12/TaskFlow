@@ -431,14 +431,14 @@ mysql -u root -p <db_name> < server/database/project_docs.sql
 # 2. Backend
 cd server
 cp .env.example .env   # then fill in credentials
-npm install
-npm run dev            # http://localhost:5000 (Swagger: /api/docs)
+bun install
+bun run dev            # http://localhost:5000 (Swagger: /api/docs)
 
 # 3. Frontend
 cd client
 cp .env.example .env
-npm install
-npm run dev            # http://localhost:5173 (also reachable on LAN IP:5173)
+bun install
+bun run dev            # http://localhost:5173 (also reachable on LAN IP:5173)
 ```
 
 ---
