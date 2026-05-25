@@ -100,6 +100,30 @@ const TaskModel = {
       deadline ?? null,
       assigneeId ?? null,
     ]);
+
+    const formattedExistingDeadline =
+      existing.deadline &&
+      new Date(existing.deadline).toLocaleDateString('en-IN');
+
+    const formattedNewDeadline =
+      deadline && new Date(deadline).toLocaleDateString('en-IN');
+
+    if (formattedExistingDeadline !== formattedNewDeadline) {
+      await CommentModel.logActivity(
+        taskId,
+        userId,
+        `changed deadline from ${formattedExistingDeadline} to ${formattedNewDeadline}`
+      );
+    }
+
+    if (existing.assigneeId !== assigneeId) {
+      await CommentModel.logActivity(
+        taskId,
+        userId,
+        `changed assignee from ${existing.assigneeName} to ${task[0].assigneeName}`
+      );
+    }
+
     return task[0];
   },
 
