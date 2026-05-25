@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { cn } from '@/lib/utils';
 
 const ProfileForm = ({ user, onSave, isLoading }) => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [avatar, setAvatar] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -23,8 +27,55 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Only image files are allowed');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size exceeds the 5MB limit');
+        return;
+      }
       setAvatar(file);
       setPreviewUrl(URL.createObjectURL(file));
+      toast.success('Avatar ready to save');
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Only image files are allowed');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size exceeds the 5MB limit');
+        return;
+      }
+      setAvatar(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      toast.success('Avatar ready to save');
     }
   };
 
@@ -41,38 +92,45 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Avatar Upload (Compact) */}
-      <div className="border-border/50 bg-background/30 flex items-center gap-4 rounded-xl border p-4 backdrop-blur-sm">
-        <div className="border-border/50 bg-muted relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border">
-          {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt="Avatar"
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xl font-bold">
-              {name.charAt(0)?.toUpperCase() || '?'}
-            </span>
-          )}
-        </div>
+      {/* Avatar Upload (Compact with Drag & Drop) */}
+      <div
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={cn(
+          'border-border/50 bg-background/30 flex items-center gap-4 rounded-xl border p-4 backdrop-blur-sm transition-all duration-200',
+          isDragging && 'border-primary bg-primary/5 scale-[1.01]'
+        )}
+      >
+        <Avatar className="w-16 h-16 border shadow-sm border-border/50 bg-muted shrink-0">
+          <AvatarImage src={previewUrl} alt="Avatar" />
+          <AvatarFallback className="text-xl font-bold uppercase">
+            {name.charAt(0)?.toUpperCase() || '?'}
+          </AvatarFallback>
+        </Avatar>
 
         <div className="flex-1">
-          <Label
-            htmlFor="avatar-upload"
-            className="text-primary hover:text-primary/80 inline-flex cursor-pointer items-center gap-2 text-sm transition-colors"
-          >
-            <DASHBOARD_ICONS.UPLOAD size={16} />
-            Change Avatar
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-          </Label>
-          <p className="text-muted-foreground mt-1 text-xs">
+          <div className="flex flex-wrap items-center gap-2">
+            <Label
+              htmlFor="avatar-upload"
+              className="inline-flex items-center gap-2 text-sm font-semibold transition-colors cursor-pointer text-primary hover:text-primary/80"
+            >
+              <DASHBOARD_ICONS.UPLOAD size={16} />
+              Change Avatar
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </Label>
+            <span className="text-xs text-muted-foreground">
+              or drag & drop here
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
             Only .jpg, .jpeg, .png or .webp format. Maximum file size: 5MB.
           </p>
         </div>
@@ -96,9 +154,9 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           id="email"
           value={user?.email || ''}
           disabled
-          className="border-border/50 bg-muted/50 text-muted-foreground h-11 cursor-not-allowed"
+          className="cursor-not-allowed border-border/50 bg-muted/50 text-muted-foreground h-11"
         />
-        <p className="text-muted-foreground text-xs">
+        <p className="text-xs text-muted-foreground">
           Email cannot be changed. Contact support if needed.
         </p>
       </div>
@@ -122,7 +180,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
       >
         {isLoading ? (
           <>
-            <DASHBOARD_ICONS.LOADER2 className="mr-2 h-4 w-4 animate-spin" />
+            <DASHBOARD_ICONS.LOADER2 className="w-4 h-4 mr-2 animate-spin" />
             Saving...
           </>
         ) : (
