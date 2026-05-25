@@ -43,6 +43,7 @@ import {
   useUpdateProjectMutation,
 } from '@/features/project/project.api';
 import CreateTaskDialog from '@/features/tasks/components/CreateTaskDialog';
+import KanbanBoard from '@/features/tasks/components/KanbanBoard';
 import TaskDetailDialog from '@/features/tasks/components/TaskDetailDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
@@ -99,6 +100,7 @@ const ProjectDetails = () => {
   const [removeReason, setRemoveReason] = useState('');
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
 
   if (isLoading) return <ProjectDetailsSkeleton />;
 
@@ -452,16 +454,36 @@ const ProjectDetails = () => {
                   : 'Tasks in this project.'}
               </CardDescription>
             </div>
-            {isManager && (
-              <Button
-                onClick={() => setIsCreateTaskOpen(true)}
-                variant="outline"
-                className="border-border/50"
-              >
-                <DASHBOARD_ICONS.PLUS className="mr-2 h-4 w-4" />
-                Create Task
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              <div className="bg-background/50 border-border/50 flex items-center rounded-lg border p-1">
+                <Button
+                  variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="h-7 px-2.5 text-xs"
+                >
+                  List
+                </Button>
+                <Button
+                  variant={viewMode === 'kanban' ? 'secondary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('kanban')}
+                  className="h-7 px-2.5 text-xs"
+                >
+                  Kanban
+                </Button>
+              </div>
+              {isManager && (
+                <Button
+                  onClick={() => setIsCreateTaskOpen(true)}
+                  variant="outline"
+                  className="border-border/50"
+                >
+                  <DASHBOARD_ICONS.PLUS className="mr-2 h-4 w-4" />
+                  Create Task
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -470,6 +492,14 @@ const ProjectDetails = () => {
               <DASHBOARD_ICONS.LISTCHECKS className="text-muted-foreground/50 mx-auto mb-3 h-10 w-10" />
               <p className="text-muted-foreground text-sm">No tasks yet.</p>
             </div>
+          ) : viewMode === 'kanban' ? (
+            <KanbanBoard
+              tasks={tasksWithProjectId}
+              isOwner={isOwner}
+              isManager={isManager}
+              currentUserId={user?.id}
+              onSelectTask={setSelectedTaskId}
+            />
           ) : (
             <ul className="divide-border/50 divide-y">
               {tasksWithProjectId.map((task) => {
