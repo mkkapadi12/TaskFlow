@@ -67,63 +67,72 @@ const DocumentList = ({ projectId, isManager }) => {
         return (
           <li
             key={doc.id}
-            className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+            className="flex flex-col gap-2.5 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
           >
-            <DASHBOARD_ICONS.FILETEXT className="text-muted-foreground h-5 w-5 shrink-0" />
-
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{doc.name}</p>
-              <p className="text-muted-foreground text-xs">
-                {formatBytes(doc.size)} · by {doc.uploaderName} ·{' '}
-                {new Date(doc.createdAt).toLocaleDateString()}
-              </p>
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <DASHBOARD_ICONS.FILETEXT className="text-muted-foreground h-5 w-5 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 justify-between sm:justify-start">
+                  <p className="truncate text-sm font-semibold pr-2">{doc.name}</p>
+                  <Badge
+                    className={`${EXT_COLORS[ext] || 'bg-muted text-muted-foreground'} lowercase border-transparent text-[9px] px-2 py-0.5 font-semibold shrink-0 rounded-full`}
+                  >
+                    .{ext}
+                  </Badge>
+                </div>
+                <p className="text-muted-foreground text-[11px] mt-0.5 truncate hidden sm:block">
+                  {formatBytes(doc.size)} · by {doc.uploaderName?.split(' ')[0]} ·{' '}
+                  {new Date(doc.createdAt).toLocaleDateString()}
+                </p>
+              </div>
             </div>
 
-            <Badge
-              className={`${EXT_COLORS[ext] || 'bg-muted text-muted-foreground'} lowecase border-transparent text-[10px]`}
-            >
-              .{ext}
-            </Badge>
+            <div className="flex items-center justify-between gap-2 border-t border-border/5 pt-2 sm:border-t-0 sm:pt-0 sm:justify-end shrink-0 w-full sm:w-auto">
+              <span className="sm:hidden text-xs text-muted-foreground font-medium">
+                {formatBytes(doc.size)} · {doc.uploaderName?.split(' ')[0]}
+              </span>
+              <div className="flex items-center gap-1">
+                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <DASHBOARD_ICONS.DOWNLOAD className="h-4 w-4" />
+                  </Button>
+                </a>
 
-            <a href={doc.url} target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                <DASHBOARD_ICONS.DOWNLOAD className="h-4 w-4" />
-              </Button>
-            </a>
-
-            {isManager && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={async () => {
-                  const isConfirmed = await confirm({
-                    title: 'Delete document?',
-                    description: (
-                      <span>
-                        <span className="text-foreground font-medium">
-                          {doc.name}
-                        </span>{' '}
-                        will be permanently deleted and cannot be recovered.
-                      </span>
-                    ),
-                    confirmText: 'Delete',
-                    cancelText: 'Cancel',
-                    media: (
-                      <DASHBOARD_ICONS.TRASH2 className="text-destructive h-6 w-6" />
-                    ),
-                    mediaClassName: 'bg-destructive/10 text-destructive',
-                    variant: 'destructive',
-                  });
-                  if (isConfirmed) {
-                    handleDelete(doc.id);
-                  }
-                }}
-                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0"
-                aria-label={`Delete ${doc.name}`}
-              >
-                <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
-              </Button>
-            )}
+                {isManager && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={async () => {
+                      const isConfirmed = await confirm({
+                        title: 'Delete document?',
+                        description: (
+                          <span>
+                            <span className="text-foreground font-medium">
+                              {doc.name}
+                            </span>{' '}
+                            will be permanently deleted and cannot be recovered.
+                          </span>
+                        ),
+                        confirmText: 'Delete',
+                        cancelText: 'Cancel',
+                        media: (
+                          <DASHBOARD_ICONS.TRASH2 className="text-destructive h-6 w-6" />
+                        ),
+                        mediaClassName: 'bg-destructive/10 text-destructive',
+                        variant: 'destructive',
+                      });
+                      if (isConfirmed) {
+                        handleDelete(doc.id);
+                      }
+                    }}
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 shrink-0"
+                    aria-label={`Delete ${doc.name}`}
+                  >
+                    <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
           </li>
         );
       })}

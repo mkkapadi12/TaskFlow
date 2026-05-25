@@ -11,7 +11,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
-const ProjectList = ({ projects, isLoading }) => {
+const ProjectList = ({ projects, isLoading, isFiltered }) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -28,7 +28,9 @@ const ProjectList = ({ projects, isLoading }) => {
         <DASHBOARD_ICONS.SQUARESTACK className="text-muted-foreground/50 mx-auto mb-4 h-12 w-12" />
         <h3 className="text-lg font-semibold">No projects found</h3>
         <p className="text-muted-foreground mt-1">
-          Create a new project to get started.
+          {isFiltered
+            ? 'No projects match your active filters. Try clearing them.'
+            : 'Create a new project to get started.'}
         </p>
       </div>
     );

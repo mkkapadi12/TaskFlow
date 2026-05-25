@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { NAV_ITEMS } from '@/constant';
 import { logout } from '@/features/auth/auth.slice';
+import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { ICONS } from '@/lib/icons/icons';
@@ -13,6 +14,23 @@ import { cn } from '@/lib/utils';
 const Sidebar = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const { user } = useAuth();
+  const confirm = useAlertDialog();
+
+  const handleLogout = async () => {
+    const isConfirmed = await confirm({
+      title: 'Sign Out',
+      description:
+        'Are you sure you want to sign out of your TaskFlow account?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+      media: <DASHBOARD_ICONS.LOGOUT className="text-destructive h-6 w-6" />,
+      mediaClassName: 'bg-destructive/10 text-destructive',
+      variant: 'destructive',
+    });
+    if (isConfirmed) {
+      dispatch(logout());
+    }
+  };
 
   return (
     <>
@@ -91,7 +109,7 @@ const Sidebar = ({ open, onClose }) => {
           </div>
 
           <button
-            onClick={() => dispatch(logout())}
+            onClick={handleLogout}
             className="text-destructive hover:bg-destructive/10 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors"
           >
             <DASHBOARD_ICONS.LOGOUT size={18} />

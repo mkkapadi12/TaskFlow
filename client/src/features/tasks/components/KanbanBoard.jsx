@@ -185,7 +185,7 @@ const KanbanBoard = ({
                         e.dataTransfer.setData('taskId', task.id.toString());
                         e.dataTransfer.setData('sourceStatus', task.status);
                         e.currentTarget.style.opacity = '0.4';
-                      }}
+                      }}  
                       onDragEnd={(e) => {
                         e.currentTarget.style.opacity = '1';
                       }}
@@ -297,22 +297,25 @@ const KanbanBoard = ({
               reject it and send it back to the active board?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <AlertDialogCancel className="border-border/50 mt-0">
+          <AlertDialogFooter className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2">
+            <AlertDialogCancel className="border-border/50 mt-0 sm:mr-auto">
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => handleVerify(false)}
-              className="bg-warning text-warning-foreground hover:bg-warning/90 border border-amber-500/20 bg-amber-500/10 text-amber-600"
-            >
-              Reject (Send Back)
-            </AlertDialogAction>
-            <AlertDialogAction
-              onClick={() => handleVerify(true)}
-              className="bg-primary hover:bg-primary/90"
-            >
-              Approve & Mark DONE
-            </AlertDialogAction>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <AlertDialogAction
+                onClick={() => handleVerify(false)}
+                variant="outline"
+                className="border-amber-500/30 text-amber-500 hover:bg-amber-500/10"
+              >
+                Send Back
+              </AlertDialogAction>
+              <AlertDialogAction
+                onClick={() => handleVerify(true)}
+                variant="default"
+              >
+                Approve Task
+              </AlertDialogAction>
+            </div>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -18,6 +18,7 @@ import Docs from './features/guest/pages/Docs';
 import ErrorPage from './features/guest/pages/ErrorPage';
 // ── Guest Pages Components
 import Home from './features/guest/pages/Home';
+import AdvancedAnalytics from './features/project/pages/AdvancedAnalytics';
 import ProjectDetails from './features/project/pages/ProjectDetails';
 // ── Project Pages Components
 import Projects from './features/project/pages/Projects';
@@ -67,6 +68,11 @@ const router = createBrowserRouter([
           { path: '/calendar', element: <UserCalendar /> },
           { path: '/projects', element: <Projects /> },
           { path: '/projects/:projectId', element: <ProjectDetails /> },
+          {
+            path: '/projects/:projectId/analytics',
+            element: <AdvancedAnalytics />,
+          },
+          { path: '/analytics', element: <AdvancedAnalytics /> },
           { path: '/tasks', element: <MyTask /> },
         ],
       },

@@ -41,6 +41,23 @@ const Topbar = ({ onMenuClick }) => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  const handleLogout = async () => {
+    setDropdownOpen(false);
+    const isConfirmed = await confirm({
+      title: 'Sign Out',
+      description:
+        'Are you sure you want to sign out of your TaskFlow account?',
+      confirmText: 'Sign Out',
+      cancelText: 'Cancel',
+      media: <DASHBOARD_ICONS.LOGOUT className="text-destructive h-6 w-6" />,
+      mediaClassName: 'bg-destructive/10 text-destructive',
+      variant: 'destructive',
+    });
+    if (isConfirmed) {
+      dispatch(logout());
+    }
+  };
+
   return (
     <header className="border-border/40 bg-background/80 sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 backdrop-blur-xl md:px-6">
       {/* Left — hamburger + title */}
@@ -104,24 +121,7 @@ const Topbar = ({ onMenuClick }) => {
                 </p>
               </div>
               <button
-                onClick={async () => {
-                  setDropdownOpen(false);
-                  const isConfirmed = await confirm({
-                    title: 'Sign Out',
-                    description:
-                      'Are you sure you want to sign out of your TaskFlow account?',
-                    confirmText: 'Sign Out',
-                    cancelText: 'Cancel',
-                    media: (
-                      <DASHBOARD_ICONS.LOGOUT className="text-destructive h-6 w-6" />
-                    ),
-                    mediaClassName: 'bg-destructive/10 text-destructive',
-                    variant: 'destructive',
-                  });
-                  if (isConfirmed) {
-                    dispatch(logout());
-                  }
-                }}
+                onClick={handleLogout}
                 className="text-destructive hover:bg-destructive/10 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
               >
                 <DASHBOARD_ICONS.LOGOUT size={16} />

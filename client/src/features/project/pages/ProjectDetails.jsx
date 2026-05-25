@@ -47,7 +47,7 @@ import KanbanBoard from '@/features/tasks/components/KanbanBoard';
 import TaskDetailDialog from '@/features/tasks/components/TaskDetailDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
-import { formatDateDisplay } from '@/lib/utils';
+import { cn, formatDateDisplay } from '@/lib/utils';
 import { ProjectDetailsSkeleton } from '@/skeleton/ProjectDetalsSkeleton';
 
 const ROLE_OPTIONS = ['ADMIN', 'MEMBER', 'OWNER'];
@@ -101,6 +101,7 @@ const ProjectDetails = () => {
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [viewMode, setViewMode] = useState('list');
+  const [activeTab, setActiveTab] = useState('tasks');
 
   if (isLoading) return <ProjectDetailsSkeleton />;
 
@@ -210,15 +211,26 @@ const ProjectDetails = () => {
             Back to Projects
           </Button>
         </Link>
-        {isOwner && (
-          <Button
-            onClick={() => setIsEditOpen(true)}
-            className="shadow-primary/20 hover:shadow-primary/25 h-10 rounded-full shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
-          >
-            <DASHBOARD_ICONS.PENCIL className="mr-2 h-4 w-4" />
-            Edit Project
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <Link to={`/projects/${projectId}/analytics`}>
+            <Button
+              variant="outline"
+              className="border-border/50 h-10 rounded-full hover:bg-muted/50"
+            >
+              <DASHBOARD_ICONS.TRENDINGUP className="mr-2 h-4 w-4 text-primary" />
+              Analytics
+            </Button>
+          </Link>
+          {isOwner && (
+            <Button
+              onClick={() => setIsEditOpen(true)}
+              className="shadow-primary/20 hover:shadow-primary/25 h-10 rounded-full shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
+            >
+              <DASHBOARD_ICONS.PENCIL className="mr-2 h-4 w-4" />
+              Edit Project
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Project header card */}
@@ -267,17 +279,17 @@ const ProjectDetails = () => {
       </Card>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="bg-primary/10 text-primary flex h-11 w-11 items-center justify-center rounded-full">
-              <DASHBOARD_ICONS.USERS className="h-5 w-5" />
+          <CardContent className="flex flex-col items-center gap-2 p-3 text-center sm:flex-row sm:gap-4 sm:p-5 sm:text-left">
+            <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11">
+              <DASHBOARD_ICONS.USERS className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <div className="text-muted-foreground text-xs tracking-wider uppercase">
+            <div className="w-full min-w-0">
+              <div className="text-muted-foreground truncate text-[10px] tracking-wider uppercase sm:text-xs">
                 Members
               </div>
-              <div className="text-2xl font-semibold">
+              <div className="text-lg font-semibold sm:text-2xl">
                 {project.memberCount ?? members.length}
               </div>
             </div>
@@ -285,15 +297,15 @@ const ProjectDetails = () => {
         </Card>
 
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="bg-primary/10 text-primary flex h-11 w-11 items-center justify-center rounded-full">
-              <DASHBOARD_ICONS.LISTCHECKS className="h-5 w-5" />
+          <CardContent className="flex flex-col items-center gap-2 p-3 text-center sm:flex-row sm:gap-4 sm:p-5 sm:text-left">
+            <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11">
+              <DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <div className="text-muted-foreground text-xs tracking-wider uppercase">
+            <div className="w-full min-w-0">
+              <div className="text-muted-foreground truncate text-[10px] tracking-wider uppercase sm:text-xs">
                 Tasks
               </div>
-              <div className="text-2xl font-semibold">
+              <div className="text-lg font-semibold sm:text-2xl">
                 {project.taskCount ?? tasks.length}
               </div>
             </div>
@@ -301,29 +313,88 @@ const ProjectDetails = () => {
         </Card>
 
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="flex items-center gap-4 p-5">
-            <div className="bg-primary/10 text-primary flex h-11 w-11 items-center justify-center rounded-full">
-              <DASHBOARD_ICONS.CALENDARDAYS className="h-5 w-5" />
+          <CardContent className="flex flex-col items-center gap-2 p-3 text-center sm:flex-row sm:gap-4 sm:p-5 sm:text-left">
+            <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11">
+              <DASHBOARD_ICONS.CALENDARDAYS className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <div className="text-muted-foreground text-xs tracking-wider uppercase">
+            <div className="w-full min-w-0">
+              <div className="text-muted-foreground truncate text-[10px] tracking-wider uppercase sm:text-xs">
                 Created
               </div>
-              <div className="text-sm font-medium">
-                {project.createdAt ? formatDateDisplay(project.createdAt) : '—'}
+              <div className="mt-0.5 truncate text-[11px] font-medium sm:text-sm">
+                {project.createdAt
+                  ? formatDateDisplay(project.createdAt, 'short')
+                  : '—'}
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
+      {/* Mobile Tab Switcher */}
+      <div className="bg-card/30 border-border/40 mb-4 flex rounded-xl border p-1 backdrop-blur-md md:hidden">
+        <button
+          onClick={() => setActiveTab('tasks')}
+          className={cn(
+            'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all',
+            activeTab === 'tasks'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4" />
+          Tasks
+          <Badge
+            variant="secondary"
+            className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full p-0 px-1 text-[9px]"
+          >
+            {tasksWithProjectId.length}
+          </Badge>
+        </button>
+        <button
+          onClick={() => setActiveTab('members')}
+          className={cn(
+            'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all',
+            activeTab === 'members'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <DASHBOARD_ICONS.USERS className="h-4 w-4" />
+          Members
+          <Badge
+            variant="secondary"
+            className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full p-0 px-1 text-[9px]"
+          >
+            {members.length}
+          </Badge>
+        </button>
+        <button
+          onClick={() => setActiveTab('documents')}
+          className={cn(
+            'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all',
+            activeTab === 'documents'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          <DASHBOARD_ICONS.FILETEXT className="h-4 w-4" />
+          Documents
+        </button>
+      </div>
+
       {/* Members */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between gap-4">
-            <div>
+      <Card
+        className={cn(
+          'border-border/50 bg-card/50 backdrop-blur-sm',
+          activeTab === 'members' ? 'block' : 'hidden md:block'
+        )}
+      >
+        <CardHeader className="pb-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div className="space-y-1">
               <CardTitle className="text-xl">Project Members</CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {isOwner
                   ? 'Manage who has access to this project.'
                   : 'People with access to this project.'}
@@ -333,9 +404,10 @@ const ProjectDetails = () => {
               <Button
                 onClick={() => setIsAddMemberOpen(true)}
                 variant="outline"
-                className="border-border/50"
+                className="border-border/50 w-full sm:w-auto shrink-0"
+                size="sm"
               >
-                <DASHBOARD_ICONS.PLUS className="mr-2 h-4 w-4" />
+                <DASHBOARD_ICONS.PLUS className="mr-1.5 h-3.5 w-3.5" />
                 Add Member
               </Button>
             )}
@@ -356,83 +428,89 @@ const ProjectDetails = () => {
                 return (
                   <li
                     key={member.id}
-                    className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0"
+                    className="flex flex-col gap-2.5 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                   >
-                    <Avatar size="lg">
-                      {member.userAvatar && (
-                        <AvatarImage src={member.userAvatar} />
-                      )}
-                      <AvatarFallback>
-                        {member.userName?.charAt(0).toUpperCase() || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="truncate text-sm font-medium">
-                          {member.userName}
-                        </span>
-                        {member.userId === user?.id && (
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] uppercase"
-                          >
-                            You
-                          </Badge>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Avatar className="h-10 w-10 shrink-0">
+                        {member.userAvatar && (
+                          <AvatarImage src={member.userAvatar} />
                         )}
-                      </div>
-                      <div className="text-muted-foreground truncate text-xs">
-                        {member.userEmail}
+                        <AvatarFallback>
+                          {member.userName?.charAt(0).toUpperCase() || '?'}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="truncate text-sm font-semibold max-w-[150px] sm:max-w-none">
+                            {member.userName}
+                          </span>
+                          {member.userId === user?.id && (
+                            <Badge
+                              variant="secondary"
+                              className="text-[9px] uppercase tracking-wider px-1.5 py-0 rounded shrink-0 font-medium"
+                            >
+                              You
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-muted-foreground truncate text-[11px] mt-0.5 max-w-[200px] sm:max-w-none">
+                          {member.userEmail}
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      {canManage ? (
-                        <Select
-                          value={member.role}
-                          onValueChange={(role) =>
-                            handleRoleChange(member, role)
-                          }
-                        >
-                          <SelectTrigger
-                            size="sm"
-                            className="border-border/50 bg-background/50 w-[120px]"
+                    <div className="flex items-center justify-between gap-2 border-t border-border/5 pt-2 sm:border-t-0 sm:pt-0 sm:justify-end shrink-0 w-full sm:w-auto">
+                      <span className="sm:hidden text-xs text-muted-foreground font-medium">Role</span>
+                      <div className="flex items-center gap-1.5">
+                        {canManage ? (
+                          <Select
+                            value={member.role}
+                            onValueChange={(role) =>
+                              handleRoleChange(member, role)
+                            }
                           >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent
-                            position="popper"
-                            className="bg-card/95 border-border/50 backdrop-blur-sm"
+                            <SelectTrigger
+                              size="sm"
+                              className="border-border/50 bg-background/50 w-[110px] text-xs px-2 h-8"
+                            >
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent
+                              position="popper"
+                              className="bg-card/95 border-border/50 backdrop-blur-sm"
+                            >
+                              {ROLE_OPTIONS.map((role) => (
+                                <SelectItem key={role} value={role}>
+                                  {role}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              ROLE_STYLES[member.role] || ROLE_STYLES.MEMBER,
+                              "border-none text-[9px] sm:text-xs font-semibold uppercase tracking-wider rounded-full px-2.5 py-0.5"
+                            )}
                           >
-                            {ROLE_OPTIONS.map((role) => (
-                              <SelectItem key={role} value={role}>
-                                {role}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      ) : (
-                        <Badge
-                          variant="outline"
-                          className={
-                            ROLE_STYLES[member.role] || ROLE_STYLES.MEMBER
-                          }
-                        >
-                          {member.role}
-                        </Badge>
-                      )}
+                            {member.role}
+                          </Badge>
+                        )}
 
-                      {canManage && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setMemberToRemove(member)}
-                          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-9 w-9 p-0"
-                          aria-label={`Remove ${member.userName}`}
-                        >
-                          <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
-                        </Button>
-                      )}
+                        {canManage && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setMemberToRemove(member)}
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 shrink-0"
+                            aria-label={`Remove ${member.userName}`}
+                          >
+                            <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </li>
                 );
@@ -443,19 +521,24 @@ const ProjectDetails = () => {
       </Card>
 
       {/* Tasks */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between gap-4">
-            <div>
+      <Card
+        className={cn(
+          'border-border/50 bg-card/50 backdrop-blur-sm',
+          activeTab === 'tasks' ? 'block' : 'hidden md:block'
+        )}
+      >
+        <CardHeader className="pb-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div className="space-y-1">
               <CardTitle className="text-xl">Tasks</CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {isManager
                   ? 'Assign work to members and verify completed tasks.'
                   : 'Tasks in this project.'}
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="bg-background/50 border-border/50 flex items-center rounded-lg border p-1">
+            <div className="flex items-center justify-between gap-2 w-full sm:w-auto shrink-0">
+              <div className="bg-background/50 border-border/50 flex items-center rounded-lg border p-0.5">
                 <Button
                   variant={viewMode === 'list' ? 'secondary' : 'ghost'}
                   size="sm"
@@ -477,10 +560,11 @@ const ProjectDetails = () => {
                 <Button
                   onClick={() => setIsCreateTaskOpen(true)}
                   variant="outline"
-                  className="border-border/50"
+                  className="border-border/50 h-8 text-xs shrink-0"
+                  size="sm"
                 >
-                  <DASHBOARD_ICONS.PLUS className="mr-2 h-4 w-4" />
-                  Create Task
+                  <DASHBOARD_ICONS.PLUS className="h-3.5 w-3.5 mr-1" />
+                  <span>Create Task</span>
                 </Button>
               )}
             </div>
@@ -508,18 +592,20 @@ const ProjectDetails = () => {
                   <li
                     key={task.id}
                     onClick={() => setSelectedTaskId(task.id)}
-                    className="hover:bg-muted/30 -mx-2 flex cursor-pointer items-center gap-4 rounded-md px-2 py-3 transition-colors first:pt-0 last:pb-0"
+                    className="hover:bg-muted/30 -mx-2 flex flex-col gap-2 rounded-lg px-2.5 py-3.5 cursor-pointer transition-all sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="truncate text-sm font-medium">
+                      {/* Row 1: Title + Badges (Priority, Verification) */}
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <span className="text-sm font-semibold truncate max-w-[200px] sm:max-w-none">
                           {task.title}
                         </span>
                         {task.priority && (
                           <Badge
-                            className={`${
-                              TASK_PRIORITY_STYLES[task.priority]
-                            } border-transparent text-[10px] uppercase`}
+                            className={cn(
+                              TASK_PRIORITY_STYLES[task.priority],
+                              "border-none rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider shrink-0"
+                            )}
                           >
                             {task.priority}
                           </Badge>
@@ -527,29 +613,43 @@ const ProjectDetails = () => {
                         {needsReview && (
                           <Badge
                             variant="outline"
-                            className="border-amber-500/40 text-[10px] text-amber-600 uppercase"
+                            className="bg-amber-500/10 text-amber-600 border-none rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider shrink-0"
                           >
-                            Needs verification
+                            Review
                           </Badge>
                         )}
                       </div>
-                      <div className="text-muted-foreground mt-0.5 truncate text-xs">
-                        {task.assigneeName
-                          ? `Assigned to ${task.assigneeName}`
-                          : 'Unassigned'}
-                        {task.deadline &&
-                          ` · Due ${formatDateDisplay(task.deadline)}`}
+
+                      {/* Row 2: Metadata (Assignee, Due Date) */}
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground mt-1">
+                        <span className="truncate">
+                          {task.assigneeName ? task.assigneeName.split(' ')[0] : 'Unassigned'}
+                        </span>
+                        {task.deadline && (
+                          <>
+                            <span className="opacity-40">•</span>
+                            <span className="flex items-center gap-1">
+                              <DASHBOARD_ICONS.CLOCK className="h-3 w-3 opacity-60 text-primary" />
+                              {formatDateDisplay(task.deadline, 'short')}
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={
-                        TASK_STATUS_STYLES[task.status] ||
-                        TASK_STATUS_STYLES.TODO
-                      }
-                    >
-                      {task.status?.replace('_', ' ')}
-                    </Badge>
+
+                    {/* Row 3 on mobile / Right Column on desktop: Status Badge */}
+                    <div className="flex items-center justify-between border-t border-border/5 pt-2 sm:border-t-0 sm:pt-0 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
+                      <span className="sm:hidden text-xs text-muted-foreground font-medium">Status</span>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          TASK_STATUS_STYLES[task.status] || TASK_STATUS_STYLES.TODO,
+                          "rounded-full border-none px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider shrink-0"
+                        )}
+                      >
+                        {task.status?.replace('_', ' ')}
+                      </Badge>
+                    </div>
                   </li>
                 );
               })}
@@ -558,7 +658,12 @@ const ProjectDetails = () => {
         </CardContent>
       </Card>
 
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+      <Card
+        className={cn(
+          'border-border/50 bg-card/50 backdrop-blur-sm',
+          activeTab === 'documents' ? 'block' : 'hidden md:block'
+        )}
+      >
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
             <div>

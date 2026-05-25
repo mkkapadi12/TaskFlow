@@ -87,6 +87,11 @@ export const NAV_ITEMS = [
     icon: DASHBOARD_ICONS.SQUARESTACK,
   },
   {
+    to: '/analytics',
+    label: 'Analytics',
+    icon: DASHBOARD_ICONS.TRENDINGUP,
+  },
+  {
     to: '/documents',
     label: 'Requirements',
     icon: DASHBOARD_ICONS.FILETEXT,
@@ -121,6 +126,11 @@ export const PAGE_TITLES = [
     path: '/projects',
     title: 'Projects',
     description: 'View and manage your projects',
+  },
+  {
+    path: '/analytics',
+    title: 'Analytics',
+    description: 'Visualize productivity trends, workloads, and task efficiency',
   },
   {
     path: '/documents',
