@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -12,6 +13,7 @@ import { loginSchema } from '@/schemas/auth.schema';
 import { useLoginMutation } from '../auth.api';
 
 const LoginForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
 
@@ -36,14 +38,14 @@ const LoginForm = () => {
       {/* Email */}
       <div className="space-y-2">
         <Label htmlFor="login-email" className="text-sm font-medium">
-          Email address
+          {t('auth.emailAddressLabel')}
         </Label>
         <div className="relative">
           <GUEST_ICONS.MAIL className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             id="login-email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t('auth.emailPlaceholder')}
             className="h-11 pl-10"
             {...register('email')}
           />
@@ -59,13 +61,13 @@ const LoginForm = () => {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="login-password" className="text-sm font-medium">
-            Password
+            {t('auth.passwordLabel')}
           </Label>
           <Link
             to="/forgot-password"
             className="text-primary text-sm font-medium underline-offset-4 hover:underline"
           >
-            Forgot password?
+            {t('auth.forgotPassword')}
           </Link>
         </div>
         <div className="relative">
@@ -73,7 +75,7 @@ const LoginForm = () => {
           <Input
             id="login-password"
             type="password"
-            placeholder="••••••••"
+            placeholder={t('auth.passwordPlaceholder')}
             className="h-11 pl-10"
             {...register('password')}
           />
@@ -94,21 +96,21 @@ const LoginForm = () => {
         {isLoading ? (
           <span className="flex items-center gap-2">
             <span className="border-primary-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
-            Signing in…
+            {t('auth.signingIn')}
           </span>
         ) : (
-          'Sign in'
+          t('auth.signIn')
         )}
       </Button>
 
       {/* Register link */}
       <p className="text-muted-foreground pt-2 text-center text-sm">
-        Don&apos;t have an account?{' '}
+        {t('auth.noAccount')}{' '}
         <Link
           to="/register"
           className="text-primary hover:text-primary/80 font-semibold underline underline-offset-4 transition-colors"
         >
-          Create one
+          {t('auth.createOne')}
         </Link>
       </p>
     </form>

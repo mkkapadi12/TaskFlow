@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -17,6 +18,7 @@ import { useForgotPasswordMutation } from '@/features/auth/auth.api';
 import { useAuth } from '@/hooks/useAuth';
 
 const ForgotPasswordPage = () => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -41,21 +43,20 @@ const ForgotPasswordPage = () => {
     <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t('auth.forgotPasswordTitle')}</CardTitle>
           <CardDescription>
-            Enter your email address and we'll send you a link to reset your
-            password.
+            {t('auth.forgotPasswordDesc')}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.emailLabel')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
-                {...register('email', { required: 'Email is required' })}
+                placeholder={t('auth.emailPlaceholder')}
+                {...register('email', { required: t('messages.required') })}
               />
               {errors.email && (
                 <p className="text-destructive text-xs">
@@ -66,15 +67,15 @@ const ForgotPasswordPage = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Sending...' : 'Send Reset Link'}
+              {isLoading ? t('auth.sending') : t('auth.sendResetLink')}
             </Button>
             {isAuthenticated ? (
               <Button variant="link" asChild className="w-full">
-                <Link to="/dashboard">Back to Dashboard</Link>
+                <Link to="/dashboard">{t('auth.backToDashboard')}</Link>
               </Button>
             ) : (
               <Button variant="link" asChild className="w-full">
-                <Link to="/login">Back to Login</Link>
+                <Link to="/login">{t('auth.backToLogin')}</Link>
               </Button>
             )}
           </CardFooter>

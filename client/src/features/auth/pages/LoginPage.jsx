@@ -1,17 +1,20 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 import LoginForm from '../components/LoginForm';
 
-const HIGHLIGHTS = [
-  { icon: GUEST_ICONS.ZAP, text: 'Real-time project tracking' },
-  { icon: GUEST_ICONS.USERS, text: 'Seamless team collaboration' },
-  { icon: GUEST_ICONS.SHIELD_CHECK, text: 'Secure role-based access' },
-  { icon: GUEST_ICONS.CHECK, text: 'Smart task management' },
-];
-
 const LoginPage = () => {
+  const { t } = useTranslation();
+
+  const highlights = [
+    { icon: GUEST_ICONS.ZAP, text: t('auth.realtimeTracking') },
+    { icon: GUEST_ICONS.USERS, text: t('auth.teamCollaboration') },
+    { icon: GUEST_ICONS.SHIELD_CHECK, text: t('auth.secureAccess') },
+    { icon: GUEST_ICONS.CHECK, text: t('auth.smartTaskManagement') },
+  ];
+
   return (
     <div className="flex min-h-screen">
       {/* ── Left Branding Panel ── */}
@@ -34,19 +37,18 @@ const LoginPage = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl leading-tight font-extrabold tracking-tight xl:text-5xl">
-                Welcome back to
+                {t('auth.welcomeBack').split(' ').slice(0, 2).join(' ')}
                 <br />
-                your workspace
+                {t('auth.welcomeBack').split(' ').slice(2).join(' ')}
               </h1>
               <p className="text-primary-foreground/70 max-w-md text-lg leading-relaxed">
-                Pick up right where you left off. Your projects, tasks, and team
-                are waiting.
+                {t('auth.welcomeBackDesc')}
               </p>
             </div>
 
             {/* Feature highlights */}
             <div className="space-y-4">
-              {HIGHLIGHTS.map(({ icon: Icon, text }) => (
+              {highlights.map(({ icon: Icon, text }) => (
                 <div
                   key={text}
                   className="text-primary-foreground/80 flex items-center gap-3"
@@ -62,7 +64,7 @@ const LoginPage = () => {
 
           {/* Footer */}
           <p className="text-primary-foreground/40 text-xs">
-            © {new Date().getFullYear()} TaskFlow. All rights reserved.
+            © {new Date().getFullYear()} TaskFlow. {t('auth.allRightsReserved')}
           </p>
         </div>
       </div>
@@ -80,9 +82,9 @@ const LoginPage = () => {
 
           {/* Header */}
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Sign in</h2>
+            <h2 className="text-3xl font-bold tracking-tight">{t('auth.signIn')}</h2>
             <p className="text-muted-foreground">
-              Enter your credentials to access your account
+              {t('auth.enterCredentials')}
             </p>
           </div>
 

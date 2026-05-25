@@ -1,17 +1,20 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
 
 import RegisterForm from '../components/RegisterForm';
 
-const HIGHLIGHTS = [
-  { icon: GUEST_ICONS.ROCKET, text: 'Get started in under 60 seconds' },
-  { icon: GUEST_ICONS.USERS, text: 'Invite your team instantly' },
-  { icon: GUEST_ICONS.SHIELD_CHECK, text: 'Enterprise-grade security' },
-  { icon: GUEST_ICONS.CHECK, text: 'Free forever for small teams' },
-];
-
 const RegisterPage = () => {
+  const { t } = useTranslation();
+
+  const highlights = [
+    { icon: GUEST_ICONS.ROCKET, text: t('auth.registerHighlight1') },
+    { icon: GUEST_ICONS.USERS, text: t('auth.registerHighlight2') },
+    { icon: GUEST_ICONS.SHIELD_CHECK, text: t('auth.registerHighlight3') },
+    { icon: GUEST_ICONS.CHECK, text: t('auth.registerHighlight4') },
+  ];
+
   return (
     <div className="flex min-h-screen">
       {/* ── Left Branding Panel ── */}
@@ -34,19 +37,18 @@ const RegisterPage = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl leading-tight font-extrabold tracking-tight xl:text-5xl">
-                Start building
+                {t('auth.startBuilding').split(' ').slice(0, 2).join(' ')}
                 <br />
-                something great
+                {t('auth.startBuilding').split(' ').slice(2).join(' ')}
               </h1>
               <p className="text-primary-foreground/70 max-w-md text-lg leading-relaxed">
-                Join thousands of teams who trust TaskFlow to ship faster and
-                stay organized.
+                {t('auth.startBuildingDesc')}
               </p>
             </div>
 
             {/* Feature highlights */}
             <div className="space-y-4">
-              {HIGHLIGHTS.map(({ icon: Icon, text }) => (
+              {highlights.map(({ icon: Icon, text }) => (
                 <div
                   key={text}
                   className="text-primary-foreground/80 flex items-center gap-3"
@@ -62,7 +64,7 @@ const RegisterPage = () => {
 
           {/* Footer */}
           <p className="text-primary-foreground/40 text-xs">
-            © {new Date().getFullYear()} TaskFlow. All rights reserved.
+            © {new Date().getFullYear()} TaskFlow. {t('auth.allRightsReserved')}
           </p>
         </div>
       </div>
@@ -81,10 +83,10 @@ const RegisterPage = () => {
           {/* Header */}
           <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tight">
-              Create your account
+              {t('auth.createAccount')}
             </h2>
             <p className="text-muted-foreground">
-              Fill in the details below to get started with TaskFlow
+              {t('auth.fillDetails')}
             </p>
           </div>
 

@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -16,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { useResetPasswordMutation } from '@/features/auth/auth.api';
 
 const ResetPasswordPage = () => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -52,15 +54,15 @@ const ResetPasswordPage = () => {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-destructive text-2xl font-bold">
-              Invalid Link
+              {t('auth.invalidLink')}
             </CardTitle>
             <CardDescription>
-              The password reset link is invalid or missing a token.
+              {t('auth.invalidLinkDesc')}
             </CardDescription>
           </CardHeader>
           <CardFooter>
             <Button variant="link" asChild className="w-full">
-              <Link to="/login">Back to Login</Link>
+              <Link to="/login">{t('auth.backToLogin')}</Link>
             </Button>
           </CardFooter>
         </Card>
@@ -72,21 +74,21 @@ const ResetPasswordPage = () => {
     <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
-          <CardDescription>Enter your new password below.</CardDescription>
+          <CardTitle className="text-2xl font-bold">{t('auth.resetPasswordTitle')}</CardTitle>
+          <CardDescription>{t('auth.resetPasswordDesc')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
+              <Label htmlFor="password">{t('auth.newPasswordLabel')}</Label>
               <Input
                 id="password"
                 type="password"
                 {...register('password', {
-                  required: 'Password is required',
+                  required: t('messages.required'),
                   minLength: {
                     value: 6,
-                    message: 'Password must be at least 6 characters',
+                    message: t('auth.passwordRegPlaceholder'),
                   },
                 })}
               />
@@ -97,12 +99,12 @@ const ResetPasswordPage = () => {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t('auth.confirmPasswordLabel')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 {...register('confirmPassword', {
-                  required: 'Please confirm your password',
+                  required: t('messages.required'),
                   validate: (value) =>
                     value === password || 'Passwords do not match',
                 })}
@@ -116,10 +118,10 @@ const ResetPasswordPage = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Resetting...' : 'Reset Password'}
+              {isLoading ? t('auth.resetting') : t('auth.resetPasswordBtn')}
             </Button>
             <Button variant="link" asChild className="w-full">
-              <Link to="/login">Back to Login</Link>
+              <Link to="/login">{t('auth.backToLogin')}</Link>
             </Button>
           </CardFooter>
         </form>

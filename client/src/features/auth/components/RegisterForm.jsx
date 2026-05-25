@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -12,6 +13,7 @@ import { registerSchema } from '@/schemas/auth.schema';
 import { useRegisterMutation } from '../auth.api';
 
 const RegisterForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [registerUser, { isLoading }] = useRegisterMutation();
 
@@ -36,13 +38,13 @@ const RegisterForm = () => {
       {/* Name */}
       <div className="space-y-2">
         <Label htmlFor="register-name" className="text-sm font-medium">
-          Full name
+          {t('auth.fullNameLabel')}
         </Label>
         <div className="relative">
           <GUEST_ICONS.USER className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             id="register-name"
-            placeholder="John Doe"
+            placeholder={t('auth.fullNamePlaceholder')}
             className="h-11 pl-10"
             {...register('name')}
           />
@@ -55,14 +57,14 @@ const RegisterForm = () => {
       {/* Email */}
       <div className="space-y-2">
         <Label htmlFor="register-email" className="text-sm font-medium">
-          Email address
+          {t('auth.emailAddressLabel')}
         </Label>
         <div className="relative">
           <GUEST_ICONS.MAIL className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             id="register-email"
             type="email"
-            placeholder="you@example.com"
+            placeholder={t('auth.emailPlaceholder')}
             className="h-11 pl-10"
             {...register('email')}
           />
@@ -77,14 +79,14 @@ const RegisterForm = () => {
       {/* Password */}
       <div className="space-y-2">
         <Label htmlFor="register-password" className="text-sm font-medium">
-          Password
+          {t('auth.passwordLabel')}
         </Label>
         <div className="relative">
           <GUEST_ICONS.SHIELD className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             id="register-password"
             type="password"
-            placeholder="Min. 6 characters"
+            placeholder={t('auth.passwordRegPlaceholder')}
             className="h-11 pl-10"
             {...register('password')}
           />
@@ -105,21 +107,21 @@ const RegisterForm = () => {
         {isLoading ? (
           <span className="flex items-center gap-2">
             <span className="border-primary-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
-            Creating account…
+            {t('auth.creatingAccount')}
           </span>
         ) : (
-          'Create account'
+          t('auth.createAccountBtn')
         )}
       </Button>
 
       {/* Login link */}
       <p className="text-muted-foreground pt-2 text-center text-sm">
-        Already have an account?{' '}
+        {t('auth.alreadyAccount')}{' '}
         <Link
           to="/login"
           className="text-primary hover:text-primary/80 font-semibold underline underline-offset-4 transition-colors"
         >
-          Sign in
+          {t('auth.signIn')}
         </Link>
       </p>
     </form>
