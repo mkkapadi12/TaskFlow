@@ -31,7 +31,14 @@ const getTasksByProject = async (req, res, next) => {
 
 const getMyTasks = async (req, res, next) => {
   try {
-    const tasks = await TaskModel.getMyTasks(req.user.id);
+    const { search, priority, startDate, endDate } = req.query;
+    const tasks = await TaskModel.getMyTasks(
+      req.user.id,
+      search || null,
+      priority || null,
+      startDate || null,
+      endDate || null
+    );
     res.status(200).json({
       success: true,
       data: tasks,

@@ -259,6 +259,7 @@ BEGIN
         p.id, p.title, p.description, p.ownerId, p.status,
         p.createdAt, p.updatedAt,
         u.name  AS ownerName,
+        u.avatar AS ownerAvatar,
         u.email AS ownerEmail,
         (SELECT COUNT(*) FROM project_members pm WHERE pm.projectId = p.id) AS memberCount,
         (SELECT COUNT(*) FROM tasks t          WHERE t.projectId  = p.id) AS taskCount

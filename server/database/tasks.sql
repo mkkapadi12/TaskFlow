@@ -78,7 +78,11 @@ END //
 -- ── 3. Get Tasks Assigned to a User ──────────────────────────
 DROP PROCEDURE IF EXISTS sp_GetTasksByAssignee //
 CREATE PROCEDURE sp_GetTasksByAssignee(
-    IN p_assigneeId INT
+    IN p_assigneeId  INT,
+    IN p_searchQuery VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    IN p_priority    VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    IN p_startDate   DATETIME,
+    IN p_endDate     DATETIME
 )
 BEGIN
     SELECT
@@ -91,6 +95,10 @@ BEGIN
     JOIN users    c ON c.id = t.creatorId
     JOIN projects p ON p.id = t.projectId
     WHERE t.assigneeId = p_assigneeId
+      AND (p_searchQuery IS NULL OR p_searchQuery = '' OR t.title LIKE CONCAT('%', p_searchQuery, '%') OR p.title LIKE CONCAT('%', p_searchQuery, '%') COLLATE utf8mb4_unicode_ci)
+      AND (p_priority IS NULL OR p_priority = '' OR p_priority = 'ALL' OR t.priority = p_priority COLLATE utf8mb4_unicode_ci)
+      AND (p_startDate IS NULL OR t.deadline >= p_startDate)
+      AND (p_endDate IS NULL OR t.deadline <= p_endDate)
     ORDER BY t.deadline ASC;
 END //
 

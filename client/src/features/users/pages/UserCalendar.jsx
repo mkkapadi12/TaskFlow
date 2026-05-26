@@ -48,10 +48,16 @@ const UserCalendar = () => {
   };
 
   // Custom DayButton renderer to show priority dots
-  const MyCustomDayButton = ({ day, modifiers, locale, className, ...props }) => {
+  const MyCustomDayButton = ({
+    day,
+    modifiers,
+    locale,
+    className,
+    ...props
+  }) => {
     const dateString = formatDateKey(day.date);
     const dayTasks = tasksWithDeadlines.filter((task) =>
-      task.deadline.startsWith(dateString)
+      formatDateKey(new Date(task.deadline)) === dateString
     );
 
     return (
@@ -73,8 +79,8 @@ const UserCalendar = () => {
                 task.priority === 'URGENT' || task.priority === 'HIGH'
                   ? 'bg-rose-500 animate-pulse'
                   : task.priority === 'MEDIUM'
-                  ? 'bg-amber-500'
-                  : 'bg-sky-500';
+                    ? 'bg-amber-500'
+                    : 'bg-sky-500';
               return (
                 <span
                   key={task.id}
@@ -88,10 +94,12 @@ const UserCalendar = () => {
     );
   };
 
+  console.log(selectedDate);
+
   // Filter tasks for the selected date
   const selectedDateString = selectedDate ? formatDateKey(selectedDate) : '';
   const tasksOnSelectedDate = tasksWithDeadlines.filter((task) => {
-    return task.deadline.startsWith(selectedDateString);
+    return formatDateKey(new Date(task.deadline)) === selectedDateString;
   });
 
   return (
@@ -104,7 +112,7 @@ const UserCalendar = () => {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[auto_1fr]">
         {/* Calendar Card */}
-        <Card className="border-border/50 bg-card/50 h-fit w-full backdrop-blur-sm sm:w-fit">
+        <Card className="border-border/50 bg-card/50 h-fit w-full py-0 backdrop-blur-sm sm:w-fit">
           <CardContent className="p-4">
             <Calendar
               mode="single"
@@ -113,7 +121,7 @@ const UserCalendar = () => {
               components={{
                 DayButton: MyCustomDayButton,
               }}
-              className="rounded-md border"
+              className="w-full rounded-md border"
             />
           </CardContent>
         </Card>
@@ -154,7 +162,7 @@ const UserCalendar = () => {
                             {priority && (
                               <Badge
                                 variant="outline"
-                                className={`${priority.className} border-none rounded-full px-2 py-0 text-[10px] font-semibold uppercase tracking-wider`}
+                                className={`${priority.className} rounded-full border-none px-2 py-0 text-[10px] font-semibold tracking-wider uppercase`}
                               >
                                 {priority.label}
                               </Badge>
@@ -187,7 +195,7 @@ const UserCalendar = () => {
                         <div className="flex flex-row flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:gap-2">
                           <Badge
                             variant="outline"
-                            className={`${status.className} border-none rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider`}
+                            className={`${status.className} rounded-full border-none px-2.5 py-0.5 text-[11px] font-semibold tracking-wider uppercase`}
                           >
                             {status.label}
                           </Badge>

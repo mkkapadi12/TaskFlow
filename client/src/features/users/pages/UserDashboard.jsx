@@ -15,6 +15,7 @@ import {
   useGetOverdueTasksQuery,
 } from '@/features/tasks/task.api';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { cn } from '@/lib/utils';
 
 const UserDashboard = () => {
   const { data: projectData, isLoading: projectsLoading } =
@@ -44,8 +45,22 @@ const UserDashboard = () => {
     value,
   }));
 
-  // Colors aligned with the app's status/accent palette:
-  // emerald (DONE), sky (TODO), amber (IN_REVIEW), violet (IN_PROGRESS)
+  // Helper to calculate relative remaining days label
+  const getRemainingDaysLabel = (deadlineStr) => {
+    const deadline = new Date(deadlineStr);
+    const now = new Date();
+    const dDate = new Date(deadline.getFullYear(), deadline.getMonth(), deadline.getDate());
+    const nDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const diffTime = dDate.getTime() - nDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Tomorrow';
+    if (diffDays < 0) return 'Overdue';
+    return `In ${diffDays} days`;
+  };
+
   const COLORS = ['#10b981', '#38bdf8', '#f59e0b', '#8b5cf6'];
 
   // Filter upcoming deadlines
@@ -158,37 +173,87 @@ const UserDashboard = () => {
         </Card>
 
         {/* Upcoming Deadlines */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Deadlines</CardTitle>
+        <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-sm">
+          <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+            <div className="space-y-1">
+              <CardTitle className="text-xl">Upcoming Deadlines</CardTitle>
+              <p className="text-muted-foreground text-xs">Your near-term due dates</p>
+            </div>
+            <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
+              <DASHBOARD_ICONS.CLOCK className="h-4 w-4" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="pt-0">
+            <div className="space-y-3">
               {upcomingTasks.length > 0 ? (
-                upcomingTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0"
-                  >
-                    <div>
-                      <p className="font-medium">{task.title}</p>
-                      <p className="text-muted-foreground text-sm">
-                        Due: {new Date(task.deadline).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <Badge
-                      variant={
-                        task.priority === 'URGENT' || task.priority === 'HIGH'
-                          ? 'destructive'
-                          : 'secondary'
-                      }
+                upcomingTasks.map((task) => {
+                  const priorityColors = {
+                    LOW: 'border-l-blue-500 bg-blue-500/5 hover:bg-blue-500/10 text-blue-500 border-blue-500/20',
+                    MEDIUM: 'border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/10 text-amber-600 border-amber-500/20',
+                    HIGH: 'border-l-orange-500 bg-orange-500/5 hover:bg-orange-500/10 text-orange-600 border-orange-500/20',
+                    URGENT: 'border-l-red-500 bg-red-500/5 hover:bg-red-500/10 text-red-600 border-red-500/20',
+                  };
+
+                  const priorityBadges = {
+                    LOW: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
+                    MEDIUM: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+                    HIGH: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
+                    URGENT: 'bg-red-500/10 text-red-500 border-red-500/30',
+                  };
+
+                  return (
+                    <div
+                      key={task.id}
+                      className={cn(
+                        'group flex items-center justify-between border-l-4 rounded-r-xl border border-border/40 p-3 transition-all duration-200 hover:-translate-x-0.5 hover:shadow-md backdrop-blur-sm',
+                        task.priority === 'URGENT' ? priorityColors.URGENT :
+                        task.priority === 'HIGH' ? priorityColors.HIGH :
+                        task.priority === 'MEDIUM' ? priorityColors.MEDIUM :
+                        priorityColors.LOW
+                      )}
                     >
-                      {task.priority}
-                    </Badge>
-                  </div>
-                ))
+                      <div className="space-y-1 min-w-0 flex-1 pr-2">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="font-semibold text-sm text-foreground truncate max-w-40 sm:max-w-xs group-hover:text-primary transition-colors">
+                            {task.title}
+                          </span>
+                          {task.projectTitle && (
+                            <span className="text-[9px] text-muted-foreground font-semibold uppercase tracking-wider bg-background/50 border border-border/30 px-1.5 py-0.5 rounded">
+                              {task.projectTitle}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <DASHBOARD_ICONS.CLOCK className="h-3.5 w-3.5 opacity-60 text-primary" />
+                            {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </span>
+                          <span className="flex items-center gap-1 font-semibold text-foreground/80">
+                            <DASHBOARD_ICONS.CALENDAR className="h-3.5 w-3.5 opacity-60 text-primary" />
+                            {getRemainingDaysLabel(task.deadline)}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'rounded-full px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase border shrink-0',
+                          task.priority === 'URGENT' ? priorityBadges.URGENT :
+                          task.priority === 'HIGH' ? priorityBadges.HIGH :
+                          task.priority === 'MEDIUM' ? priorityBadges.MEDIUM :
+                          priorityBadges.LOW
+                        )}
+                      >
+                        {task.priority}
+                      </Badge>
+                    </div>
+                  );
+                })
               ) : (
-                <p className="text-muted-foreground">No upcoming deadlines</p>
+                <div className="text-muted-foreground border-border/40 flex h-36 items-center justify-center rounded-xl border border-dashed text-sm">
+                  No upcoming deadlines found!
+                </div>
               )}
             </div>
           </CardContent>

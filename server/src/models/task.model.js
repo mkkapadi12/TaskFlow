@@ -68,8 +68,14 @@ const TaskModel = {
   },
 
   // Get tasks assigned to the logged-in user
-  getMyTasks: async (userId) => {
-    const [tasks] = await callProcedure('sp_GetTasksByAssignee', [userId]);
+  getMyTasks: async (userId, search, priority, startDate, endDate) => {
+    const [tasks] = await callProcedure('sp_GetTasksByAssignee', [
+      userId,
+      search ?? null,
+      priority ?? null,
+      startDate ?? null,
+      endDate ?? null,
+    ]);
     return tasks;
   },
 

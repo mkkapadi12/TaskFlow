@@ -44,7 +44,7 @@ CALL sp_CreateTask('Write tests',       NULL,                        'TODO', 'ME
 CALL sp_GetAllTasks();
 CALL sp_GetTaskById(1);
 CALL sp_GetTasksByProject(1);
-CALL sp_GetTasksByAssignee(2);
+CALL sp_GetTasksByAssignee(2, NULL, NULL, NULL, NULL);
 CALL sp_GetTasksByCreator(1);
 CALL sp_GetTasksByStatus(1, 'TODO');
 CALL sp_GetOverdueTasks(2);

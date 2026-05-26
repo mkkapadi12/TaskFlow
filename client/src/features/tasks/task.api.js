@@ -3,7 +3,11 @@ import { baseApi } from '@/app/baseApi';
 export const tasksApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getMyTasks: builder.query({
-      query: () => ({ url: '/tasks/my', method: 'GET' }),
+      query: (params) => ({
+        url: '/tasks/my',
+        method: 'GET',
+        params,
+      }),
       providesTags: ['Task'],
     }),
 

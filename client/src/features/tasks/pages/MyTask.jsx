@@ -8,23 +8,21 @@ import { useGetMyTasksQuery } from '../task.api';
 const MyTask = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState('ALL');
+  const [startDateFilter, setStartDateFilter] = useState('');
+  const [endDateFilter, setEndDateFilter] = useState('');
 
-  const { data: tasksData, isLoading } = useGetMyTasksQuery();
+  const { data: tasksData, isLoading } = useGetMyTasksQuery({
+    search: searchQuery || undefined,
+    priority: priorityFilter === 'ALL' ? undefined : priorityFilter,
+    startDate: startDateFilter || undefined,
+    endDate: endDateFilter || undefined,
+  });
 
   const filteredTasks = tasksData?.data?.filter((task) => {
     const matchesStatus =
       statusFilter === 'ALL' || task.status === statusFilter;
-    const matchesSearch =
-      !searchQuery ||
-      task.projectTitle
-        .toLowerCase()
-        .trim()
-        .includes(searchQuery.toLowerCase().trim()) ||
-      task.title
-        .toLowerCase()
-        .trim()
-        .includes(searchQuery.toLowerCase().trim());
-    return matchesStatus && matchesSearch;
+    return matchesStatus;
   });
 
   return (
@@ -36,6 +34,12 @@ const MyTask = () => {
         searchQuery={searchQuery}
         onStatusChange={setStatusFilter}
         onSearchChange={setSearchQuery}
+        priority={priorityFilter}
+        onPriorityChange={setPriorityFilter}
+        startDate={startDateFilter}
+        onStartDateChange={setStartDateFilter}
+        endDate={endDateFilter}
+        onEndDateChange={setEndDateFilter}
       />
 
       <TaskList tasks={filteredTasks} isLoading={isLoading} />

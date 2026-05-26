@@ -203,7 +203,7 @@ const AdvancedAnalytics = () => {
     // Chart 3: Workload Distribution (members)
     const workloadMap = {};
     tasks.forEach((t) => {
-      const name = t.assigneeName ? t.assigneeName.split(' ')[0] : 'Unassigned';
+      const name = t.assigneeName ? t.assigneeName : 'Unassigned';
       if (!workloadMap[name]) {
         workloadMap[name] = {
           name,
@@ -279,7 +279,7 @@ const AdvancedAnalytics = () => {
         <div className="flex flex-wrap items-center gap-3">
           {/* Project Selector */}
           <Select value={selectedProjId} onValueChange={setSelectedProjId}>
-            <SelectTrigger className="border-border/50 bg-card/40 w-[180px] backdrop-blur-sm sm:w-[220px]">
+            <SelectTrigger className="border-border/50 bg-card/40 w-45 backdrop-blur-sm sm:w-55">
               <SelectValue placeholder="Select Project" />
             </SelectTrigger>
             <SelectContent className="bg-card/95 border-border/50 backdrop-blur-sm">
@@ -294,7 +294,7 @@ const AdvancedAnalytics = () => {
 
           {/* Timeframe Selector */}
           <Select value={timeframe} onValueChange={setTimeframe}>
-            <SelectTrigger className="border-border/50 bg-card/40 w-[130px] backdrop-blur-sm sm:w-[150px]">
+            <SelectTrigger className="border-border/50 bg-card/40 w-32.5 backdrop-blur-sm sm:w-37.5">
               <SelectValue placeholder="Select Range" />
             </SelectTrigger>
             <SelectContent className="bg-card/95 border-border/50 backdrop-blur-sm">
@@ -424,7 +424,7 @@ const AdvancedAnalytics = () => {
           </CardHeader>
           <CardContent>
             {analyticsData.velocityData.length > 0 ? (
-              <div className="h-[260px] w-full sm:h-[300px]">
+              <div className="h-65 w-full sm:h-75">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={analyticsData.velocityData}>
                     <defs>
@@ -507,7 +507,7 @@ const AdvancedAnalytics = () => {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="text-muted-foreground border-border/40 flex h-[260px] items-center justify-center rounded-lg border border-dashed text-xs sm:h-[300px]">
+              <div className="text-muted-foreground border-border/40 flex h-65 items-center justify-center rounded-lg border border-dashed text-xs sm:h-75">
                 Insufficient timeline data to map trend
               </div>
             )}
@@ -526,7 +526,7 @@ const AdvancedAnalytics = () => {
           </CardHeader>
           <CardContent>
             {analyticsData.workloadData.length > 0 ? (
-              <div className="h-[260px] w-full sm:h-[300px]">
+              <div className="h-65 w-full sm:h-75">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analyticsData.workloadData}>
                     <CartesianGrid
@@ -579,7 +579,7 @@ const AdvancedAnalytics = () => {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="text-muted-foreground border-border/40 flex h-[260px] items-center justify-center rounded-lg border border-dashed text-xs sm:h-[300px]">
+              <div className="text-muted-foreground border-border/40 flex h-65 items-center justify-center rounded-lg border border-dashed text-xs sm:h-75">
                 No active member task assignments found
               </div>
             )}
@@ -598,7 +598,7 @@ const AdvancedAnalytics = () => {
           </CardHeader>
           <CardContent>
             {analyticsData.total > 0 ? (
-              <div className="flex h-[260px] w-full items-center justify-center sm:h-[300px]">
+              <div className="flex h-65 w-full items-center justify-center sm:h-75">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -633,7 +633,7 @@ const AdvancedAnalytics = () => {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="text-muted-foreground border-border/40 flex h-[260px] items-center justify-center rounded-lg border border-dashed text-xs sm:h-[300px]">
+              <div className="text-muted-foreground border-border/40 flex h-65 items-center justify-center rounded-lg border border-dashed text-xs sm:h-75">
                 No task priority metrics available
               </div>
             )}
@@ -652,7 +652,7 @@ const AdvancedAnalytics = () => {
           </CardHeader>
           <CardContent>
             {analyticsData.total > 0 ? (
-              <div className="h-[260px] w-full sm:h-[300px]">
+              <div className="h-65 w-full sm:h-75">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart
                     data={[
@@ -700,7 +700,7 @@ const AdvancedAnalytics = () => {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="text-muted-foreground border-border/40 flex h-[260px] items-center justify-center rounded-lg border border-dashed text-xs sm:h-[300px]">
+              <div className="text-muted-foreground border-border/40 flex h-65 items-center justify-center rounded-lg border border-dashed text-xs sm:h-75">
                 No active tasks to compile workflow stages
               </div>
             )}
@@ -741,13 +741,11 @@ const AdvancedAnalytics = () => {
                         onClick={() => setSelectedTaskId(task.id)}
                         className="hover:bg-muted/30 group cursor-pointer transition-colors"
                       >
-                        <td className="group-hover:text-primary max-w-[150px] truncate px-4 py-3.5 font-medium transition-colors sm:max-w-[200px]">
+                        <td className="group-hover:text-primary max-w-37.5 truncate px-4 py-3.5 font-medium transition-colors sm:max-w-50">
                           {task.title}
                         </td>
                         <td className="text-muted-foreground px-4 py-3.5">
-                          {task.assigneeName
-                            ? task.assigneeName.split(' ')[0]
-                            : 'Unassigned'}
+                          {task.assigneeName ? task.assigneeName : 'Unassigned'}
                         </td>
                         <td className="px-4 py-3.5">
                           <Badge
@@ -768,7 +766,7 @@ const AdvancedAnalytics = () => {
                 </table>
               </div>
             ) : (
-              <div className="text-muted-foreground border-border/40 m-4 flex h-[150px] items-center justify-center rounded-lg border border-dashed text-xs">
+              <div className="text-muted-foreground border-border/40 m-4 flex h-37.5 items-center justify-center rounded-lg border border-dashed text-xs">
                 🎉 Awesome! No high-risk overdue tasks found!
               </div>
             )}
@@ -802,7 +800,7 @@ const AdvancedAnalytics = () => {
                           {performer.name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="max-w-[100px] truncate text-sm font-semibold sm:max-w-none">
+                      <span className="max-w-25 truncate text-sm font-semibold sm:max-w-none">
                         {performer.name}
                       </span>
                     </div>
@@ -816,7 +814,7 @@ const AdvancedAnalytics = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-muted-foreground border-border/40 flex h-[150px] items-center justify-center rounded-lg border border-dashed text-xs">
+              <div className="text-muted-foreground border-border/40 flex h-37.5 items-center justify-center rounded-lg border border-dashed text-xs">
                 No completions to score performances
               </div>
             )}

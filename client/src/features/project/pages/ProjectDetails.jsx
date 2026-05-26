@@ -2,16 +2,6 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,7 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -30,11 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import DocumentList from '@/features/documents/components/DocumentList';
 import DocumentUploader from '@/features/documents/components/DocumentUploader';
 import AddMemberDialog from '@/features/project/components/AddMemberDialog';
 import EditProjectDialog from '@/features/project/components/EditProjectDialog';
+import RemoveMemberDialog from '@/features/project/components/RemoveMemberDialog';
 import {
   useAddProjectMemberMutation,
   useGetProjectDetailsQuery,
@@ -145,6 +134,8 @@ const ProjectDetails = () => {
   }));
   const selectedTask = tasksWithProjectId.find((t) => t.id === selectedTaskId);
 
+  console.log(project);
+
   const handleSaveProject = async (payload) => {
     try {
       const result = await updateProject({ projectId, ...payload }).unwrap();
@@ -205,21 +196,21 @@ const ProjectDetails = () => {
   return (
     <div className="container mx-auto space-y-4 px-3 py-5 sm:space-y-6 sm:px-6 sm:py-8">
       {/* Back nav */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <Link to="/projects">
           <Button
             variant="ghost"
-            className="text-muted-foreground hover:text-foreground h-9 px-3"
+            className="text-muted-foreground hover:text-foreground -ml-3 h-9 px-3 sm:ml-0"
           >
             <DASHBOARD_ICONS.ARROWLEFT className="mr-2 h-4 w-4" />
             Back to Projects
           </Button>
         </Link>
-        <div className="flex items-center gap-2">
-          <Link to={`/projects/${projectId}/analytics`}>
+        <div className="flex w-full items-center gap-2 justify-between sm:w-auto sm:justify-end">
+          <Link to={`/projects/${projectId}/analytics`} className="flex-1 sm:flex-none">
             <Button
               variant="outline"
-              className="border-border/50 hover:bg-muted/50 h-10 rounded-full"
+              className="border-border/50 hover:bg-muted/50 h-10 w-full rounded-full sm:w-auto"
             >
               <DASHBOARD_ICONS.TRENDINGUP className="text-primary mr-2 h-4 w-4" />
               Analytics
@@ -228,7 +219,7 @@ const ProjectDetails = () => {
           {isOwner && (
             <Button
               onClick={() => setIsEditOpen(true)}
-              className="shadow-primary/20 hover:shadow-primary/25 h-10 rounded-full shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl"
+              className="shadow-primary/20 hover:shadow-primary/25 h-10 w-full flex-1 rounded-full shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl sm:flex-none sm:w-auto"
             >
               <DASHBOARD_ICONS.PENCIL className="mr-2 h-4 w-4" />
               Edit Project
@@ -261,7 +252,8 @@ const ProjectDetails = () => {
             </div>
 
             <div className="border-border/50 bg-background/40 flex items-center gap-3 rounded-lg border p-3">
-              <Avatar size="lg">
+              <Avatar size="lg" className="h-12 w-12">
+                <AvatarImage src={project?.ownerAvatar} />
                 <AvatarFallback>
                   {project.ownerName?.charAt(0).toUpperCase() || '?'}
                 </AvatarFallback>
@@ -335,12 +327,12 @@ const ProjectDetails = () => {
         </Card>
       </div>
 
-      {/* Mobile Tab Switcher */}
-      <div className="bg-card/30 border-border/40 mb-4 flex rounded-xl border p-1 backdrop-blur-md md:hidden">
+      {/* Unified Tab Switcher */}
+      <div className="bg-card/30 border-border/40 flex max-w-md rounded-xl border p-1 backdrop-blur-md sm:max-w-lg">
         <button
           onClick={() => setActiveTab('tasks')}
           className={cn(
-            'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all',
+            'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-all sm:text-sm',
             activeTab === 'tasks'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -350,7 +342,7 @@ const ProjectDetails = () => {
           Tasks
           <Badge
             variant="secondary"
-            className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full p-0 px-1 text-[9px]"
+            className="bg-primary/10 text-primary border-primary/20 flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full p-0 px-1 text-[10px]"
           >
             {tasksWithProjectId.length}
           </Badge>
@@ -358,7 +350,7 @@ const ProjectDetails = () => {
         <button
           onClick={() => setActiveTab('members')}
           className={cn(
-            'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all',
+            'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-all sm:text-sm',
             activeTab === 'members'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -368,7 +360,7 @@ const ProjectDetails = () => {
           Members
           <Badge
             variant="secondary"
-            className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full p-0 px-1 text-[9px]"
+            className="bg-primary/10 text-primary border-primary/20 flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full p-0 px-1 text-[10px]"
           >
             {members.length}
           </Badge>
@@ -376,7 +368,7 @@ const ProjectDetails = () => {
         <button
           onClick={() => setActiveTab('documents')}
           className={cn(
-            'flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all',
+            'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-all sm:text-sm',
             activeTab === 'documents'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -390,8 +382,10 @@ const ProjectDetails = () => {
       {/* Members */}
       <Card
         className={cn(
-          'border-border/50 bg-card/50 backdrop-blur-sm',
-          activeTab === 'members' ? 'block' : 'hidden md:block'
+          'border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-200',
+          activeTab === 'members'
+            ? 'animate-in fade-in block duration-200'
+            : 'hidden'
         )}
       >
         <CardHeader className="pb-3">
@@ -529,8 +523,10 @@ const ProjectDetails = () => {
       {/* Tasks */}
       <Card
         className={cn(
-          'border-border/50 bg-card/50 backdrop-blur-sm',
-          activeTab === 'tasks' ? 'block' : 'hidden md:block'
+          'border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-200',
+          activeTab === 'tasks'
+            ? 'animate-in fade-in block duration-200'
+            : 'hidden'
         )}
       >
         <CardHeader className="pb-3">
@@ -669,7 +665,8 @@ const ProjectDetails = () => {
                                 title: 'Delete task?',
                                 description: (
                                   <span>
-                                    Are you sure you want to permanently delete task{' '}
+                                    Are you sure you want to permanently delete
+                                    task{' '}
                                     <span className="text-foreground font-medium">
                                       {task.title}
                                     </span>
@@ -681,7 +678,8 @@ const ProjectDetails = () => {
                                 media: (
                                   <DASHBOARD_ICONS.TRASH2 className="text-destructive h-6 w-6" />
                                 ),
-                                mediaClassName: 'bg-destructive/10 text-destructive',
+                                mediaClassName:
+                                  'bg-destructive/10 text-destructive',
                                 variant: 'destructive',
                               });
                               if (isConfirmed) {
@@ -695,11 +693,13 @@ const ProjectDetails = () => {
                                   }
                                   toast.success('Task deleted');
                                 } catch (err) {
-                                  toast.error(err?.message || 'Failed to delete task');
+                                  toast.error(
+                                    err?.message || 'Failed to delete task'
+                                  );
                                 }
                               }
                             }}
-                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-7 w-7 p-0 shrink-0 rounded-lg transition-colors"
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-7 w-7 shrink-0 rounded-lg p-0 transition-colors"
                             aria-label={`Delete task ${task.title}`}
                           >
                             <DASHBOARD_ICONS.TRASH2 className="h-3.5 w-3.5" />
@@ -715,10 +715,13 @@ const ProjectDetails = () => {
         </CardContent>
       </Card>
 
+      {/* documents */}
       <Card
         className={cn(
-          'border-border/50 bg-card/50 backdrop-blur-sm',
-          activeTab === 'documents' ? 'block' : 'hidden md:block'
+          'border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-200',
+          activeTab === 'documents'
+            ? 'animate-in fade-in block duration-200'
+            : 'hidden'
         )}
       >
         <CardHeader>
@@ -771,47 +774,14 @@ const ProjectDetails = () => {
         projectRole={projectRole}
       />
 
-      <AlertDialog
-        open={!!memberToRemove}
+      <RemoveMemberDialog
+        member={memberToRemove}
+        isOpen={!!memberToRemove}
         onOpenChange={handleRemoveDialogChange}
-      >
-        <AlertDialogContent className="border-border/50 bg-card/95 backdrop-blur-sm sm:max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove member?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {memberToRemove
-                ? `${memberToRemove.userName} will lose access to this project. They'll receive an email notification.`
-                : ''}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <div className="space-y-2">
-            <Label htmlFor="remove-reason" className="text-sm">
-              Reason{' '}
-              <span className="text-muted-foreground">
-                (shared in the email)
-              </span>
-            </Label>
-            <Textarea
-              id="remove-reason"
-              value={removeReason}
-              onChange={(e) => setRemoveReason(e.target.value)}
-              placeholder="Why are you removing this member?"
-              className="border-border/50 bg-background/50 min-h-22"
-            />
-          </div>
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmRemove}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        reason={removeReason}
+        onReasonChange={setRemoveReason}
+        onConfirm={handleConfirmRemove}
+      />
     </div>
   );
 };
