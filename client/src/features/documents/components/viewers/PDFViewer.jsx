@@ -1,7 +1,7 @@
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 import { Button } from '@/components/ui/button';
@@ -13,11 +13,34 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const PDFViewer = ({ url }) => {
   const [numPages, setNumPages] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  
+  const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return Math.min(window.innerWidth - 32, 700);
+    }
+    return 700;
+  });
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver((entries) => {
+      if (entries[0]) {
+        const width = entries[0].contentRect.width;
+        // Keep it responsive, subtract padding/scrollbar width
+        setContainerWidth(Math.max(200, Math.min(width - 32, 700)));
+      }
+    });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="flex h-full flex-col">
+    <div ref={containerRef} className="flex h-full flex-col">
       <ScrollArea className="min-h-0 flex-1">
-        <div className="flex justify-center p-4">
+        <div className="flex justify-center p-2 sm:p-4">
           <Document
             file={url}
             onLoadSuccess={({ numPages }) => setNumPages(numPages)}
@@ -25,7 +48,7 @@ const PDFViewer = ({ url }) => {
               <p className="text-muted-foreground text-sm">Loading PDF…</p>
             }
           >
-            <Page pageNumber={currentPage} width={700} />
+            <Page pageNumber={currentPage} width={containerWidth} />
           </Document>
         </div>
       </ScrollArea>

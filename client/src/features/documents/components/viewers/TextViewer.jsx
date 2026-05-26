@@ -45,8 +45,8 @@ const TextViewer = ({ url }) => {
 
   return (
     <ScrollArea className="h-full bg-muted/5">
-      <div className="p-6 max-w-4xl mx-auto">
-        <pre className="whitespace-pre-wrap font-mono text-xs p-4 bg-muted/40 border border-border/40 rounded-lg text-foreground leading-relaxed">
+      <div className="p-3 sm:p-6 max-w-4xl mx-auto">
+        <pre className="whitespace-pre-wrap font-mono text-[10px] sm:text-xs p-3 sm:p-4 bg-muted/40 border border-border/40 rounded-lg text-foreground leading-relaxed">
           {content}
         </pre>
       </div>
