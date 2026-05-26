@@ -1,3 +1,4 @@
+-- Active: 1779819246707@@nozomi.proxy.rlwy.net@10354@railway
 -- ============================================================
 --  DATABASE SCHEMA  (Posts excluded)
 -- ============================================================
@@ -11,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     role      ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
     avatar    VARCHAR(500)  DEFAULT NULL,
     publicId  VARCHAR(255)  DEFAULT NULL,
+    phone     BIGINT        DEFAULT NULL,
     createdAt TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
