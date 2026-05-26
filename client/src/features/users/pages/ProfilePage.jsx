@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { formatDateDisplay } from '@/lib/utils';
@@ -39,10 +39,10 @@ const ProfilePage = () => {
   return (
     <div className="container px-3 py-5 mx-auto sm:px-6 sm:py-8">
       <div className="mb-5 sm:mb-8">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Account Settings
         </h1>
-        <p className="mt-1 text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground">
           Manage your profile information and preferences.
         </p>
       </div>
@@ -52,10 +52,10 @@ const ProfilePage = () => {
         <div className="space-y-6 lg:col-span-1">
           <Card className="py-0 overflow-hidden shadow-xl border-border/50 bg-card/50 shadow-black/5 backdrop-blur-sm">
             <div className="flex flex-col items-center justify-center h-24 ">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs text-muted-foreground sm:text-sm">
                 Member since
               </span>{' '}
-              <span className="text-lg">
+              <span className="text-base font-medium sm:text-lg">
                 {formatDateDisplay(user?.createdAt, 'long')}
               </span>
             </div>
@@ -63,7 +63,7 @@ const ProfilePage = () => {
               <div className="relative group inline-flex mb-4">
                 <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
                   <AvatarImage src={user?.avatar} alt="Avatar" />
-                  <AvatarFallback className="text-3xl font-bold uppercase">
+                  <AvatarFallback className="text-3xl font-semibold uppercase">
                     {user?.name?.charAt(0) || '?'}
                   </AvatarFallback>
                 </Avatar>
@@ -79,10 +79,10 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              <h2 className="text-xl font-semibold">
+              <h2 className="text-lg font-semibold sm:text-xl">
                 {user?.name || 'User Name'}
               </h2>
-              <p className="mb-3 text-sm text-muted-foreground">
+              <p className="mb-3 text-xs text-muted-foreground sm:text-sm">
                 {user?.email}
               </p>
 
@@ -90,7 +90,7 @@ const ProfilePage = () => {
                 {user?.role && (
                   <Badge
                     variant="secondary"
-                    className="gap-1 px-3 py-1 rounded-full"
+                    className="gap-1 px-3 py-1 rounded-full text-xs"
                   >
                     <DASHBOARD_ICONS.SHIELD
                       size={12}
@@ -103,7 +103,7 @@ const ProfilePage = () => {
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl font-bold text-primary sm:text-2xl">
                     {isProjectsLoading ? (
                       <Skeleton className="w-12 h-8 mx-auto" />
                     ) : (
@@ -116,7 +116,7 @@ const ProfilePage = () => {
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">
+                  <div className="text-xl font-bold text-primary sm:text-2xl">
                     {isTasksLoading ? (
                       <Skeleton className="w-12 h-8 mx-auto" />
                     ) : (
@@ -137,7 +137,7 @@ const ProfilePage = () => {
         <div className="lg:col-span-2">
           <Card className="h-full shadow-xl border-border/50 bg-card/50 shadow-black/5 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
+              <CardTitle className="text-lg font-semibold tracking-tight sm:text-xl">Profile Information</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               {isProfileLoading ? (
@@ -160,7 +160,8 @@ const ProfilePage = () => {
       </div>
 
       <Dialog open={isAvatarModalOpen} onOpenChange={setIsAvatarModalOpen}>
-        <DialogContent className="max-w-md p-6 bg-card border-border/50 sm:max-w-md flex items-center justify-center">
+        <DialogContent className="max-w-md p-6 bg-card border-border/50 sm:max-w-md flex flex-col items-center justify-center">
+          <DialogTitle className="sr-only">Profile Picture</DialogTitle>
           <Avatar className="h-48 w-48 border shrink-0 shadow-lg bg-muted">
             <AvatarImage src={user?.avatar} alt={user?.name || 'User Avatar'} />
             <AvatarFallback className="text-8xl font-bold uppercase">

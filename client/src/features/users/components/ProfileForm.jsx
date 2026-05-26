@@ -103,7 +103,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           isDragging && 'border-primary bg-primary/5 scale-[1.01]'
         )}
       >
-        <Avatar className="w-16 h-16 border shadow-sm border-border/50 bg-muted shrink-0">
+        <Avatar className="border-border/50 bg-muted h-16 w-16 shrink-0 border shadow-sm">
           <AvatarImage src={previewUrl} alt="Avatar" />
           <AvatarFallback className="text-xl font-bold uppercase">
             {name.charAt(0)?.toUpperCase() || '?'}
@@ -114,7 +114,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           <div className="flex flex-wrap items-center gap-2">
             <Label
               htmlFor="avatar-upload"
-              className="inline-flex items-center gap-2 text-sm font-semibold transition-colors cursor-pointer text-primary hover:text-primary/80"
+              className="text-primary hover:text-primary/80 inline-flex cursor-pointer items-center gap-2 text-xs font-semibold transition-colors sm:text-sm"
             >
               <DASHBOARD_ICONS.UPLOAD size={16} />
               Change Avatar
@@ -126,11 +126,11 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
                 onChange={handleFileChange}
               />
             </Label>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-muted-foreground text-[11px] sm:text-xs">
               or drag & drop here
             </span>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-[11px] sm:text-xs">
             Only .jpg, .jpeg, .png or .webp format. Maximum file size: 5MB.
           </p>
         </div>
@@ -144,7 +144,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           onChange={(e) => setName(e.target.value)}
           placeholder="Your Name"
           required
-          className="border-border/50 bg-background/50 h-11"
+          className="border-border/50 bg-background/50 h-10 text-sm"
         />
       </div>
 
@@ -154,9 +154,9 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           id="email"
           value={user?.email || ''}
           disabled
-          className="cursor-not-allowed border-border/50 bg-muted/50 text-muted-foreground h-11"
+          className="border-border/50 bg-muted/50 text-muted-foreground h-10 cursor-not-allowed text-sm"
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-[11px] sm:text-xs">
           Email cannot be changed. Contact support if needed.
         </p>
       </div>
@@ -169,7 +169,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Your Phone Number"
           required
-          className="border-border/50 bg-background/50 h-11"
+          className="border-border/50 bg-background/50 font-normal text-sm h-10"
         />
       </div>
 
@@ -180,7 +180,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
       >
         {isLoading ? (
           <>
-            <DASHBOARD_ICONS.LOADER2 className="w-4 h-4 mr-2 animate-spin" />
+            <DASHBOARD_ICONS.LOADER2 className="mr-2 h-4 w-4 animate-spin" />
             Saving...
           </>
         ) : (

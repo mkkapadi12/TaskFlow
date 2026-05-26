@@ -14,6 +14,6 @@ export const transporter = nodemailer.createTransport({
 
 // verify connection on startup
 transporter.verify((err) => {
-  if (err) console.error('❌ Mailer error:', err);
-  else console.log('✅ Mailer ready');
+  if (err) console.error('Mailer error:', err);
+  else console.log('Mailer connection ready');
 });

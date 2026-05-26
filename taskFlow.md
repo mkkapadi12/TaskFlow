@@ -388,6 +388,7 @@ src/
 - [x] **UserCalendar**: Fully interactive calendar view mapping task deadlines onto a month grid with custom priority indicator dots, and list details sidebar displaying tasks for selected dates
 
 **Infra / DX**
+- [x] **SEO & Metadata Optimization** — custom brand-focused title, description, keywords, Open Graph card metadata, Twitter card description, brand favicon integration, and mobile device theme-color support in `index.html`.
 - [x] Helmet + CORS configured for `CLIENT_URL`
 - [x] Global error handler (`AppError` + `globalErrorHandler`) maps `SIGNAL 45000` → 400 and `ER_DUP_ENTRY` → 409
 - [x] Zod request validation middleware (replaces `req.body` with parsed/coerced data)

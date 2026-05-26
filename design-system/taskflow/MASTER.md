@@ -48,9 +48,10 @@ Geist is the same family Vercel/Linear use — it slots perfectly into the recom
 
 | Use                  | Class                                                          |
 |----------------------|----------------------------------------------------------------|
-| Page H1              | `text-3xl font-semibold tracking-tight` (`text-4xl` on `md:`)  |
-| Section heading      | `text-xl font-semibold tracking-tight`                         |
+| Page H1              | `text-2xl font-semibold tracking-tight sm:text-3xl`            |
+| Section heading      | `text-lg font-semibold tracking-tight sm:text-xl`              |
 | Card title           | `text-base font-semibold`                                      |
+| Stat Numbers         | `text-xl font-bold sm:text-2xl`                                |
 | Body                 | `text-sm leading-relaxed` (16 px equivalent on mobile inputs)  |
 | Helper / meta        | `text-xs text-muted-foreground`                                |
 | Label                | `text-sm font-medium`                                          |

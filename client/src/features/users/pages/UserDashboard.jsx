@@ -49,12 +49,16 @@ const UserDashboard = () => {
   const getRemainingDaysLabel = (deadlineStr) => {
     const deadline = new Date(deadlineStr);
     const now = new Date();
-    const dDate = new Date(deadline.getFullYear(), deadline.getMonth(), deadline.getDate());
+    const dDate = new Date(
+      deadline.getFullYear(),
+      deadline.getMonth(),
+      deadline.getDate()
+    );
     const nDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
+
     const diffTime = dDate.getTime() - nDate.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Tomorrow';
     if (diffDays < 0) return 'Overdue';
@@ -79,49 +83,63 @@ const UserDashboard = () => {
   return (
     <div className="space-y-4 p-3 sm:space-y-6 sm:p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Dashboard
         </h1>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <Card className="p-0 border-border/50 bg-card/50 backdrop-blur-sm shadow-sm transition-all hover:bg-card/80 border-l-4 border-l-sky-500">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+            <CardTitle className="text-[11px] font-semibold tracking-tight text-muted-foreground sm:text-sm sm:font-medium sm:text-foreground">
               Total Projects
             </CardTitle>
-            <DASHBOARD_ICONS.BRIEFCASE className="text-muted-foreground h-4 w-4" />
+            <div className="bg-sky-500/10 text-sky-600 dark:text-sky-400 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full shrink-0">
+              <DASHBOARD_ICONS.BRIEFCASE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{projects?.length || 0}</div>
-            <p className="text-muted-foreground text-xs">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-lg font-bold sm:text-2xl text-foreground">
+              {projects?.length || 0}
+            </div>
+            <p className="text-muted-foreground text-xs mt-1 hidden sm:block">
               Active projects you are part of
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-            <DASHBOARD_ICONS.LISTCHECKS className="text-muted-foreground h-4 w-4" />
+        <Card className="p-0 border-border/50 bg-card/50 backdrop-blur-sm shadow-sm transition-all hover:bg-card/80 border-l-4 border-l-violet-500">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+            <CardTitle className="text-[11px] font-semibold tracking-tight text-muted-foreground sm:text-sm sm:font-medium sm:text-foreground">
+              Total Tasks
+            </CardTitle>
+            <div className="bg-violet-500/10 text-violet-600 dark:text-violet-400 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full shrink-0">
+              <DASHBOARD_ICONS.LISTCHECKS className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{tasks?.data?.length || 0}</div>
-            <p className="text-muted-foreground text-xs">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-lg font-bold sm:text-2xl text-foreground">
+              {tasks?.data?.length || 0}
+            </div>
+            <p className="text-muted-foreground text-xs mt-1 hidden sm:block">
               Tasks assigned to you
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue Tasks</CardTitle>
-            <DASHBOARD_ICONS.ALERTTRIANGLE className="text-destructive h-4 w-4" />
+        <Card className="p-0 border-border/50 bg-card/50 backdrop-blur-sm shadow-sm transition-all hover:bg-card/80 border-l-4 border-l-destructive">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
+            <CardTitle className="text-[11px] font-semibold tracking-tight text-muted-foreground sm:text-sm sm:font-medium sm:text-foreground">
+              Overdue Tasks
+            </CardTitle>
+            <div className="bg-destructive/10 text-destructive flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full shrink-0">
+              <DASHBOARD_ICONS.ALERTTRIANGLE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-destructive text-2xl font-bold">
+          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
+            <div className="text-destructive text-lg font-bold sm:text-2xl">
               {overdueTasksData?.length || 0}
             </div>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-muted-foreground text-xs mt-1 hidden sm:block">
               Tasks past their deadline
             </p>
           </CardContent>
@@ -173,11 +191,15 @@ const UserDashboard = () => {
         </Card>
 
         {/* Upcoming Deadlines */}
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-sm">
-          <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+        <Card className="border-border/50 bg-card/50 shadow-sm backdrop-blur-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
             <div className="space-y-1">
-              <CardTitle className="text-xl">Upcoming Deadlines</CardTitle>
-              <p className="text-muted-foreground text-xs">Your near-term due dates</p>
+              <CardTitle className="text-lg font-semibold tracking-tight sm:text-xl">
+                Upcoming Deadlines
+              </CardTitle>
+              <p className="text-muted-foreground text-xs">
+                Your near-term due dates
+              </p>
             </div>
             <div className="bg-primary/10 text-primary flex h-8 w-8 items-center justify-center rounded-full">
               <DASHBOARD_ICONS.CLOCK className="h-4 w-4" />
@@ -189,14 +211,17 @@ const UserDashboard = () => {
                 upcomingTasks.map((task) => {
                   const priorityColors = {
                     LOW: 'border-l-blue-500 bg-blue-500/5 hover:bg-blue-500/10 text-blue-500 border-blue-500/20',
-                    MEDIUM: 'border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/10 text-amber-600 border-amber-500/20',
+                    MEDIUM:
+                      'border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/10 text-amber-600 border-amber-500/20',
                     HIGH: 'border-l-orange-500 bg-orange-500/5 hover:bg-orange-500/10 text-orange-600 border-orange-500/20',
-                    URGENT: 'border-l-red-500 bg-red-500/5 hover:bg-red-500/10 text-red-600 border-red-500/20',
+                    URGENT:
+                      'border-l-red-500 bg-red-500/5 hover:bg-red-500/10 text-red-600 border-red-500/20',
                   };
 
                   const priorityBadges = {
                     LOW: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
-                    MEDIUM: 'bg-amber-500/10 text-amber-500 border-amber-500/30',
+                    MEDIUM:
+                      'bg-amber-500/10 text-amber-500 border-amber-500/30',
                     HIGH: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
                     URGENT: 'bg-red-500/10 text-red-500 border-red-500/30',
                   };
@@ -205,44 +230,53 @@ const UserDashboard = () => {
                     <div
                       key={task.id}
                       className={cn(
-                        'group flex items-center justify-between border-l-4 rounded-r-xl border border-border/40 p-3 transition-all duration-200 hover:-translate-x-0.5 hover:shadow-md backdrop-blur-sm',
-                        task.priority === 'URGENT' ? priorityColors.URGENT :
-                        task.priority === 'HIGH' ? priorityColors.HIGH :
-                        task.priority === 'MEDIUM' ? priorityColors.MEDIUM :
-                        priorityColors.LOW
+                        'group border-border/40 flex items-center justify-between rounded-r-xl border border-l-4 p-3 backdrop-blur-sm transition-all duration-200 hover:-translate-x-0.5 hover:shadow-md',
+                        task.priority === 'URGENT'
+                          ? priorityColors.URGENT
+                          : task.priority === 'HIGH'
+                            ? priorityColors.HIGH
+                            : task.priority === 'MEDIUM'
+                              ? priorityColors.MEDIUM
+                              : priorityColors.LOW
                       )}
                     >
-                      <div className="space-y-1 min-w-0 flex-1 pr-2">
+                      <div className="min-w-0 flex-1 space-y-1 pr-2">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="font-semibold text-sm text-foreground truncate max-w-40 sm:max-w-xs group-hover:text-primary transition-colors">
+                          <span className="text-foreground group-hover:text-primary max-w-40 truncate text-sm font-semibold transition-colors sm:max-w-xs">
                             {task.title}
                           </span>
                           {task.projectTitle && (
-                            <span className="text-[9px] text-muted-foreground font-semibold uppercase tracking-wider bg-background/50 border border-border/30 px-1.5 py-0.5 rounded">
+                            <span className="text-muted-foreground bg-background/50 border-border/30 rounded border px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase">
                               {task.projectTitle}
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                        <div className="text-muted-foreground flex items-center gap-3 text-[11px]">
                           <span className="flex items-center gap-1">
-                            <DASHBOARD_ICONS.CLOCK className="h-3.5 w-3.5 opacity-60 text-primary" />
-                            {new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            <DASHBOARD_ICONS.CLOCK className="text-primary h-3.5 w-3.5 opacity-60" />
+                            {new Date(task.deadline).toLocaleDateString(
+                              undefined,
+                              { month: 'short', day: 'numeric' }
+                            )}
                           </span>
-                          <span className="flex items-center gap-1 font-semibold text-foreground/80">
-                            <DASHBOARD_ICONS.CALENDAR className="h-3.5 w-3.5 opacity-60 text-primary" />
+                          <span className="text-foreground/80 flex items-center gap-1 font-semibold">
+                            <DASHBOARD_ICONS.CALENDAR className="text-primary h-3.5 w-3.5 opacity-60" />
                             {getRemainingDaysLabel(task.deadline)}
                           </span>
                         </div>
                       </div>
-                      
+
                       <Badge
                         variant="outline"
                         className={cn(
-                          'rounded-full px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase border shrink-0',
-                          task.priority === 'URGENT' ? priorityBadges.URGENT :
-                          task.priority === 'HIGH' ? priorityBadges.HIGH :
-                          task.priority === 'MEDIUM' ? priorityBadges.MEDIUM :
-                          priorityBadges.LOW
+                          'shrink-0 rounded-full border px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase',
+                          task.priority === 'URGENT'
+                            ? priorityBadges.URGENT
+                            : task.priority === 'HIGH'
+                              ? priorityBadges.HIGH
+                              : task.priority === 'MEDIUM'
+                                ? priorityBadges.MEDIUM
+                                : priorityBadges.LOW
                         )}
                       >
                         {task.priority}

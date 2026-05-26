@@ -351,14 +351,14 @@ const ProjectDetails = () => {
       <div
         className={cn(
           'bg-card/30 border-border/40 flex w-full flex-nowrap overflow-x-auto rounded-xl border p-1 backdrop-blur-md',
-          isManager ? 'max-w-xl' : 'max-w-lg'
+          isManager ? 'max-w-full' : 'max-w-full'
         )}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <button
           onClick={() => setActiveTab('tasks')}
           className={cn(
-            'flex min-w-[100px] flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
+            'flex min-w-25 flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
             activeTab === 'tasks'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -376,7 +376,7 @@ const ProjectDetails = () => {
         <button
           onClick={() => setActiveTab('members')}
           className={cn(
-            'flex min-w-[110px] flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
+            'flex min-w-27.5 flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
             activeTab === 'members'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -394,7 +394,7 @@ const ProjectDetails = () => {
         <button
           onClick={() => setActiveTab('documents')}
           className={cn(
-            'flex min-w-[110px] flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
+            'flex min-w-27.5 flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
             activeTab === 'documents'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
@@ -407,7 +407,7 @@ const ProjectDetails = () => {
           <button
             onClick={() => setActiveTab('settings')}
             className={cn(
-              'flex min-w-[100px] flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
+              'flex min-w-25 flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
               activeTab === 'settings'
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
