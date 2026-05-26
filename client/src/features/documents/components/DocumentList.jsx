@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,7 @@ import {
   useDeleteDocumentMutation,
   useGetDocumentsQuery,
 } from '../document.api';
+import DocumentPreviewModal from './DocumentPreviewModal';
 
 const formatBytes = (bytes) => {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -32,6 +34,7 @@ const DocumentList = ({ projectId, isManager }) => {
   const { data, isLoading } = useGetDocumentsQuery(projectId);
   const [deleteDocument] = useDeleteDocumentMutation();
   const confirm = useAlertDialog();
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   const handleDelete = async (documentId) => {
     try {
@@ -61,7 +64,8 @@ const DocumentList = ({ projectId, isManager }) => {
   }
 
   return (
-    <ul className="divide-border/50 divide-y">
+    <>
+      <ul className="divide-border/50 divide-y">
       {docs.map((doc) => {
         const ext = getExt(doc.name);
         return (
@@ -92,7 +96,17 @@ const DocumentList = ({ projectId, isManager }) => {
                 {formatBytes(doc.size)} · {doc.uploaderName?.split(' ')[0]}
               </span>
               <div className="flex items-center gap-1">
-                <a href={doc.url} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                  onClick={() => setPreviewDoc(doc)}
+                  aria-label={`Preview ${doc.name}`}
+                >
+                  <DASHBOARD_ICONS.EYE className="h-4 w-4" />
+                </Button>
+
+                <a href={doc.url} target="_blank" rel="noopener noreferrer"  className="shrink-0" >
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                     <DASHBOARD_ICONS.DOWNLOAD className="h-4 w-4" />
                   </Button>
@@ -137,6 +151,13 @@ const DocumentList = ({ projectId, isManager }) => {
         );
       })}
     </ul>
+      
+      <DocumentPreviewModal
+        doc={previewDoc}
+        open={!!previewDoc}
+        onClose={() => setPreviewDoc(null)}
+      />
+    </>
   );
 };
 
