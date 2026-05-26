@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { EXT_COLORS } from '@/constant';
 import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
@@ -15,17 +16,6 @@ import DocumentPreviewModal from './DocumentPreviewModal';
 const formatBytes = (bytes) => {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
-
-const EXT_COLORS = {
-  pdf: 'bg-red-500/10 text-red-500',
-  doc: 'bg-blue-500/10 text-blue-500',
-  docx: 'bg-blue-500/10 text-blue-500',
-  xls: 'bg-emerald-500/10 text-emerald-500',
-  xlsx: 'bg-emerald-500/10 text-emerald-500',
-  ppt: 'bg-orange-500/10 text-orange-500',
-  pptx: 'bg-orange-500/10 text-orange-500',
-  md: 'bg-blue-500/10 text-blue-500',
 };
 
 const getExt = (name) => name.split('.').pop()?.toLowerCase() || 'file';

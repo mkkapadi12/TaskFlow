@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { EXT_COLORS } from '@/constant';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
 import ImageViewer from './viewers/ImageViewer';
@@ -38,7 +39,9 @@ const DocumentPreviewModal = ({ doc, open, onClose }) => {
             <DialogTitle className="max-w-35 truncate text-sm font-semibold sm:max-w-md">
               {doc.name}
             </DialogTitle>
-            <Badge className="px-1.5 text-[9px] uppercase">.{ext}</Badge>
+            <Badge className={`px-1.5 text-[9px] uppercase ${EXT_COLORS[ext]}`}>
+              .{ext}
+            </Badge>
           </div>
           <a href={doc.url} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm" className="h-7 gap-1 text-xs">

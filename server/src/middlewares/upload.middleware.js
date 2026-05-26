@@ -47,6 +47,10 @@ const ALLOWED_DOC_TYPES = [
   'image/jpeg',
   'image/png',
   'image/webp',
+
+  //json
+  'application/json',
+  'text/x-json',
 ];
 
 const documentFilter = (req, file, cb) => {

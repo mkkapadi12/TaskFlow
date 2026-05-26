@@ -248,3 +248,79 @@ export const priorityConfig = {
     className: 'bg-red-500/10 text-red-500 border-red-500/20',
   },
 };
+
+export const EXT_COLORS = {
+  // =========================
+  // 📄 Text & Documents
+  // =========================
+  pdf: 'bg-blue-500/10 text-blue-500',
+
+  doc: 'bg-blue-500/10 text-blue-500',
+  docx: 'bg-blue-500/10 text-blue-500',
+
+  txt: 'bg-blue-500/10 text-blue-500',
+
+  md: 'bg-sky-500/10 text-sky-500',
+
+  // =========================
+  // 📊 Spreadsheets & Data
+  // =========================
+  xls: 'bg-emerald-500/10 text-emerald-500',
+  xlsx: 'bg-emerald-500/10 text-emerald-500',
+
+  csv: 'bg-emerald-500/10 text-emerald-500',
+  tsv: 'bg-emerald-500/10 text-emerald-500',
+
+  // =========================
+  // 📽️ Presentations
+  // =========================
+  ppt: 'bg-orange-500/10 text-orange-500',
+  pptx: 'bg-orange-500/10 text-orange-500',
+
+  // =========================
+  // 🖼️ Images & Media
+  // =========================
+  jpg: 'bg-pink-500/10 text-pink-500',
+  jpeg: 'bg-pink-500/10 text-pink-500',
+  png: 'bg-pink-500/10 text-pink-500',
+  webp: 'bg-pink-500/10 text-pink-500',
+  gif: 'bg-pink-500/10 text-pink-500',
+
+  svg: 'bg-cyan-500/10 text-cyan-500',
+
+  // =========================
+  // ⚙️ Code & Config
+  // =========================
+  json: 'bg-yellow-500/10 text-yellow-500',
+
+  js: 'bg-yellow-500/10 text-yellow-500',
+  jsx: 'bg-yellow-500/10 text-yellow-500',
+  ts: 'bg-yellow-500/10 text-yellow-500',
+  tsx: 'bg-yellow-500/10 text-yellow-500',
+
+  html: 'bg-yellow-500/10 text-yellow-500',
+  css: 'bg-yellow-500/10 text-yellow-500',
+
+  py: 'bg-yellow-500/10 text-yellow-500',
+
+  // =========================
+  // ⚙️ System / Executables
+  // =========================
+  exe: 'bg-zinc-500/10 text-zinc-500',
+  dll: 'bg-zinc-500/10 text-zinc-500',
+  bat: 'bg-zinc-500/10 text-zinc-500',
+  sh: 'bg-zinc-500/10 text-zinc-500',
+
+  // =========================
+  // 📦 Archives
+  // =========================
+  zip: 'bg-stone-500/10 text-stone-500',
+  rar: 'bg-stone-500/10 text-stone-500',
+  tar: 'bg-stone-500/10 text-stone-500',
+  '7z': 'bg-stone-500/10 text-stone-500',
+
+  // =========================
+  // ❓ Default
+  // =========================
+  default: 'bg-muted text-muted-foreground',
+};
