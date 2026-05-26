@@ -56,9 +56,7 @@ const ResetPasswordPage = () => {
             <CardTitle className="text-destructive text-2xl font-bold">
               {t('auth.invalidLink')}
             </CardTitle>
-            <CardDescription>
-              {t('auth.invalidLinkDesc')}
-            </CardDescription>
+            <CardDescription>{t('auth.invalidLinkDesc')}</CardDescription>
           </CardHeader>
           <CardFooter>
             <Button variant="link" asChild className="w-full">
@@ -74,7 +72,9 @@ const ResetPasswordPage = () => {
     <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">{t('auth.resetPasswordTitle')}</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            {t('auth.resetPasswordTitle')}
+          </CardTitle>
           <CardDescription>{t('auth.resetPasswordDesc')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -99,7 +99,9 @@ const ResetPasswordPage = () => {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t('auth.confirmPasswordLabel')}</Label>
+              <Label htmlFor="confirmPassword">
+                {t('auth.confirmPasswordLabel')}
+              </Label>
               <Input
                 id="confirmPassword"
                 type="password"

@@ -130,7 +130,8 @@ export const PAGE_TITLES = [
   {
     path: '/analytics',
     title: 'Analytics',
-    description: 'Visualize productivity trends, workloads, and task efficiency',
+    description:
+      'Visualize productivity trends, workloads, and task efficiency',
   },
   {
     path: '/documents',

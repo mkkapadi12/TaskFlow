@@ -37,12 +37,12 @@ const ProfilePage = () => {
   const taskCount = tasksData?.data?.length || 0;
 
   return (
-    <div className="container px-3 py-5 mx-auto sm:px-6 sm:py-8">
+    <div className="container mx-auto px-3 py-5 sm:px-6 sm:py-8">
       <div className="mb-5 sm:mb-8">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Account Settings
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-sm">
           Manage your profile information and preferences.
         </p>
       </div>
@@ -50,18 +50,18 @@ const ProfilePage = () => {
       <div className="grid grid-cols-1 gap-5 sm:gap-8 lg:grid-cols-3">
         {/* Left Column: Summary */}
         <div className="space-y-6 lg:col-span-1">
-          <Card className="py-0 overflow-hidden shadow-xl border-border/50 bg-card/50 shadow-black/5 backdrop-blur-sm">
-            <div className="flex flex-col items-center justify-center h-24 ">
-              <span className="text-xs text-muted-foreground sm:text-sm">
+          <Card className="border-border/50 bg-card/50 overflow-hidden py-0 shadow-xl shadow-black/5 backdrop-blur-sm">
+            <div className="flex h-24 flex-col items-center justify-center">
+              <span className="text-muted-foreground text-xs sm:text-sm">
                 Member since
               </span>{' '}
               <span className="text-base font-medium sm:text-lg">
                 {formatDateDisplay(user?.createdAt, 'long')}
               </span>
             </div>
-            <CardContent className="relative p-6 -mt-12 text-center">
-              <div className="relative group inline-flex mb-4">
-                <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
+            <CardContent className="relative -mt-12 p-6 text-center">
+              <div className="group relative mb-4 inline-flex">
+                <Avatar className="border-background h-24 w-24 border-4 shadow-lg">
                   <AvatarImage src={user?.avatar} alt="Avatar" />
                   <AvatarFallback className="text-3xl font-semibold uppercase">
                     {user?.name?.charAt(0) || '?'}
@@ -69,7 +69,7 @@ const ProfilePage = () => {
                 </Avatar>
                 <div
                   onClick={() => setIsAvatarModalOpen(true)}
-                  className="absolute inset-0 rounded-full flex flex-col items-center justify-center text-white transition-all duration-200 opacity-0 cursor-pointer bg-black/60 group-hover:opacity-100 border-4 border-transparent"
+                  className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center rounded-full border-4 border-transparent bg-black/60 text-white opacity-0 transition-all duration-200 group-hover:opacity-100"
                   title="View full-size photo"
                 >
                   <DASHBOARD_ICONS.EYE size={18} className="mb-0.5" />
@@ -82,15 +82,15 @@ const ProfilePage = () => {
               <h2 className="text-lg font-semibold sm:text-xl">
                 {user?.name || 'User Name'}
               </h2>
-              <p className="mb-3 text-xs text-muted-foreground sm:text-sm">
+              <p className="text-muted-foreground mb-3 text-xs sm:text-sm">
                 {user?.email}
               </p>
 
-              <div className="flex justify-center gap-2 mb-4">
+              <div className="mb-4 flex justify-center gap-2">
                 {user?.role && (
                   <Badge
                     variant="secondary"
-                    className="gap-1 px-3 py-1 rounded-full text-xs"
+                    className="gap-1 rounded-full px-3 py-1 text-xs"
                   >
                     <DASHBOARD_ICONS.SHIELD
                       size={12}
@@ -101,29 +101,29 @@ const ProfilePage = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
+              <div className="border-border/50 grid grid-cols-2 gap-4 border-t pt-4">
                 <div className="text-center">
-                  <div className="text-xl font-bold text-primary sm:text-2xl">
+                  <div className="text-primary text-xl font-bold sm:text-2xl">
                     {isProjectsLoading ? (
-                      <Skeleton className="w-12 h-8 mx-auto" />
+                      <Skeleton className="mx-auto h-8 w-12" />
                     ) : (
                       projectCount
                     )}
                   </div>
-                  <div className="flex items-center justify-center gap-1 mt-1 text-xs text-muted-foreground">
+                  <div className="text-muted-foreground mt-1 flex items-center justify-center gap-1 text-xs">
                     <DASHBOARD_ICONS.BRIEFCASE size={12} />
                     Projects
                   </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xl font-bold text-primary sm:text-2xl">
+                  <div className="text-primary text-xl font-bold sm:text-2xl">
                     {isTasksLoading ? (
-                      <Skeleton className="w-12 h-8 mx-auto" />
+                      <Skeleton className="mx-auto h-8 w-12" />
                     ) : (
                       taskCount
                     )}
                   </div>
-                  <div className="flex items-center justify-center gap-1 mt-1 text-xs text-muted-foreground">
+                  <div className="text-muted-foreground mt-1 flex items-center justify-center gap-1 text-xs">
                     <DASHBOARD_ICONS.LISTCHECKS size={12} />
                     Tasks
                   </div>
@@ -135,17 +135,19 @@ const ProfilePage = () => {
 
         {/* Right Column: Form */}
         <div className="lg:col-span-2">
-          <Card className="h-full shadow-xl border-border/50 bg-card/50 shadow-black/5 backdrop-blur-sm">
+          <Card className="border-border/50 bg-card/50 h-full shadow-xl shadow-black/5 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold tracking-tight sm:text-xl">Profile Information</CardTitle>
+              <CardTitle className="text-lg font-semibold tracking-tight sm:text-xl">
+                Profile Information
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               {isProfileLoading ? (
                 <div className="space-y-6">
-                  <Skeleton className="w-full h-10" />
-                  <Skeleton className="w-full h-10" />
-                  <Skeleton className="w-full h-10" />
-                  <Skeleton className="w-full rounded-full h-11" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-11 w-full rounded-full" />
                 </div>
               ) : (
                 <ProfileForm
@@ -160,9 +162,9 @@ const ProfilePage = () => {
       </div>
 
       <Dialog open={isAvatarModalOpen} onOpenChange={setIsAvatarModalOpen}>
-        <DialogContent className="max-w-md p-6 bg-card border-border/50 sm:max-w-md flex flex-col items-center justify-center">
+        <DialogContent className="bg-card border-border/50 flex max-w-md flex-col items-center justify-center p-6 sm:max-w-md">
           <DialogTitle className="sr-only">Profile Picture</DialogTitle>
-          <Avatar className="h-48 w-48 border shrink-0 shadow-lg bg-muted">
+          <Avatar className="bg-muted h-48 w-48 shrink-0 border shadow-lg">
             <AvatarImage src={user?.avatar} alt={user?.name || 'User Avatar'} />
             <AvatarFallback className="text-8xl font-bold uppercase">
               {user?.name?.charAt(0) || '?'}

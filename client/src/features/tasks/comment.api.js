@@ -7,7 +7,9 @@ export const commentsApi = baseApi.injectEndpoints({
         url: `/tasks/${taskId}/comments`,
         method: 'GET',
       }),
-      providesTags: (result, error, taskId) => [{ type: 'Comment', id: taskId }],
+      providesTags: (result, error, taskId) => [
+        { type: 'Comment', id: taskId },
+      ],
     }),
 
     createTaskComment: builder.mutation({

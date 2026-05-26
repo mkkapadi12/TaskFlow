@@ -169,7 +169,7 @@ const ProfileForm = ({ user, onSave, isLoading }) => {
           onChange={(e) => setPhone(e.target.value)}
           placeholder="Your Phone Number"
           required
-          className="border-border/50 bg-background/50 font-normal text-sm h-10"
+          className="border-border/50 bg-background/50 h-10 text-sm font-normal"
         />
       </div>
 

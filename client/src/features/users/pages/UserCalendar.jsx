@@ -56,8 +56,8 @@ const UserCalendar = () => {
     ...props
   }) => {
     const dateString = formatDateKey(day.date);
-    const dayTasks = tasksWithDeadlines.filter((task) =>
-      formatDateKey(new Date(task.deadline)) === dateString
+    const dayTasks = tasksWithDeadlines.filter(
+      (task) => formatDateKey(new Date(task.deadline)) === dateString
     );
 
     return (

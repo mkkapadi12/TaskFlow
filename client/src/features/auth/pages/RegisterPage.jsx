@@ -85,9 +85,7 @@ const RegisterPage = () => {
             <h2 className="text-3xl font-bold tracking-tight">
               {t('auth.createAccount')}
             </h2>
-            <p className="text-muted-foreground">
-              {t('auth.fillDetails')}
-            </p>
+            <p className="text-muted-foreground">{t('auth.fillDetails')}</p>
           </div>
 
           {/* Form */}

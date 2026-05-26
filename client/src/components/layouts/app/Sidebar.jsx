@@ -45,7 +45,7 @@ const Sidebar = ({ open, onClose }) => {
       {/* Sidebar panel */}
       <aside
         className={cn(
-          'bg-sidebar text-sidebar-foreground border-sidebar-border fixed inset-y-0 left-0 z-50 flex w-[240px] flex-col border-r transition-transform duration-300 md:static md:translate-x-0',
+          'bg-sidebar text-sidebar-foreground border-sidebar-border fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r transition-transform duration-300 md:static md:translate-x-0',
           open ? 'translate-x-0' : '-translate-x-full'
         )}
       >

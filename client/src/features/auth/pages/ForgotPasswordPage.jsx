@@ -43,10 +43,10 @@ const ForgotPasswordPage = () => {
     <div className="bg-muted/50 flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">{t('auth.forgotPasswordTitle')}</CardTitle>
-          <CardDescription>
-            {t('auth.forgotPasswordDesc')}
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            {t('auth.forgotPasswordTitle')}
+          </CardTitle>
+          <CardDescription>{t('auth.forgotPasswordDesc')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">

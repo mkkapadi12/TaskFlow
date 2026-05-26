@@ -90,48 +90,48 @@ const UserDashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <Card className="p-0 border-border/50 bg-card/50 backdrop-blur-sm shadow-sm transition-all hover:bg-card/80 border-l-4 border-l-sky-500">
+        <Card className="border-border/50 bg-card/50 hover:bg-card/80 border-l-4 border-l-sky-500 p-0 shadow-sm backdrop-blur-sm transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
-            <CardTitle className="text-[11px] font-semibold tracking-tight text-muted-foreground sm:text-sm sm:font-medium sm:text-foreground">
+            <CardTitle className="text-muted-foreground sm:text-foreground text-[11px] font-semibold tracking-tight sm:text-sm sm:font-medium">
               Total Projects
             </CardTitle>
-            <div className="bg-sky-500/10 text-sky-600 dark:text-sky-400 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full shrink-0">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-500/10 text-sky-600 sm:h-8 sm:w-8 dark:text-sky-400">
               <DASHBOARD_ICONS.BRIEFCASE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-            <div className="text-lg font-bold sm:text-2xl text-foreground">
+            <div className="text-foreground text-lg font-bold sm:text-2xl">
               {projects?.length || 0}
             </div>
-            <p className="text-muted-foreground text-xs mt-1 hidden sm:block">
+            <p className="text-muted-foreground mt-1 hidden text-xs sm:block">
               Active projects you are part of
             </p>
           </CardContent>
         </Card>
-        <Card className="p-0 border-border/50 bg-card/50 backdrop-blur-sm shadow-sm transition-all hover:bg-card/80 border-l-4 border-l-violet-500">
+        <Card className="border-border/50 bg-card/50 hover:bg-card/80 border-l-4 border-l-violet-500 p-0 shadow-sm backdrop-blur-sm transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
-            <CardTitle className="text-[11px] font-semibold tracking-tight text-muted-foreground sm:text-sm sm:font-medium sm:text-foreground">
+            <CardTitle className="text-muted-foreground sm:text-foreground text-[11px] font-semibold tracking-tight sm:text-sm sm:font-medium">
               Total Tasks
             </CardTitle>
-            <div className="bg-violet-500/10 text-violet-600 dark:text-violet-400 flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full shrink-0">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-500/10 text-violet-600 sm:h-8 sm:w-8 dark:text-violet-400">
               <DASHBOARD_ICONS.LISTCHECKS className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </CardHeader>
           <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-            <div className="text-lg font-bold sm:text-2xl text-foreground">
+            <div className="text-foreground text-lg font-bold sm:text-2xl">
               {tasks?.data?.length || 0}
             </div>
-            <p className="text-muted-foreground text-xs mt-1 hidden sm:block">
+            <p className="text-muted-foreground mt-1 hidden text-xs sm:block">
               Tasks assigned to you
             </p>
           </CardContent>
         </Card>
-        <Card className="p-0 border-border/50 bg-card/50 backdrop-blur-sm shadow-sm transition-all hover:bg-card/80 border-l-4 border-l-destructive">
+        <Card className="border-border/50 bg-card/50 hover:bg-card/80 border-l-destructive border-l-4 p-0 shadow-sm backdrop-blur-sm transition-all">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
-            <CardTitle className="text-[11px] font-semibold tracking-tight text-muted-foreground sm:text-sm sm:font-medium sm:text-foreground">
+            <CardTitle className="text-muted-foreground sm:text-foreground text-[11px] font-semibold tracking-tight sm:text-sm sm:font-medium">
               Overdue Tasks
             </CardTitle>
-            <div className="bg-destructive/10 text-destructive flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full shrink-0">
+            <div className="bg-destructive/10 text-destructive flex h-7 w-7 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8">
               <DASHBOARD_ICONS.ALERTTRIANGLE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
           </CardHeader>
@@ -139,7 +139,7 @@ const UserDashboard = () => {
             <div className="text-destructive text-lg font-bold sm:text-2xl">
               {overdueTasksData?.length || 0}
             </div>
-            <p className="text-muted-foreground text-xs mt-1 hidden sm:block">
+            <p className="text-muted-foreground mt-1 hidden text-xs sm:block">
               Tasks past their deadline
             </p>
           </CardContent>

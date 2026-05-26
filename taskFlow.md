@@ -372,6 +372,7 @@ src/
 - [x] Up to 5 files per request, 20 MB each; PDF / Word / Excel / PowerPoint / Markdown / plain text / images allowed
 - [x] Document list with uploader, size, mime type; alert-dialog confirm before delete
 - [x] Manager-only (OWNER/ADMIN) upload and delete; any project member can list
+- [x] **Premium Document Preview Viewer** — high-fidelity, highly-responsive inline preview modal supporting PDFs (with dynamic ResizeObserver-driven auto-scaling), Markdown (rendered with ReactMarkdown + syntax highlighting), images, Office documents, and plain text files with smart padding and robust overflow scrollbars.
 
 **Notifications**
 - [x] Per-user toggles for welcome / password-reset / member-added / member-removed
@@ -383,9 +384,10 @@ src/
 - [x] English / Hindi / Gujarati locales for guest-facing pages with `i18next` + browser detector
 - [x] Language preference persisted to `localStorage`
 
-**Dashboard & Calendar**
+**Dashboard, Analytics & Calendar**
 - [x] **UserDashboard**: Custom stat counters (projects, tasks, overdue tasks), visual Recharts Pie Chart representing task status metrics, and an upcoming deadlines feed
 - [x] **UserCalendar**: Fully interactive calendar view mapping task deadlines onto a month grid with custom priority indicator dots, and list details sidebar displaying tasks for selected dates
+- [x] **Advanced Project Analytics**: Enrich the project analytics screen with comprehensive interactive graphs, including Task Completion Velocity line/area charts (tasks finished over time), Workload by Assignee bar charts, task distribution by status and priority, and historical completion metrics.
 
 **Infra / DX**
 - [x] **SEO & Metadata Optimization** — custom brand-focused title, description, keywords, Open Graph card metadata, Twitter card description, brand favicon integration, and mobile device theme-color support in `index.html`.
@@ -409,21 +411,26 @@ src/
 
 ### Near-term
 1. **Soft-Deletes & Project Archiving**: Transition from permanent project deletion to support archiving projects (soft delete) to hide inactive items while preserving history, requiring database status modifications and stored procedure updates.
-2. **Premium Document Preview Viewer**: Add a high-fidelity inline document preview modal for PDFs and common file types, allowing users to view resources directly inside the platform without downloading.
+2. **Task Checklists / Subtasks**: Enable users to create granular checklist sub-items within individual tasks, displaying an interactive progress bar showing completion percentages in the task details workspace.
+3. **In-App Live Notification Feed**: Implement an in-app notifications center (a header-mounted bell dropdown) with read/unread states, dynamically reporting real-time system events (comment additions, task assignment changes) without relying solely on emails.
+4. **Document Search, Filter & Bulk-download**: Enrich the project documents workspace with instant search, filtering by file extension/mimetype, and a bulk-download utility to package multiple select items into a single ZIP file.
 
 ### Mid-term
-3. **Interactive Analytics Dashboard**: Enrich the project analytics screen with comprehensive graphs, such as Task Completion Velocity line charts (tasks finished over time) and Workload by Assignee bar charts.
-4. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
-5. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
-6. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
+5. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
+6. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
+7. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
+8. **Task Dependencies & Sequencing**: Let users establish link relationships between tasks (e.g. "Task B blocks Task C", "Task A must finish before Task B starts"), with warning indicators in the board view when deadlines conflict.
+9. **Project Template Factory**: Allow system administrators to compile project blueprints (standardized boards, column milestones, boilerplate documents) and deploy new project structures instantly from pre-saved configurations.
 
 ### Long-term / nice-to-have
-6. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
-7. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
-8. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
-9. **Rate Limiting**: Add rate-limiting middleware (`express-rate-limit`) to prevent brute-force attacks on auth and password reset endpoints.
-10. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
-11. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
+10. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
+11. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
+12. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
+13. **Rate Limiting**: Add rate-limiting middleware (`express-rate-limit`) to prevent brute-force attacks on auth and password reset endpoints.
+14. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
+15. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
+16. **Interactive Timeline / Gantt View**: Create a full-screen dynamic Gantt chart visualization mapping project deadlines, task sequencing, and assignees over calendar milestones with drag-and-resize timeline bands.
+17. **Multi-Tenant Organizations & Workspaces**: Upgrade the platform hierarchy to support isolated organizations and distinct team spaces, enabling granular enterprise-grade tenant-level billing and control settings.
 
 ---
 

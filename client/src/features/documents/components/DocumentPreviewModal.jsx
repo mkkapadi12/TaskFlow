@@ -35,7 +35,7 @@ const DocumentPreviewModal = ({ doc, open, onClose }) => {
         <DialogHeader className="border-border/40 flex-row items-center justify-between border-b py-3 pr-12 pl-4">
           <div className="flex items-center gap-2">
             <DASHBOARD_ICONS.FILETEXT className="text-muted-foreground h-4 w-4" />
-            <DialogTitle className="max-w-35 sm:max-w-md truncate text-sm font-semibold">
+            <DialogTitle className="max-w-35 truncate text-sm font-semibold sm:max-w-md">
               {doc.name}
             </DialogTitle>
             <Badge className="px-1.5 text-[9px] uppercase">.{ext}</Badge>

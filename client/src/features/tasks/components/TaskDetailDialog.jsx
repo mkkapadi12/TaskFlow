@@ -140,30 +140,36 @@ const TaskDetailDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl p-0 overflow-hidden h-[90vh] md:h-162.5 flex flex-col bg-background border border-border/80">
-        
+      <DialogContent className="bg-background border-border/80 flex h-[90vh] flex-col overflow-hidden border p-0 sm:max-w-4xl md:h-162.5">
         {/* Top Header */}
-        <DialogHeader className="border-b border-border/40 px-6 py-4 flex flex-row items-center justify-between gap-4">
+        <DialogHeader className="border-border/40 flex flex-row items-center justify-between gap-4 border-b px-6 py-4">
           <DialogTitle className="flex items-center gap-2">
-            <span className="text-muted-foreground font-normal text-xs uppercase tracking-wider">
+            <span className="text-muted-foreground text-xs font-normal tracking-wider uppercase">
               {isManager ? 'Edit Task' : 'Task Detail'}
             </span>
             <span className="text-muted-foreground/30">/</span>
-            <Badge variant="outline" className="text-[10px] uppercase font-semibold bg-muted/30 border-border/50">
+            <Badge
+              variant="outline"
+              className="bg-muted/30 border-border/50 text-[10px] font-semibold uppercase"
+            >
               {task.status?.replace('_', ' ')}
             </Badge>
           </DialogTitle>
         </DialogHeader>
 
         {/* Content Body Layout */}
-        <form onSubmit={handleSubmit(onSaveFields)} className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
-          
+        <form
+          onSubmit={handleSubmit(onSaveFields)}
+          className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row"
+        >
           {/* Left Main Content Pane */}
-          <div className="flex-1 flex flex-col p-6 min-h-0 overflow-y-auto space-y-6">
-            
+          <div className="flex min-h-0 flex-1 flex-col space-y-6 overflow-y-auto p-6">
             {/* Title Block */}
             <div className="space-y-1.5">
-              <Label htmlFor="title" className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+              <Label
+                htmlFor="title"
+                className="text-muted-foreground text-xs font-semibold tracking-wider uppercase"
+              >
                 Title
               </Label>
               <Input
@@ -171,16 +177,19 @@ const TaskDetailDialog = ({
                 {...register('title', { required: true })}
                 disabled={!isManager}
                 placeholder="Task title..."
-                className="text-lg font-semibold tracking-tight border-none px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/40 bg-transparent disabled:opacity-100 disabled:cursor-not-allowed"
+                className="placeholder:text-muted-foreground/40 border-none bg-transparent px-0 text-lg font-semibold tracking-tight shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-100"
               />
               {errors.title && (
-                <p className="text-xs text-destructive">Title is required</p>
+                <p className="text-destructive text-xs">Title is required</p>
               )}
             </div>
 
             {/* Description Block */}
             <div className="space-y-1.5">
-              <Label htmlFor="description" className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+              <Label
+                htmlFor="description"
+                className="text-muted-foreground text-xs font-semibold tracking-wider uppercase"
+              >
                 Description
               </Label>
               <Textarea
@@ -188,15 +197,15 @@ const TaskDetailDialog = ({
                 {...register('description')}
                 disabled={!isManager}
                 placeholder="No description provided..."
-                className="text-sm border-none px-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 min-h-25 resize-none placeholder:text-muted-foreground/30 bg-transparent disabled:opacity-100 disabled:cursor-not-allowed"
+                className="placeholder:text-muted-foreground/30 min-h-25 resize-none border-none bg-transparent px-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-100"
               />
             </div>
 
             {/* Divider */}
-            <div className="border-t border-border/40 my-2" />
+            <div className="border-border/40 my-2 border-t" />
 
             {/* Activity / Comments Block */}
-            <div className="flex-1 min-h-0">
+            <div className="min-h-0 flex-1">
               <TaskComments
                 taskId={task.id}
                 taskStatus={task.status}
@@ -204,21 +213,19 @@ const TaskDetailDialog = ({
                 projectRole={projectRole}
               />
             </div>
-
           </div>
 
           {/* Right Inspector Sidebar Pane */}
-          <div className="w-full md:w-80 border-t md:border-t-0 md:border-l border-border/40 bg-muted/4 flex flex-col justify-between p-6 gap-6 min-h-0 overflow-y-auto">
-            
+          <div className="border-border/40 bg-muted/4 flex min-h-0 w-full flex-col justify-between gap-6 overflow-y-auto border-t p-6 md:w-80 md:border-t-0 md:border-l">
             <div className="space-y-5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground/80 mb-2">
+              <h4 className="text-muted-foreground/80 mb-2 text-xs font-bold tracking-wider uppercase">
                 Attributes
               </h4>
 
               {/* Status Section */}
               {canChangeStatus && task.status !== 'DONE' && (
                 <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  <div className="text-muted-foreground flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
                     <StatusIcon className="h-3.5 w-3.5" />
                     <span>Status</span>
                   </div>
@@ -231,7 +238,7 @@ const TaskDetailDialog = ({
                     onValueChange={handleStatusChange}
                     disabled={isStatusUpdating}
                   >
-                    <SelectTrigger className="w-full h-9 bg-background/50 border-border/60 hover:bg-background/80 transition-colors">
+                    <SelectTrigger className="bg-background/50 border-border/60 hover:bg-background/80 h-9 w-full transition-colors">
                       <SelectValue placeholder="Move task" />
                     </SelectTrigger>
                     <SelectContent>
@@ -243,8 +250,9 @@ const TaskDetailDialog = ({
                     </SelectContent>
                   </Select>
                   {isAssignee && !isManager && (
-                    <p className="text-[10px] text-muted-foreground/80 italic leading-snug">
-                      Move to "In Review" when you're ready for owner verification.
+                    <p className="text-muted-foreground/80 text-[10px] leading-snug italic">
+                      Move to "In Review" when you're ready for owner
+                      verification.
                     </p>
                   )}
                 </div>
@@ -252,7 +260,7 @@ const TaskDetailDialog = ({
 
               {/* Assignee Section */}
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <div className="text-muted-foreground flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
                   <UserIcon className="h-3.5 w-3.5" />
                   <span>Assignee</span>
                 </div>
@@ -265,7 +273,10 @@ const TaskDetailDialog = ({
                       value={field.value}
                       disabled={!isManager}
                     >
-                      <SelectTrigger id="assigneeId" className="w-full h-9 bg-background/50 border-border/60 hover:bg-background/80 transition-colors">
+                      <SelectTrigger
+                        id="assigneeId"
+                        className="bg-background/50 border-border/60 hover:bg-background/80 h-9 w-full transition-colors"
+                      >
                         <SelectValue placeholder="Unassigned" />
                       </SelectTrigger>
                       <SelectContent>
@@ -285,7 +296,7 @@ const TaskDetailDialog = ({
 
               {/* Priority Section */}
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <div className="text-muted-foreground flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
                   <PriorityIcon className="h-3.5 w-3.5" />
                   <span>Priority</span>
                 </div>
@@ -298,7 +309,10 @@ const TaskDetailDialog = ({
                       value={field.value}
                       disabled={!isManager}
                     >
-                      <SelectTrigger id="priority" className="w-full h-9 bg-background/50 border-border/60 hover:bg-background/80 transition-colors">
+                      <SelectTrigger
+                        id="priority"
+                        className="bg-background/50 border-border/60 hover:bg-background/80 h-9 w-full transition-colors"
+                      >
                         <SelectValue placeholder="Select priority" />
                       </SelectTrigger>
                       <SelectContent>
@@ -314,7 +328,7 @@ const TaskDetailDialog = ({
 
               {/* Deadline Section */}
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <div className="text-muted-foreground flex items-center gap-2 text-xs font-semibold tracking-wider uppercase">
                   <CalendarIcon className="h-3.5 w-3.5" />
                   <span>Deadline</span>
                 </div>
@@ -329,10 +343,10 @@ const TaskDetailDialog = ({
                       'Deadline cannot be in the past',
                   })}
                   disabled={!isManager}
-                  className="w-full h-9 bg-background/50 border-border/60 hover:bg-background/80 transition-colors cursor-pointer"
+                  className="bg-background/50 border-border/60 hover:bg-background/80 h-9 w-full cursor-pointer transition-colors"
                 />
                 {errors.deadline && (
-                  <p className="text-[10px] text-destructive">
+                  <p className="text-destructive text-[10px]">
                     {errors.deadline.message}
                   </p>
                 )}
@@ -340,8 +354,8 @@ const TaskDetailDialog = ({
 
               {/* Owner Verification Section */}
               {canVerify && (
-                <div className="pt-4 border-t border-border/40 space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                <div className="border-border/40 space-y-2 border-t pt-4">
+                  <div className="text-muted-foreground flex items-center gap-2 text-xs font-bold tracking-wider uppercase">
                     <span>Owner Verification</span>
                   </div>
                   <div className="flex gap-2">
@@ -349,7 +363,7 @@ const TaskDetailDialog = ({
                       type="button"
                       onClick={() => handleVerify(true)}
                       disabled={isVerifying}
-                      className="flex-1 text-xs h-9 bg-primary hover:bg-primary/95 text-primary-foreground font-semibold rounded-lg shadow-sm"
+                      className="bg-primary hover:bg-primary/95 text-primary-foreground h-9 flex-1 rounded-lg text-xs font-semibold shadow-sm"
                     >
                       {isVerifying ? 'Saving...' : 'Approve & Close'}
                     </Button>
@@ -358,39 +372,36 @@ const TaskDetailDialog = ({
                       variant="outline"
                       onClick={() => handleVerify(false)}
                       disabled={isVerifying}
-                      className="flex-1 text-xs h-9 border-border/60 hover:bg-accent font-semibold rounded-lg"
+                      className="border-border/60 hover:bg-accent h-9 flex-1 rounded-lg text-xs font-semibold"
                     >
                       Send back
                     </Button>
                   </div>
                 </div>
               )}
-
             </div>
 
             {/* Save Changes / Cancel buttons */}
             {isManager && (
-              <div className="pt-4 border-t border-border/40 flex items-center gap-2 mt-auto">
+              <div className="border-border/40 mt-auto flex items-center gap-2 border-t pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  className="flex-1 text-xs h-9 border-border/60 hover:bg-accent font-semibold rounded-lg"
+                  className="border-border/60 hover:bg-accent h-9 flex-1 rounded-lg text-xs font-semibold"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={isUpdating}
-                  className="flex-1 text-xs h-9 bg-primary text-primary-foreground font-semibold rounded-lg shadow-sm"
+                  className="bg-primary text-primary-foreground h-9 flex-1 rounded-lg text-xs font-semibold shadow-sm"
                 >
                   {isUpdating ? 'Saving...' : 'Save'}
                 </Button>
               </div>
             )}
-
           </div>
-
         </form>
       </DialogContent>
     </Dialog>

@@ -13,7 +13,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 const PDFViewer = ({ url }) => {
   const [numPages, setNumPages] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(() => {
     if (typeof window !== 'undefined') {

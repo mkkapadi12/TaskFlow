@@ -26,9 +26,9 @@ const TextViewer = ({ url }) => {
 
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center text-muted-foreground text-sm p-6">
+      <div className="text-muted-foreground flex h-full items-center justify-center p-6 text-sm">
         <div className="flex flex-col items-center gap-2">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <div className="border-primary h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
           <p>Loading file content...</p>
         </div>
       </div>
@@ -37,16 +37,16 @@ const TextViewer = ({ url }) => {
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center text-destructive text-sm p-6">
+      <div className="text-destructive flex h-full items-center justify-center p-6 text-sm">
         <p>{error}</p>
       </div>
     );
   }
 
   return (
-    <ScrollArea className="h-full bg-muted/5">
-      <div className="p-3 sm:p-6 max-w-4xl mx-auto">
-        <pre className="whitespace-pre-wrap font-mono text-[10px] sm:text-xs p-3 sm:p-4 bg-muted/40 border border-border/40 rounded-lg text-foreground leading-relaxed">
+    <ScrollArea className="bg-muted/5 h-full">
+      <div className="mx-auto max-w-4xl p-3 sm:p-6">
+        <pre className="bg-muted/40 border-border/40 text-foreground rounded-lg border p-3 font-mono text-[10px] leading-relaxed whitespace-pre-wrap sm:p-4 sm:text-xs">
           {content}
         </pre>
       </div>

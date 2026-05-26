@@ -84,7 +84,9 @@ const ProjectFilters = ({
                     {opt.value !== 'ALL' && (
                       <span
                         className={`inline-block h-2 w-2 rounded-full border ${
-                          opt.value === 'ACTIVE' ? 'bg-emerald-500 border-emerald-500/20' : 'bg-gray-500 border-gray-500/20'
+                          opt.value === 'ACTIVE'
+                            ? 'border-emerald-500/20 bg-emerald-500'
+                            : 'border-gray-500/20 bg-gray-500'
                         }`}
                       />
                     )}

@@ -36,7 +36,9 @@ const Projects = () => {
         const matchesSearch =
           project.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (project.description &&
-            project.description.toLowerCase().includes(searchQuery.toLowerCase()));
+            project.description
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()));
         return matchesStatus && matchesSearch;
       })
     : [];

@@ -66,92 +66,100 @@ const DocumentList = ({ projectId, isManager }) => {
   return (
     <>
       <ul className="divide-border/50 divide-y">
-      {docs.map((doc) => {
-        const ext = getExt(doc.name);
-        return (
-          <li
-            key={doc.id}
-            className="flex flex-col gap-2.5 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
-          >
-            <div className="flex items-center gap-3 min-w-0 flex-1">
-              <DASHBOARD_ICONS.FILETEXT className="text-muted-foreground h-5 w-5 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 justify-between sm:justify-start">
-                  <p className="truncate text-sm font-semibold pr-2">{doc.name}</p>
-                  <Badge
-                    className={`${EXT_COLORS[ext] || 'bg-muted text-muted-foreground'} lowercase border-transparent text-[9px] px-2 py-0.5 font-semibold shrink-0 rounded-full`}
-                  >
-                    .{ext}
-                  </Badge>
+        {docs.map((doc) => {
+          const ext = getExt(doc.name);
+          return (
+            <li
+              key={doc.id}
+              className="flex flex-col gap-2.5 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <DASHBOARD_ICONS.FILETEXT className="text-muted-foreground h-5 w-5 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1.5 sm:justify-start">
+                    <p className="truncate pr-2 text-sm font-semibold">
+                      {doc.name}
+                    </p>
+                    <Badge
+                      className={`${EXT_COLORS[ext] || 'bg-muted text-muted-foreground'} shrink-0 rounded-full border-transparent px-2 py-0.5 text-[9px] font-semibold lowercase`}
+                    >
+                      .{ext}
+                    </Badge>
+                  </div>
+                  <p className="text-muted-foreground mt-0.5 hidden truncate text-[11px] sm:block">
+                    {formatBytes(doc.size)} · by {doc.uploaderName} ·{' '}
+                    {new Date(doc.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
-                <p className="text-muted-foreground text-[11px] mt-0.5 truncate hidden sm:block">
-                  {formatBytes(doc.size)} · by {doc.uploaderName?.split(' ')[0]} ·{' '}
-                  {new Date(doc.createdAt).toLocaleDateString()}
-                </p>
               </div>
-            </div>
 
-            <div className="flex items-center justify-between gap-2 border-t border-border/5 pt-2 sm:border-t-0 sm:pt-0 sm:justify-end shrink-0 w-full sm:w-auto">
-              <span className="sm:hidden text-xs text-muted-foreground font-medium">
-                {formatBytes(doc.size)} · {doc.uploaderName?.split(' ')[0]}
-              </span>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                  onClick={() => setPreviewDoc(doc)}
-                  aria-label={`Preview ${doc.name}`}
-                >
-                  <DASHBOARD_ICONS.EYE className="h-4 w-4" />
-                </Button>
-
-                <a href={doc.url} target="_blank" rel="noopener noreferrer"  className="shrink-0" >
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <DASHBOARD_ICONS.DOWNLOAD className="h-4 w-4" />
-                  </Button>
-                </a>
-
-                {isManager && (
+              <div className="border-border/5 flex w-full shrink-0 items-center justify-between gap-2 border-t pt-2 sm:w-auto sm:justify-end sm:border-t-0 sm:pt-0">
+                <span className="text-muted-foreground text-xs font-medium sm:hidden">
+                  {formatBytes(doc.size)} · {doc.uploaderName}
+                </span>
+                <div className="flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={async () => {
-                      const isConfirmed = await confirm({
-                        title: 'Delete document?',
-                        description: (
-                          <span>
-                            <span className="text-foreground font-medium">
-                              {doc.name}
-                            </span>{' '}
-                            will be permanently deleted and cannot be recovered.
-                          </span>
-                        ),
-                        confirmText: 'Delete',
-                        cancelText: 'Cancel',
-                        media: (
-                          <DASHBOARD_ICONS.TRASH2 className="text-destructive h-6 w-6" />
-                        ),
-                        mediaClassName: 'bg-destructive/10 text-destructive',
-                        variant: 'destructive',
-                      });
-                      if (isConfirmed) {
-                        handleDelete(doc.id);
-                      }
-                    }}
-                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0 shrink-0"
-                    aria-label={`Delete ${doc.name}`}
+                    className="text-muted-foreground hover:text-primary hover:bg-primary/10 h-8 w-8 p-0 transition-colors"
+                    onClick={() => setPreviewDoc(doc)}
+                    aria-label={`Preview ${doc.name}`}
                   >
-                    <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
+                    <DASHBOARD_ICONS.EYE className="h-4 w-4" />
                   </Button>
-                )}
+
+                  <a
+                    href={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0"
+                  >
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <DASHBOARD_ICONS.DOWNLOAD className="h-4 w-4" />
+                    </Button>
+                  </a>
+
+                  {isManager && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        const isConfirmed = await confirm({
+                          title: 'Delete document?',
+                          description: (
+                            <span>
+                              <span className="text-foreground font-medium">
+                                {doc.name}
+                              </span>{' '}
+                              will be permanently deleted and cannot be
+                              recovered.
+                            </span>
+                          ),
+                          confirmText: 'Delete',
+                          cancelText: 'Cancel',
+                          media: (
+                            <DASHBOARD_ICONS.TRASH2 className="text-destructive h-6 w-6" />
+                          ),
+                          mediaClassName: 'bg-destructive/10 text-destructive',
+                          variant: 'destructive',
+                        });
+                        if (isConfirmed) {
+                          handleDelete(doc.id);
+                        }
+                      }}
+                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 shrink-0 p-0"
+                      aria-label={`Delete ${doc.name}`}
+                    >
+                      <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
-      
+            </li>
+          );
+        })}
+      </ul>
+
       <DocumentPreviewModal
         doc={previewDoc}
         open={!!previewDoc}
