@@ -17,8 +17,8 @@ TaskFlow is a productivity workspace where users can:
 - Create, assign, prioritize, and track tasks within projects
 - Upload and manage project documents (PDF, Office, images, plain text) up to 20 MB
 - View overdue tasks and personal task lists across all projects
-- Receive welcome / password-reset / member-added / member-removed emails via SMTP,
-  gated by per-user notification preferences
+- Receive welcome / password-reset / member-added / member-removed / deadline-reminder emails via SMTP,
+  gated by per-user notification preferences and project settings
 - Use the guest pages in English, Hindi, or Gujarati (i18next)
 
 The project is split into two cleanly separated apps:
@@ -79,9 +79,9 @@ Defined in `server/database/create.sql`. Tables:
 | Table                   | Purpose                                                              |
 |-------------------------|----------------------------------------------------------------------|
 | `users`                 | Accounts. Fields: `id`, `name`, `email` (unique), `password`, `role` (`USER` / `ADMIN`), `avatar`, `publicId` (Cloudinary), `phone`, timestamps. |
-| `projects`              | Projects owned by a user. Fields: `id`, `title`, `description`, `ownerId` → users, `status` (`ACTIVE` / `INACTIVE`). |
+| `projects`              | Projects owned by a user. Fields: `id`, `title`, `description`, `ownerId` → users, `status` (`ACTIVE` / `INACTIVE`), `allowReminders` (`TINYINT(1)`, default 1). |
 | `project_members`       | Join table: which users belong to which projects with role `OWNER` / `ADMIN` / `MEMBER`. Unique `(projectId, userId)`. |
-| `tasks`                 | Tasks scoped to a project. Fields: `id`, `title`, `description`, `status` (`TODO`/`IN_PROGRESS`/`IN_REVIEW`/`DONE`), `priority` (`LOW`/`MEDIUM`/`HIGH`/`URGENT`), `deadline`, `projectId`, `assigneeId`, `creatorId`. |
+| `tasks`                 | Tasks scoped to a project. Fields: `id`, `title`, `description`, `status` (`TODO`/`IN_PROGRESS`/`IN_REVIEW`/`DONE`), `priority` (`LOW`/`MEDIUM`/`HIGH`/`URGENT`), `deadline`, `projectId`, `assigneeId`, `creatorId`, `reminderSent` (`TINYINT(1)`, default 0). |
 | `notification_settings` | Per-user email preference toggles. Fields: `userId` (unique), `welcome`, `passwordReset`, `memberAdded`, `memberRemoved` (all `TINYINT(1)`, default 1). |
 | `project_documents`     | Per-project file metadata. Fields: `id`, `projectId`, `uploadedBy`, `name`, `url`, `publicId`, `size`, `mimeType`, `createdAt`. Actual files live on Cloudinary. |
 | `task_comments`         | Task comments and activity logs. Fields: `id`, `taskId`, `userId`, `content`, `type` (`COMMENT`/`ACTIVITY`), `createdAt`. |
@@ -90,7 +90,7 @@ All data access is funneled through **stored procedures** (called from `server/s
 
 - `database/users.sql` — `sp_CreateUser`, `sp_GetUserById`, `sp_GetUserByEmail`, `sp_GetAllUsers`, `sp_UpdateUser`, `sp_DeleteUser`, `sp_SearchUser`, `sp_GetUserCount`, `sp_GetUsersByRole`, `sp_CheckUserExists`, `sp_UpdatePassword`, `sp_ChangePassword`
 - `database/project.sql` — `sp_CreateProject`, `sp_GetAllProjects`, `sp_GetProjectsByOwner`, `sp_GetProjectsByMember`, `sp_GetProjectById`, `sp_UpdateProject`, `sp_DeleteProject`, `sp_AddProjectMember`, `sp_GetProjectMembers`, `sp_UpdateMemberRole`, `sp_RemoveProjectMember`, `sp_GetMemberRole`, `sp_GetFullProjectDetails`
-- `database/tasks.sql` — `sp_CreateTask`, `sp_GetTasksByProject`, `sp_GetTasksByAssignee`, `sp_GetTaskById`, `sp_UpdateTask`, `sp_DeleteTask`, `sp_GetOverdueTasks`, `sp_VerifyTask` (owner-only `IN_REVIEW` → `DONE` / `IN_PROGRESS` transition, SIGNALs 45000 if precondition fails)
+- `database/tasks.sql` — `sp_CreateTask`, `sp_GetTasksByProject`, `sp_GetTasksByAssignee`, `sp_GetTaskById`, `sp_UpdateTask`, `sp_DeleteTask`, `sp_GetOverdueTasks`, `sp_VerifyTask` (owner-only `IN_REVIEW` → `DONE` / `IN_PROGRESS` transition, SIGNALs 45000 if precondition fails), `sp_GetUpcomingTaskReminders`, `sp_MarkTaskReminderSent`
 - `database/notification.sql` — `sp_GetNotificationSettings` (returns a virtual default row when no record exists yet), `sp_UpdateNotificationSettings` (upsert)
 - `database/project_docs.sql` — `sp_CreateProjectDocument`, `sp_GetProjectDocuments`, `sp_GetProjectDocumentById`, `sp_DeleteProjectDocument`
 - `database/task_comments.sql` — `sp_CreateTaskComment`, `sp_GetTaskComments`, `sp_DeleteTaskComment`, `sp_GetTaskCommentById`, `sp_CreateTaskActivity` (convenience activity logging)
@@ -127,9 +127,10 @@ src/
 ├── docs/                      → JSDoc-style Swagger annotations per domain
 ├── services/
 │   ├── email.service.js       → sendWelcomeEmail, sendPasswordResetEmail,
-│   │                            sendProjectMemberAddedEmail, sendProjectMemberRemovedEmail
+│   │                            sendProjectMemberAddedEmail, sendProjectMemberRemovedEmail, sendDeadlineReminderEmail
 │   │                            (each gated by getNotificationSettings)
-│   └── notification.service.js → getNotificationSettings / updateNotificationSettings
+│   ├── notification.service.js → getNotificationSettings / updateNotificationSettings
+│   └── reminder.service.js    → checkAndSendReminders, initReminderService (hourly cron)
 ├── templates/emails/          → welcome.js, passwordReset.js, addMember.js, removeMember.js
 └── utils/                     → sendEmail, uploadToCloudinary (image + raw doc), requireRole
 ```
@@ -363,6 +364,7 @@ src/
 - [x] **Kanban board** on the project detail page — group tasks by status, drag/drop status changes (still subject to the verify rules: assignee may not drop into `DONE`)
 - [x] **Task comments & activity log** — threaded discussion and automated system action logging (deadline/assignee changes, etc.) per task
 - [x] **Task Deletion** — conditional task deletion (owner/admin only) next to status badges in ProjectDetails, integrated with `useDeleteTaskMutation` and `useAlertDialog` confirmation hook
+- [x] **Advanced Task Filters** — dynamic task filtering in "My Tasks" page supporting Search, Status, Priority, and custom start/end deadline ranges with interactive active filter badges.
 
 
 **Documents**
@@ -375,6 +377,7 @@ src/
 - [x] Per-user toggles for welcome / password-reset / member-added / member-removed
 - [x] SP returns a virtual default row (all enabled) if the user has never saved settings — no FK insert side-effects
 - [x] Partial PATCH semantics (`null` fields preserve existing values)
+- [x] **Task Deadline Reminders**: Hourly background service checking soon-to-be-overdue tasks with SMTP emails, custom transactional template, self-healing DB schema/procedure compilation migrations on server start, and owner-controlled reminders setting.
 
 **Internationalization**
 - [x] English / Hindi / Gujarati locales for guest-facing pages with `i18next` + browser detector
@@ -404,13 +407,14 @@ src/
 ## 7. Future / Planned Implementation
 
 ### Near-term
-1. **Advanced Task Filters**: Extend task filtering on the project details page and "My Tasks" dashboard to support filtering by Priority, Assignee, and Deadline ranges.
+1. **Soft-Deletes & Project Archiving**: Transition from permanent project deletion to support archiving projects (soft delete) to hide inactive items while preserving history, requiring database status modifications and stored procedure updates.
+2. **Premium Document Preview Viewer**: Add a high-fidelity inline document preview modal for PDFs and common file types, allowing users to view resources directly inside the platform without downloading.
 
 ### Mid-term
-2. **Deadline Reminder Emails**: Systematically notify assignees via SMTP before their tasks become overdue (extending `email.service.js`).
-3. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
-4. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
-5. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
+3. **Interactive Analytics Dashboard**: Enrich the project analytics screen with comprehensive graphs, such as Task Completion Velocity line charts (tasks finished over time) and Workload by Assignee bar charts.
+4. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
+5. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
+6. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
 
 ### Long-term / nice-to-have
 6. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.

@@ -87,7 +87,9 @@ The task status machine is enforced in the model layer and in `sp_VerifyTask`:
 
 ### Server: emails and notifications
 
-Email delivery is in `services/email.service.js` (SMTP via Nodemailer; HTML in `templates/emails/`). In-app notification settings live in `services/notification.service.js` and `database/notification.sql`. Respect the per-user `notification_settings` toggles before sending any email triggered by a user-facing event.
+- Email delivery is in `services/email.service.js` (SMTP via Nodemailer; HTML in `templates/emails/`). In-app notification settings live in `services/notification.service.js` and `database/notification.sql`. Respect the per-user `notification_settings` toggles before sending any email triggered by a user-facing event.
+- **Deadline Reminder Emails**: Scheduled as an hourly background service booted inside `index.js` (`reminder.service.js`). It automatically checks for uncompleted tasks due within 24 hours (`sp_GetUpcomingTaskReminders`) and sends alert emails using a custom template.
+- **Project-Level Reminders Control**: Project owners can pause/resume reminders via the `allowReminders` field in `projects` (persisted as `TINYINT(1)` via `sp_UpdateProject`). This is configured in the responsive **Settings** tab in the client project details view.
 
 ### Client: RTK Query endpoint injection
 
