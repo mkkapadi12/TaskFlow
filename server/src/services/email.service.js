@@ -1,5 +1,6 @@
 import env from '../config/env.js';
 import { addMemberTemplate } from '../templates/emails/addMember.js';
+import { deadlineReminderTemplate } from '../templates/emails/deadlineReminder.js';
 import { passwordResetTemplate } from '../templates/emails/passwordReset.js';
 import { removeMemberTemplate } from '../templates/emails/removeMember.js';
 import { welcomeTemplate } from '../templates/emails/welcome.js';
@@ -67,6 +68,27 @@ export const sendProjectMemberRemovedEmail = async ({
     projectTitle,
     ownerName,
     reason,
+  });
+  await sendEmail({ to: memberEmail, subject, html });
+};
+
+export const sendDeadlineReminderEmail = async ({
+  memberName,
+  memberEmail,
+  taskTitle,
+  projectTitle,
+  deadline,
+  remainingLabel,
+  projectId,
+}) => {
+  const taskUrl = `${env.client.url}/projects/${projectId}`;
+  const { subject, html } = deadlineReminderTemplate({
+    memberName,
+    taskTitle,
+    projectTitle,
+    deadline,
+    remainingLabel,
+    taskUrl,
   });
   await sendEmail({ to: memberEmail, subject, html });
 };

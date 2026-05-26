@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import DocumentList from '@/features/documents/components/DocumentList';
 import DocumentUploader from '@/features/documents/components/DocumentUploader';
 import AddMemberDialog from '@/features/project/components/AddMemberDialog';
@@ -134,8 +135,6 @@ const ProjectDetails = () => {
   }));
   const selectedTask = tasksWithProjectId.find((t) => t.id === selectedTaskId);
 
-  console.log(project);
-
   const handleSaveProject = async (payload) => {
     try {
       const result = await updateProject({ projectId, ...payload }).unwrap();
@@ -206,8 +205,11 @@ const ProjectDetails = () => {
             Back to Projects
           </Button>
         </Link>
-        <div className="flex w-full items-center gap-2 justify-between sm:w-auto sm:justify-end">
-          <Link to={`/projects/${projectId}/analytics`} className="flex-1 sm:flex-none">
+        <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+          <Link
+            to={`/projects/${projectId}/analytics`}
+            className="flex-1 sm:flex-none"
+          >
             <Button
               variant="outline"
               className="border-border/50 hover:bg-muted/50 h-10 w-full rounded-full sm:w-auto"
@@ -219,7 +221,7 @@ const ProjectDetails = () => {
           {isOwner && (
             <Button
               onClick={() => setIsEditOpen(true)}
-              className="shadow-primary/20 hover:shadow-primary/25 h-10 w-full flex-1 rounded-full shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl sm:flex-none sm:w-auto"
+              className="shadow-primary/20 hover:shadow-primary/25 h-10 w-full flex-1 rounded-full shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl sm:w-auto sm:flex-none"
             >
               <DASHBOARD_ICONS.PENCIL className="mr-2 h-4 w-4" />
               Edit Project
@@ -245,6 +247,24 @@ const ProjectDetails = () => {
                 >
                   {(project.status || '—').replace('_', ' ')}
                 </Badge>
+                {project.allowReminders === 1 ||
+                project.allowReminders === true ? (
+                  <Badge
+                    variant="outline"
+                    className="flex shrink-0 items-center gap-1 border-sky-500/30 bg-sky-500/10 text-sky-600"
+                  >
+                    <DASHBOARD_ICONS.CLOCK className="h-3 w-3" />
+                    Reminders Active
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="bg-muted text-muted-foreground border-muted-foreground/30 flex shrink-0 items-center gap-1"
+                  >
+                    <DASHBOARD_ICONS.CLOSE className="h-3 w-3" />
+                    Reminders Muted
+                  </Badge>
+                )}
               </div>
               <CardDescription className="text-base">
                 {project.description || 'No description provided.'}
@@ -328,17 +348,23 @@ const ProjectDetails = () => {
       </div>
 
       {/* Unified Tab Switcher */}
-      <div className="bg-card/30 border-border/40 flex max-w-md rounded-xl border p-1 backdrop-blur-md sm:max-w-lg">
+      <div
+        className={cn(
+          'bg-card/30 border-border/40 flex w-full flex-nowrap overflow-x-auto rounded-xl border p-1 backdrop-blur-md',
+          isManager ? 'max-w-xl' : 'max-w-lg'
+        )}
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
         <button
           onClick={() => setActiveTab('tasks')}
           className={cn(
-            'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-all sm:text-sm',
+            'flex min-w-[100px] flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
             activeTab === 'tasks'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          <DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4" />
+          <DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4 shrink-0" />
           Tasks
           <Badge
             variant="secondary"
@@ -350,13 +376,13 @@ const ProjectDetails = () => {
         <button
           onClick={() => setActiveTab('members')}
           className={cn(
-            'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-all sm:text-sm',
+            'flex min-w-[110px] flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
             activeTab === 'members'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          <DASHBOARD_ICONS.USERS className="h-4 w-4" />
+          <DASHBOARD_ICONS.USERS className="h-4 w-4 shrink-0" />
           Members
           <Badge
             variant="secondary"
@@ -368,15 +394,29 @@ const ProjectDetails = () => {
         <button
           onClick={() => setActiveTab('documents')}
           className={cn(
-            'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-all sm:text-sm',
+            'flex min-w-[110px] flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
             activeTab === 'documents'
               ? 'bg-background text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          <DASHBOARD_ICONS.FILETEXT className="h-4 w-4" />
+          <DASHBOARD_ICONS.FILETEXT className="h-4 w-4 shrink-0" />
           Documents
         </button>
+        {isManager && (
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={cn(
+              'flex min-w-[100px] flex-1 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all sm:min-w-0 sm:text-sm',
+              activeTab === 'settings'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
+          >
+            <DASHBOARD_ICONS.SETTINGS className="h-4 w-4 shrink-0" />
+            Settings
+          </button>
+        )}
       </div>
 
       {/* Members */}
@@ -741,6 +781,66 @@ const ProjectDetails = () => {
           <DocumentList projectId={projectId} isManager={isManager} />
         </CardContent>
       </Card>
+
+      {/* settings */}
+      {isManager && (
+        <Card
+          className={cn(
+            'border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-200',
+            activeTab === 'settings'
+              ? 'animate-in fade-in block duration-200'
+              : 'hidden'
+          )}
+        >
+          <CardHeader>
+            <div>
+              <CardTitle className="text-xl">Project Settings</CardTitle>
+              <CardDescription>
+                Configure project settings and preferences.
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="border-border/50 bg-background/30 flex items-center justify-between rounded-xl border p-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <DASHBOARD_ICONS.CLOCK className="h-4 w-4 text-sky-500" />
+                  Task Deadline Reminders
+                </div>
+                <div className="text-muted-foreground text-xs">
+                  Send automatic email notifications to assignees 24 hours
+                  before tasks become overdue.
+                </div>
+              </div>
+              <Switch
+                id="tab-reminders"
+                checked={
+                  project.allowReminders === 1 ||
+                  project.allowReminders === true
+                }
+                disabled={isUpdatingProject}
+                onCheckedChange={async (checked) => {
+                  try {
+                    await updateProject({
+                      projectId,
+                      allowReminders: checked ? 1 : 0,
+                    }).unwrap();
+                    toast.success(
+                      checked
+                        ? 'Deadline reminders enabled'
+                        : 'Deadline reminders muted'
+                    );
+                  } catch (err) {
+                    toast.error(
+                      err?.message || 'Failed to update reminder settings'
+                    );
+                  }
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <EditProjectDialog
         open={isEditOpen}

@@ -144,6 +144,7 @@ BEGIN
         priority    = IFNULL(p_priority,    priority),
         deadline    = IF(p_deadline IS NOT NULL, p_deadline, deadline),
         assigneeId  = IF(p_assigneeId IS NOT NULL, p_assigneeId, assigneeId),
+        reminderSent = IF(p_deadline IS NOT NULL AND p_deadline <> deadline, 0, reminderSent),
         updatedAt   = NOW()
     WHERE id = p_id;
 
@@ -232,6 +233,39 @@ BEGIN
     JOIN      users    c ON c.id = t.creatorId
     JOIN      projects p ON p.id = t.projectId
     WHERE t.id = p_id;
+END //
+
+
+-- ── 9. Get Upcoming Task Reminders ───────────────────────────
+DROP PROCEDURE IF EXISTS sp_GetUpcomingTaskReminders //
+CREATE PROCEDURE sp_GetUpcomingTaskReminders()
+BEGIN
+    SELECT
+        t.id, t.title, t.deadline, t.priority, t.projectId,
+        u.name  AS assigneeName,
+        u.email AS assigneeEmail,
+        u.id    AS assigneeId,
+        p.title AS projectTitle
+    FROM tasks t
+    JOIN users u ON u.id = t.assigneeId
+    JOIN projects p ON p.id = t.projectId
+    WHERE t.status <> 'DONE'
+      AND t.deadline > NOW()
+      AND t.deadline <= DATE_ADD(NOW(), INTERVAL 24 HOUR)
+      AND t.reminderSent = 0
+      AND p.allowReminders = 1;
+END //
+
+
+-- ── 10. Mark Task Reminder Sent ──────────────────────────────
+DROP PROCEDURE IF EXISTS sp_MarkTaskReminderSent //
+CREATE PROCEDURE sp_MarkTaskReminderSent(
+    IN p_taskId INT
+)
+BEGIN
+    UPDATE tasks
+    SET reminderSent = 1
+    WHERE id = p_taskId;
 END //
 
 

@@ -3,6 +3,7 @@ import 'dotenv/config';
 import app from './src/app.js';
 import pool from './src/config/db.js';
 import env from './src/config/env.js';
+import { initReminderService } from './src/services/reminder.service.js';
 
 async function startServer() {
   const server = app.listen(env.server.port, () => {
@@ -12,6 +13,7 @@ async function startServer() {
   });
 
   await pool.getConnection();
+  await initReminderService();
 
   process.on('SIGINT', () => {
     server.close(() => {

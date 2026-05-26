@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 --  STORED PROCEDURES  â€“  projects & project_members
 -- ============================================================
 
@@ -91,7 +91,7 @@ CREATE PROCEDURE sp_GetProjectById(
 )
 BEGIN
     SELECT
-        p.id, p.title, p.description, p.ownerId, p.status, p.createdAt, p.updatedAt,
+        p.id, p.title, p.description, p.ownerId, p.status, p.allowReminders, p.createdAt, p.updatedAt,
         u.name AS ownerName, u.email AS ownerEmail
     FROM projects p
     JOIN users u ON u.id = p.ownerId
@@ -99,25 +99,27 @@ BEGIN
 END //
 
 
--- â”€â”€ 6. Update Project â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 6. Update Project ─────────────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_UpdateProject //
 CREATE PROCEDURE sp_UpdateProject(
-    IN p_id          INT,
-    IN p_title       VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    IN p_description TEXT         CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    IN p_status      VARCHAR(20)
+    IN p_id             INT,
+    IN p_title          VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    IN p_description    TEXT         CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+    IN p_status         VARCHAR(20),
+    IN p_allowReminders TINYINT(1)
 )
 BEGIN
     UPDATE projects
     SET
-        title       = IFNULL(p_title,       title),
-        description = IFNULL(p_description, description),
-        status      = IFNULL(p_status,      status),
-        updatedAt   = NOW()
+        title          = IFNULL(p_title,          title),
+        description    = IFNULL(p_description,    description),
+        status         = IFNULL(p_status,         status),
+        allowReminders = IF(p_allowReminders IS NOT NULL, p_allowReminders, allowReminders),
+        updatedAt      = NOW()
     WHERE id = p_id;
 
     SELECT
-        p.id, p.title, p.description, p.ownerId, p.status, p.createdAt, p.updatedAt,
+        p.id, p.title, p.description, p.ownerId, p.status, p.allowReminders, p.createdAt, p.updatedAt,
         u.name AS ownerName
     FROM projects p
     JOIN users u ON u.id = p.ownerId
@@ -256,7 +258,7 @@ CREATE PROCEDURE sp_GetFullProjectDetails(
 BEGIN
     -- Result set 1: project info + owner
     SELECT
-        p.id, p.title, p.description, p.ownerId, p.status,
+        p.id, p.title, p.description, p.ownerId, p.status, p.allowReminders,
         p.createdAt, p.updatedAt,
         u.name  AS ownerName,
         u.avatar AS ownerAvatar,

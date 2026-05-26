@@ -63,15 +63,21 @@ const ProjectModel = {
   // Update project (only owner)
   update: async (projectId, ownerId, body) => {
     await requireOwner(projectId, ownerId);
-    const { title, description, status } = body;
+    const { title, description, status, allowReminders } = body;
 
     const [row] = await callProcedure('sp_GetProjectById', [projectId]);
     if (!row) throw new AppError('Project not found', 404);
 
     const project = row[0];
 
-    if(project.title === title && project.description === description && project.status === status)
-    {
+    const hasChanges =
+      project.title !== title ||
+      project.description !== description ||
+      project.status !== status ||
+      (allowReminders !== undefined &&
+        (project.allowReminders ? 1 : 0) !== (allowReminders ? 1 : 0));
+
+    if (!hasChanges) {
       throw new AppError('No changes to update', 400);
     }
 
@@ -80,6 +86,7 @@ const ProjectModel = {
       title ?? null,
       description ?? null,
       status ?? null,
+      allowReminders !== undefined ? (allowReminders ? 1 : 0) : null,
     ]);
     return result[0];
   },

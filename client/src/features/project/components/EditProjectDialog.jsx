@@ -43,12 +43,16 @@ const EditProjectDialog = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ title, description, status });
+    onSave({
+      title,
+      description,
+      status,
+    });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-border/50 bg-card/95 backdrop-blur-sm sm:max-w-[480px]">
+      <DialogContent className="border-border/50 bg-card/95 backdrop-blur-sm sm:max-w-120">
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
           <DialogDescription>
@@ -74,7 +78,7 @@ const EditProjectDialog = ({
               id="edit-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="border-border/50 bg-background/50 min-h-[100px]"
+              className="border-border/50 bg-background/50 min-h-25"
             />
           </div>
 
