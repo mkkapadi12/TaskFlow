@@ -10,7 +10,18 @@ import routes from './routes.js';
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'script-src': ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
+        'style-src': ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
+        'img-src': ["'self'", 'data:', 'cdnjs.cloudflare.com'],
+      },
+    },
+  })
+);
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -36,7 +47,20 @@ app.use(
 app.use(express.json());
 
 // mount after other middleware
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+const swaggerUiOptions = {
+  customCssUrl:
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui.css',
+  customJs: [
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-bundle.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-standalone-preset.js',
+  ],
+};
+
+app.use(
+  '/api/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, swaggerUiOptions)
+);
 
 app.get('/api', (req, res) =>
   res.json({ status: 'ok', message: 'API is live!' })
