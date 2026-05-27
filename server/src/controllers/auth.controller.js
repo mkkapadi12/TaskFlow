@@ -9,11 +9,15 @@ import {
 const register = async (req, res, next) => {
   try {
     const { user, token } = await AuthModel.register(req.body);
-    await sendWelcomeEmail({
-      userId: user.id,
-      name: user.name,
-      email: user.email,
-    });
+    try {
+      await sendWelcomeEmail({
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+      });
+    } catch (emailErr) {
+      console.error('[Registration] Welcome email sending failed:', emailErr);
+    }
     res.status(201).json({
       success: true,
       message: 'Account created successfully',
@@ -54,6 +58,7 @@ const forgotPassword = async (req, res, next) => {
       });
     } catch (err) {
       console.error('Failed to send email, logging link instead:', resetUrl);
+      console.error('[Forgot Password] Email sending error details:', err);
     }
 
     const data = env.server.isDev ? { resetUrl } : {};
