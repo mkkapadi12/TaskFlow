@@ -6,6 +6,8 @@ const env = {
     nodeEnv: process.env.NODE_ENV || 'development',
     isDev: process.env.NODE_ENV === 'development',
     isProd: process.env.NODE_ENV === 'production',
+    url: process.env.SERVER_URL || `http://localhost:${Number(process.env.PORT) || 5000}`,
+    additional: process.env.ADDITIONAL_SERVER_URLS,
   },
 
   client: {
