@@ -8,18 +8,21 @@ import enContact from './locales/en/contact.json';
 import enDocs from './locales/en/docs.json';
 import enError from './locales/en/error.json';
 import enHome from './locales/en/home.json';
+import enPrivacy from './locales/en/privacy.json';
 import guAbout from './locales/gu/about.json';
 import guCommon from './locales/gu/common.json';
 import guContact from './locales/gu/contact.json';
 import guDocs from './locales/gu/docs.json';
 import guError from './locales/gu/error.json';
 import guHome from './locales/gu/home.json';
+import guPrivacy from './locales/gu/privacy.json';
 import hiAbout from './locales/hi/about.json';
 import hiCommon from './locales/hi/common.json';
 import hiContact from './locales/hi/contact.json';
 import hiDocs from './locales/hi/docs.json';
 import hiError from './locales/hi/error.json';
 import hiHome from './locales/hi/home.json';
+import hiPrivacy from './locales/hi/privacy.json';
 
 i18n
   .use(LanguageDetector) // auto-detect from localStorage / browser
@@ -33,6 +36,7 @@ i18n
         contact: enContact,
         docs: enDocs,
         error: enError,
+        privacy: enPrivacy,
       },
       hi: {
         common: hiCommon,
@@ -41,6 +45,7 @@ i18n
         contact: hiContact,
         docs: hiDocs,
         error: hiError,
+        privacy: hiPrivacy,
       },
       gu: {
         common: guCommon,
@@ -49,6 +54,7 @@ i18n
         contact: guContact,
         docs: guDocs,
         error: guError,
+        privacy: guPrivacy,
       },
     },
     lng: localStorage.getItem('language') || 'en',

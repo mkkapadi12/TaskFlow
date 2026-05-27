@@ -1,0 +1,140 @@
+{
+  "hero": {
+    "badge": "Legal",
+    "title": "Privacy ",
+    "titleHighlight": "Policy",
+    "lastUpdated": "Last updated: May 27, 2026"
+  },
+  "intro": {
+    "text": "At TaskFlow, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our task management platform. Please read this policy carefully to understand our practices regarding your personal data."
+  },
+  "sections": {
+    "informationWeCollect": {
+      "title": "Information We Collect",
+      "description": "We collect information that you provide directly to us, as well as information that is generated automatically when you use our platform.",
+      "items": {
+        "account": {
+          "title": "Account Information",
+          "description": "When you create an account, we collect your name, email address, phone number (optional), and password. Your password is securely hashed using bcrypt before storage."
+        },
+        "profile": {
+          "title": "Profile Data",
+          "description": "You may upload a profile avatar, which is stored securely on Cloudinary. We also store your role (User or Admin) and notification preferences."
+        },
+        "project": {
+          "title": "Project & Task Data",
+          "description": "All project information, task details, comments, documents, and team member assignments you create or participate in are stored in our database."
+        },
+        "usage": {
+          "title": "Usage Data",
+          "description": "We collect anonymized analytics data such as page views and interaction events through Vercel Analytics to improve the platform experience."
+        }
+      }
+    },
+    "howWeUse": {
+      "title": "How We Use Your Information",
+      "description": "We use the information we collect for the following purposes:",
+      "items": {
+        "service": {
+          "title": "Provide & Maintain Services",
+          "description": "To operate and maintain your TaskFlow account, projects, tasks, and team collaboration features."
+        },
+        "communication": {
+          "title": "Communication",
+          "description": "To send you transactional emails including welcome emails, password reset links, team member notifications, and task deadline reminders — all gated by your notification preferences."
+        },
+        "security": {
+          "title": "Security & Protection",
+          "description": "To protect against unauthorized access, including rate limiting on authentication endpoints and JWT-based session management."
+        },
+        "improvement": {
+          "title": "Platform Improvement",
+          "description": "To analyze usage patterns and improve the platform's performance, features, and user experience."
+        }
+      }
+    },
+    "dataSecurity": {
+      "title": "Data Security",
+      "description": "We implement industry-standard security measures to protect your personal information:",
+      "items": {
+        "encryption": {
+          "title": "Password Encryption",
+          "description": "All passwords are hashed using bcrypt with salt rounds before being stored. We never store plain-text passwords."
+        },
+        "auth": {
+          "title": "Secure Authentication",
+          "description": "We use JSON Web Tokens (JWT) for session management with configurable expiration periods."
+        },
+        "rateLimit": {
+          "title": "Rate Limiting",
+          "description": "Authentication and password reset endpoints are protected by rate limiting to prevent brute-force attacks."
+        },
+        "headers": {
+          "title": "Security Headers",
+          "description": "We use Helmet.js to set secure HTTP headers including Content Security Policy, protecting against XSS and other common attacks."
+        }
+      }
+    },
+    "dataSharing": {
+      "title": "Data Sharing & Third Parties",
+      "description": "We do not sell your personal information. We share data only with the following third-party services essential to platform operation:",
+      "items": {
+        "cloudinary": {
+          "title": "Cloudinary",
+          "description": "For secure storage of profile avatars and project documents. Subject to Cloudinary's privacy policy."
+        },
+        "smtp": {
+          "title": "Email Service (SMTP)",
+          "description": "For sending transactional emails such as welcome messages, password resets, and deadline reminders."
+        },
+        "analytics": {
+          "title": "Vercel Analytics",
+          "description": "For anonymized, privacy-friendly page-view and interaction analytics. No personal data is shared."
+        }
+      }
+    },
+    "notificationPreferences": {
+      "title": "Notification Preferences",
+      "description": "You have full control over which emails you receive. Through the Settings page, you can toggle on or off:",
+      "items": {
+        "welcome": "Welcome emails on account creation",
+        "passwordReset": "Password reset confirmation emails",
+        "memberAdded": "Notifications when added to a project",
+        "memberRemoved": "Notifications when removed from a project"
+      },
+      "footer": "Deadline reminder emails are controlled at the project level by the project owner."
+    },
+    "dataRetention": {
+      "title": "Data Retention",
+      "description": "We retain your personal data for as long as your account is active or as needed to provide services. If you request account deletion, we will remove your personal data within a reasonable timeframe, except where we are required to retain it for legal obligations."
+    },
+    "yourRights": {
+      "title": "Your Rights",
+      "description": "Depending on your location, you may have the following rights regarding your personal data:",
+      "items": {
+        "access": "Access and view the personal data we hold about you",
+        "update": "Update or correct inaccurate data through your profile and settings pages",
+        "delete": "Request deletion of your account and associated data",
+        "export": "Request a copy of your data in a portable format",
+        "withdraw": "Withdraw consent for optional data processing at any time"
+      }
+    },
+    "cookies": {
+      "title": "Cookies & Local Storage",
+      "description": "TaskFlow uses localStorage (not cookies) to persist your authentication token and language preference. We do not use tracking cookies. Your JWT token is stored under the key 'token' in localStorage and is automatically removed on logout or session expiry."
+    },
+    "children": {
+      "title": "Children's Privacy",
+      "description": "TaskFlow is not intended for use by children under 13 years of age. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us so we can remove it."
+    },
+    "changes": {
+      "title": "Changes to This Policy",
+      "description": "We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and updating the \"Last updated\" date. We encourage you to review this page periodically."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "If you have any questions or concerns about this Privacy Policy or our data practices, please reach out to us through our Contact page or email us directly.",
+      "cta": "Go to Contact Page"
+    }
+  }
+}

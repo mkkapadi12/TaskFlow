@@ -139,7 +139,7 @@ const Footer = () => {
             <ul className="text-muted-foreground space-y-3 text-sm">
               <li>
                 <Link
-                  to="/"
+                  to="/privacy"
                   className="hover:text-foreground transition-colors"
                 >
                   {t('footer.privacyPolicy')}
@@ -171,7 +171,7 @@ const Footer = () => {
             {t('footer.allRightsReserved')}
           </p>
           <div className="text-muted-foreground flex items-center gap-6 text-sm">
-            <Link to="/" className="hover:text-foreground transition-colors">
+            <Link to="/privacy" className="hover:text-foreground transition-colors">
               {t('footer.privacy')}
             </Link>
             <Link to="/" className="hover:text-foreground transition-colors">

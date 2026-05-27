@@ -18,6 +18,7 @@ import Docs from './features/guest/pages/Docs';
 import ErrorPage from './features/guest/pages/ErrorPage';
 // ── Guest Pages Components
 import Home from './features/guest/pages/Home';
+import PrivacyPolicy from './features/guest/pages/PrivacyPolicy';
 import AdvancedAnalytics from './features/project/pages/AdvancedAnalytics';
 import ProjectDetails from './features/project/pages/ProjectDetails';
 // ── Project Pages Components
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
           { path: '/about', element: <About /> },
           { path: '/contact', element: <Contact /> },
           { path: '/docs', element: <Docs /> },
+          { path: '/privacy', element: <PrivacyPolicy /> },
         ],
       },
       { path: '/login', element: <LoginPage /> },

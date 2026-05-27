@@ -9,6 +9,7 @@ import {
   Code,
   Copy,
   ExternalLink,
+  Eye,
   FileCode,
   FileText,
   Hash,
@@ -29,6 +30,7 @@ import {
   Phone,
   Play,
   Rocket,
+  ScrollText,
   Send,
   Server,
   Shield,
@@ -94,6 +96,8 @@ export const GUEST_ICONS = {
   SERVER: Server,
   BELL: Bell,
   FILE_TEXT: FileText,
+  EYE: Eye,
+  SCROLL_TEXT: ScrollText,
 
   // Social Icons
   TWITTER: FaTwitter,
