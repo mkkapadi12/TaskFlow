@@ -15,7 +15,7 @@ import {
   useGetOverdueTasksQuery,
 } from '@/features/tasks/task.api';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
-import { cn } from '@/lib/utils';
+import { cn, formatDateDisplay } from '@/lib/utils';
 
 const UserDashboard = () => {
   const { data: projectData, isLoading: projectsLoading } =
@@ -254,10 +254,7 @@ const UserDashboard = () => {
                         <div className="text-muted-foreground flex items-center gap-3 text-[11px]">
                           <span className="flex items-center gap-1">
                             <DASHBOARD_ICONS.CLOCK className="text-primary h-3.5 w-3.5 opacity-60" />
-                            {new Date(task.deadline).toLocaleDateString(
-                              undefined,
-                              { month: 'short', day: 'numeric' }
-                            )}
+                            {formatDateDisplay(task.deadline, 'short')}
                           </span>
                           <span className="text-foreground/80 flex items-center gap-1 font-semibold">
                             <DASHBOARD_ICONS.CALENDAR className="text-primary h-3.5 w-3.5 opacity-60" />

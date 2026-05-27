@@ -11,6 +11,7 @@ import { formatDateDisplay } from '@/lib/utils';
 
 import { useGetMyProjectsQuery } from '../../project/project.api';
 import { useGetMyTasksQuery } from '../../tasks/task.api';
+import ProfileSkeleton from '../components/profile.skeleton';
 import ProfileForm from '../components/ProfileForm';
 import { useGetProfileQuery, useUpdateProfileMutation } from '../user.api';
 
@@ -31,6 +32,8 @@ const ProfilePage = () => {
       toast.error(error.message || 'Failed to update profile');
     }
   };
+
+  if (isProfileLoading) return <ProfileSkeleton />;
 
   const user = profileData?.user;
   const projectCount = projectsData?.data?.length || 0;
@@ -142,20 +145,11 @@ const ProfilePage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              {isProfileLoading ? (
-                <div className="space-y-6">
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-11 w-full rounded-full" />
-                </div>
-              ) : (
-                <ProfileForm
-                  user={user}
-                  onSave={handleSave}
-                  isLoading={isUpdating}
-                />
-              )}
+              <ProfileForm
+                user={user}
+                onSave={handleSave}
+                isLoading={isUpdating}
+              />
             </CardContent>
           </Card>
         </div>

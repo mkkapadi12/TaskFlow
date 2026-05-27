@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { priorityConfig, statusConfig } from '@/constant';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { formatDateDisplay } from '@/lib/utils';
+
+import TaskListSkeleton from './TaskList.skeleton';
 
 const isOverdue = (deadline, status) => {
   if (!deadline || status === 'DONE') return false;
@@ -12,15 +14,7 @@ const isOverdue = (deadline, status) => {
 };
 
 const TaskList = ({ tasks, isLoading }) => {
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-22 w-full rounded-xl" />
-        ))}
-      </div>
-    );
-  }
+  if (isLoading) return <TaskListSkeleton />;
 
   if (!tasks || tasks.length === 0) {
     return (
@@ -119,11 +113,7 @@ const TaskList = ({ tasks, isLoading }) => {
                           className={`h-3 w-3 shrink-0 ${overdue ? 'text-destructive' : 'text-primary'}`}
                         />
                         {overdue ? 'Overdue · ' : 'Due · '}
-                        {new Date(task.deadline).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
+                        {formatDateDisplay(task.deadline, 'short')}
                       </span>
                     )}
                   </div>

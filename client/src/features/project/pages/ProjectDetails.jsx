@@ -40,7 +40,8 @@ import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { cn, formatDateDisplay } from '@/lib/utils';
-import { ProjectDetailsSkeleton } from '@/skeleton/ProjectDetalsSkeleton';
+
+import ProjectDetailsSkeleton from '../components/ProjectDetails.skeleton';
 
 const ROLE_OPTIONS = ['ADMIN', 'MEMBER', 'OWNER'];
 

@@ -26,6 +26,7 @@ import {
   useVerifyTaskMutation,
 } from '@/features/tasks/task.api';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { formatDateDisplay } from '@/lib/utils';
 
 import TaskComments from './TaskComments';
 
@@ -37,13 +38,7 @@ const ACTIVE_STATUSES = [
 
 const formatDeadlineForInput = (deadline) => {
   if (!deadline) return '';
-  return new Date(deadline)
-    .toLocaleDateString('en-CA', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    .replace(/\//g, '-');
+  return formatDateDisplay(deadline, 'calender', 'en-CA');
 };
 
 const TaskDetailDialog = ({
@@ -122,6 +117,8 @@ const TaskDetailDialog = ({
       toast.error(err?.message || 'Failed to update status');
     }
   };
+
+  
 
   const handleVerify = async (approve) => {
     try {

@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import {
   useCreateTaskCommentMutation,
@@ -13,6 +12,8 @@ import {
   useGetTaskCommentsQuery,
 } from '@/features/tasks/comment.api';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+
+import TaskCommentsSkeleton from './TaskComments.skeleton';
 
 export default function TaskComments({
   taskId,
@@ -100,17 +101,7 @@ export default function TaskComments({
       <div className="border-border/50 bg-muted/10 min-h-0 flex-1 rounded-xl border">
         <ScrollArea className="h-full p-4">
           {isLoading ? (
-            <div className="flex flex-col gap-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
-                  <div className="flex flex-1 flex-col gap-2">
-                    <Skeleton className="h-3 w-24 rounded" />
-                    <Skeleton className="h-10 w-full rounded-lg" />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TaskCommentsSkeleton />
           ) : comments.length === 0 ? (
             <div className="flex h-50 flex-col items-center justify-center gap-2 text-center">
               <div className="bg-muted text-muted-foreground flex h-10 w-10 items-center justify-center rounded-full">

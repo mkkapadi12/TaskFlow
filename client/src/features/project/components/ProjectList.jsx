@@ -8,19 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { formatDateDisplay } from '@/lib/utils';
+
+import ProjectListSkeleton from './ProjectList.skeleton';
 
 const ProjectList = ({ projects, isLoading, isFiltered }) => {
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {[...Array(6)].map((_, i) => (
-          <Skeleton key={i} className="h-[180px] w-full rounded-xl" />
-        ))}
-      </div>
-    );
-  }
+  if (isLoading) return <ProjectListSkeleton />;
 
   if (!projects || projects.length === 0) {
     return (
@@ -62,7 +56,7 @@ const ProjectList = ({ projects, isLoading, isFiltered }) => {
               </div>
             </CardContent>
             <CardFooter className="text-muted-foreground/70 text-xs">
-              Created on {new Date(project.createdAt).toLocaleDateString()}
+              Created on {formatDateDisplay(project.createdAt, 'dd/mm/yyyy')}
             </CardFooter>
           </Card>
         </Link>

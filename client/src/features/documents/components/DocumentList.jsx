@@ -11,19 +11,13 @@ import { Input } from '@/components/ui/input';
 import { EXT_COLORS } from '@/constant';
 import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { formatBytes, formatDateDisplay, getExt } from '@/lib/utils';
 
 import {
   useDeleteDocumentMutation,
   useGetDocumentsQuery,
 } from '../document.api';
 import DocumentPreviewModal from './DocumentPreviewModal';
-
-const formatBytes = (bytes) => {
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
-
-const getExt = (name) => name.split('.').pop()?.toLowerCase() || 'file';
 
 const DocumentList = ({ projectId, isManager }) => {
   const { data, isLoading } = useGetDocumentsQuery(projectId);
@@ -269,7 +263,7 @@ const DocumentList = ({ projectId, isManager }) => {
                     </div>
                     <p className="text-muted-foreground mt-0.5 hidden truncate text-[11px] sm:block">
                       {formatBytes(doc.size)} · by {doc.uploaderName} ·{' '}
-                      {new Date(doc.createdAt).toLocaleDateString()}
+                      {formatDateDisplay(doc.createdAt, 'dd/mm/yyyy')}
                     </p>
                   </div>
                 </div>
@@ -350,7 +344,7 @@ const DocumentList = ({ projectId, isManager }) => {
             <span className="bg-primary text-primary-foreground flex h-5 w-5 items-center justify-center rounded-full text-[10px]">
               {selectedIds.size}
             </span>
-            <span className="lg:inline hidden">selected</span>
+            <span className="hidden lg:inline">selected</span>
           </div>
 
           <div className="bg-border/80 h-4 w-px shrink-0" />

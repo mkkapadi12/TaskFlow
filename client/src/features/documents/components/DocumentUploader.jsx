@@ -3,17 +3,12 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
+import { formatBytes } from '@/lib/utils';
 
 import { useUploadDocumentsMutation } from '../document.api';
 
 const ALLOWED_EXTENSIONS =
   '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.webp,.md,.mdx,.csv,.json';
-
-const formatBytes = (bytes) => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
 
 const DocumentUploader = ({ projectId }) => {
   const inputRef = useRef(null);
