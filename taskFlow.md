@@ -44,10 +44,11 @@ TaskFlow/
 | Database             | MySQL via `mysql2/promise` (connection pool)|
 | Auth                 | `jsonwebtoken` + `bcryptjs`                 |
 | Validation           | `zod`                                       |
-| Security             | `helmet`, `cors`                            |
+| Security             | `helmet`, `cors`, `express-rate-limit`      |
 | File uploads         | `multer` (memory storage) + Cloudinary      |
 | Email                | `nodemailer` (SMTP)                         |
 | API Docs             | `swagger-jsdoc` + `swagger-ui-express` at `/api/docs` |
+| Deployment           | Vercel (Serverless Functions + Cron Jobs)   |
 | Dev runner           | `nodemon`                                   |
 
 ### Frontend (`client/`)
@@ -67,6 +68,8 @@ TaskFlow/
 | Charts               | `recharts`                                  |
 | Date / calendar      | `date-fns`, `react-day-picker`              |
 | Icons                | `lucide-react`                              |
+| File packaging       | `jszip` + `file-saver` (client-side ZIP)    |
+| Analytics            | `@vercel/analytics`                         |
 
 The Vite dev server binds to `0.0.0.0:5173` so the app is reachable from any device on the LAN (useful for mobile testing). Vite proxies `/api` → `VITE_API_URL`.
 
@@ -100,39 +103,46 @@ All data access is funneled through **stored procedures** (called from `server/s
 
 ## 4. Backend Architecture
 
-Layout under `server/src/`:
+Layout under `server/`:
 
 ```
-src/
-├── app.js                     → Express app (helmet, cors, json, swagger, routes, error handler)
-├── routes.js                  → Mounts /auth, /users, /projects, /tasks,
-│                                /notifications/settings, /projects/:projectId/documents under /api
-├── config/
-│   ├── env.js                 → Loads + validates required env vars
-│   ├── db.js                  → MySQL pool (connectionLimit: 10)
-│   ├── callProcedure.js       → Helper to invoke stored procedures
-│   ├── cloudinary.js          → Cloudinary SDK init
-│   ├── mailer.js              → Nodemailer transporter
-│   └── swagger.js             → OpenAPI 3.0 spec generation
-├── routes/                    → auth | user | project | task | notification | document
-├── controllers/               → Thin controllers calling model methods
-├── models/                    → Business logic + SP invocation (auth, user, project, task, document)
-├── middlewares/
-│   ├── auth.middleware.js     → `protect` (JWT), `restrictTo(...roles)`
-│   ├── validate.middleware.js → Zod schema validator
-│   ├── upload.middleware.js   → Multer: default `upload` for avatars (5 MB image)
-│   │                            and named export `uploadDoc` for documents (20 MB, doc/office/image)
-│   └── error.middleware.js    → Global error handler + `AppError`
-├── schema/                    → Zod request schemas + Swagger components
-├── docs/                      → JSDoc-style Swagger annotations per domain
-├── services/
-│   ├── email.service.js       → sendWelcomeEmail, sendPasswordResetEmail,
-│   │                            sendProjectMemberAddedEmail, sendProjectMemberRemovedEmail, sendDeadlineReminderEmail
-│   │                            (each gated by getNotificationSettings)
-│   ├── notification.service.js → getNotificationSettings / updateNotificationSettings
-│   └── reminder.service.js    → checkAndSendReminders, initReminderService (hourly cron)
-├── templates/emails/          → welcome.js, passwordReset.js, addMember.js, removeMember.js
-└── utils/                     → sendEmail, uploadToCloudinary (image + raw doc), requireRole
+server/
+├── index.js                     → Local dev entry point (app.listen + pool + initReminderService)
+├── api/
+│   └── index.js                 → Vercel Serverless Function entry point (exports Express app)
+├── vercel.json                  → Vercel config: wildcard rewrite + daily cron schedule
+└── src/
+    ├── app.js                   → Express app (trust proxy, helmet, cors, json, swagger, routes, error handler)
+    ├── routes.js                → Mounts /auth, /users, /projects, /tasks,
+    │                              /notifications/settings, /projects/:projectId/documents,
+    │                              and /cron/reminders (Vercel cron endpoint) under /api
+    ├── config/
+    │   ├── env.js               → Loads + validates required env vars (incl. server.url, vercel.cron.secret)
+    │   ├── db.js                → MySQL pool (connectionLimit: 10)
+    │   ├── callProcedure.js     → Helper to invoke stored procedures
+    │   ├── cloudinary.js        → Cloudinary SDK init
+    │   ├── mailer.js            → Nodemailer transporter
+    │   └── swagger.js           → OpenAPI 3.0 spec generation (dynamic multi-server from env)
+    ├── routes/                  → auth | user | project | task | notification | document
+    ├── controllers/             → Thin controllers calling model methods
+    ├── models/                  → Business logic + SP invocation (auth, user, project, task, document)
+    ├── middlewares/
+    │   ├── auth.middleware.js   → `protect` (JWT), `restrictTo(...roles)`
+    │   ├── rateLimit.middleware.js → `authLimiter` (10 req/15min), `passwordResetLimiter` (3 req/hr)
+    │   ├── validate.middleware.js → Zod schema validator
+    │   ├── upload.middleware.js → Multer: default `upload` for avatars (5 MB image)
+    │   │                          and named export `uploadDoc` for documents (20 MB, doc/office/image)
+    │   └── error.middleware.js  → Global error handler + `AppError`
+    ├── schema/                  → Zod request schemas + Swagger components
+    ├── docs/                    → JSDoc-style Swagger annotations per domain
+    ├── services/
+    │   ├── email.service.js     → sendWelcomeEmail, sendPasswordResetEmail,
+    │   │                          sendProjectMemberAddedEmail, sendProjectMemberRemovedEmail, sendDeadlineReminderEmail
+    │   │                          (each gated by getNotificationSettings)
+    │   ├── notification.service.js → getNotificationSettings / updateNotificationSettings
+    │   └── reminder.service.js  → checkAndSendReminders, initReminderService (Vercel: bypassed, uses cron route instead)
+    ├── templates/emails/        → welcome.js, passwordReset.js, addMember.js, removeMember.js, deadlineReminder.js
+    └── utils/                   → sendEmail, uploadToCloudinary (image + raw doc), requireRole
 ```
 
 ### Authorization tiers
@@ -147,16 +157,16 @@ Global role (`users.role`) is gated separately at the route via `restrictTo("ADM
 
 ### REST API surface
 
-Base URL: `http://localhost:5000/api`
+Base URL: `http://localhost:5000/api` (local) / `https://<your-vercel-domain>/api` (production)
 
 #### Auth (`/auth`)
-| Method | Path                | Description                                                |
-|--------|---------------------|------------------------------------------------------------|
-| POST   | `/register`         | Create user, send welcome email (if opted in), return JWT  |
-| POST   | `/login`            | Validate credentials, return JWT                           |
-| POST   | `/forgot-password`  | Email a 15-minute reset link (in dev, returns the link in `data`) |
-| POST   | `/reset-password`   | Body `{ token, password }`. Verify JWT, hash new password  |
-| POST   | `/change-password`  | Auth required. Body `{ currentPassword, newPassword, confirmPassword }` |
+| Method | Path                | Rate Limit              | Description                                                |
+|--------|---------------------|--------------------------|------------------------------------------------------------|
+| POST   | `/register`         | `authLimiter` (10/15min) | Create user, send welcome email (if opted in), return JWT  |
+| POST   | `/login`            | `authLimiter` (10/15min) | Validate credentials, return JWT                           |
+| POST   | `/forgot-password`  | `passwordResetLimiter` (3/hr) | Email a 15-minute reset link (in dev, returns the link in `data`) |
+| POST   | `/reset-password`   | `passwordResetLimiter` (3/hr) | Body `{ token, password }`. Verify JWT, hash new password  |
+| POST   | `/change-password`  | —                        | Auth required. Body `{ currentPassword, newPassword, confirmPassword }` |
 
 #### Users (`/users`) — JWT required
 | Method | Path        | Access  | Description                       |
@@ -212,9 +222,13 @@ Base URL: `http://localhost:5000/api`
 | DELETE | `/:documentId`      | OWNER / ADMIN (of project that owns the doc) | Deletes from Cloudinary first, then drops the DB row. |
 
 ### Required environment variables (`server/.env`)
-`PORT`, `NODE_ENV`, `CLIENT_URL`, `DATABASE_URL`, `DATABASE_NAME`, `DATABASE_HOST`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_PORT`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`.
+`PORT`, `NODE_ENV`, `CLIENT_URL`, `ADDITIONAL_CLIENT_URLS`, `SERVER_URL`, `ADDITIONAL_SERVER_URLS`, `DATABASE_URL`, `DATABASE_NAME`, `DATABASE_HOST`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_PORT`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`, `CRON_SECRET`, `IP_ADDRESS`.
 
 `env.js` boot-checks `DATABASE_URL`, `DATABASE_NAME`, `JWT_SECRET`, and the Cloudinary keys; the process exits if any are missing.
+
+**Vercel-specific**: `VERCEL` (auto-set by Vercel), `CRON_SECRET` (used to authenticate the cron endpoint).
+
+**Multi-origin support**: `ADDITIONAL_CLIENT_URLS` (comma-separated) extends CORS allowed origins. `SERVER_URL` + `ADDITIONAL_SERVER_URLS` (comma-separated) populates the Swagger server list dynamically.
 
 ### Email delivery and notification gating
 
@@ -373,6 +387,7 @@ src/
 - [x] Document list with uploader, size, mime type; alert-dialog confirm before delete
 - [x] Manager-only (OWNER/ADMIN) upload and delete; any project member can list
 - [x] **Premium Document Preview Viewer** — high-fidelity, highly-responsive inline preview modal supporting PDFs (with dynamic ResizeObserver-driven auto-scaling), Markdown (rendered with ReactMarkdown + syntax highlighting), images, Office documents, and plain text files with smart padding and robust overflow scrollbars.
+- [x] **Document Search, Filter & Bulk-Download** — instant search by filename, filter by file extension/mimetype, multi-select with per-row checkboxes and select-all, and a floating responsive bulk-action bar with client-side ZIP packaging (`jszip` + `file-saver`) for downloading multiple selected documents at once.
 
 **Notifications**
 - [x] Per-user toggles for welcome / password-reset / member-added / member-removed
@@ -391,14 +406,17 @@ src/
 
 **Infra / DX**
 - [x] **SEO & Metadata Optimization** — custom brand-focused title, description, keywords, Open Graph card metadata, Twitter card description, brand favicon integration, and mobile device theme-color support in `index.html`.
-- [x] Helmet + CORS configured for `CLIENT_URL`
+- [x] Helmet + CORS configured for `CLIENT_URL` + `ADDITIONAL_CLIENT_URLS` (multi-origin support)
 - [x] Global error handler (`AppError` + `globalErrorHandler`) maps `SIGNAL 45000` → 400 and `ER_DUP_ENTRY` → 409
 - [x] Zod request validation middleware (replaces `req.body` with parsed/coerced data)
-- [x] Swagger UI at `/api/docs`
+- [x] Swagger UI at `/api/docs` with dynamic server list from env (`SERVER_URL` + `ADDITIONAL_SERVER_URLS`)
 - [x] MySQL connection pool with startup health check
 - [x] Env validation at boot
 - [x] Vite + React Compiler + Tailwind v4 + shadcn
 - [x] Vite dev server on `0.0.0.0` for LAN access (mobile testing)
+- [x] **Vercel Deployment** — serverless function entry point (`api/index.js`), wildcard rewrite routing, DB pool pre-warm, and `vercel.json` config with daily cron for deadline reminders (reminder service auto-bypasses `setInterval` on Vercel)
+- [x] **Rate Limiting** — `express-rate-limit` middleware on auth routes (`authLimiter`: 10 req/15 min for login/register, `passwordResetLimiter`: 3 req/hr for forgot/reset-password); `app.set('trust proxy', 1)` for correct IP detection behind Vercel's proxy
+- [x] **Vercel Analytics** — `@vercel/analytics` integrated for client-side page-view and interaction analytics
 
 ### Partially implemented / placeholders
 
@@ -413,24 +431,22 @@ src/
 1. **Soft-Deletes & Project Archiving**: Transition from permanent project deletion to support archiving projects (soft delete) to hide inactive items while preserving history, requiring database status modifications and stored procedure updates.
 2. **Task Checklists / Subtasks**: Enable users to create granular checklist sub-items within individual tasks, displaying an interactive progress bar showing completion percentages in the task details workspace.
 3. **In-App Live Notification Feed**: Implement an in-app notifications center (a header-mounted bell dropdown) with read/unread states, dynamically reporting real-time system events (comment additions, task assignment changes) without relying solely on emails.
-4. **Document Search, Filter & Bulk-download**: Enrich the project documents workspace with instant search, filtering by file extension/mimetype, and a bulk-download utility to package multiple select items into a single ZIP file.
 
 ### Mid-term
-5. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
-6. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
-7. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
-8. **Task Dependencies & Sequencing**: Let users establish link relationships between tasks (e.g. "Task B blocks Task C", "Task A must finish before Task B starts"), with warning indicators in the board view when deadlines conflict.
-9. **Project Template Factory**: Allow system administrators to compile project blueprints (standardized boards, column milestones, boilerplate documents) and deploy new project structures instantly from pre-saved configurations.
+4. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
+5. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
+6. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
+7. **Task Dependencies & Sequencing**: Let users establish link relationships between tasks (e.g. "Task B blocks Task C", "Task A must finish before Task B starts"), with warning indicators in the board view when deadlines conflict.
+8. **Project Template Factory**: Allow system administrators to compile project blueprints (standardized boards, column milestones, boilerplate documents) and deploy new project structures instantly from pre-saved configurations.
 
 ### Long-term / nice-to-have
-10. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
-11. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
-12. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
-13. **Rate Limiting**: Add rate-limiting middleware (`express-rate-limit`) to prevent brute-force attacks on auth and password reset endpoints.
-14. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
-15. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
-16. **Interactive Timeline / Gantt View**: Create a full-screen dynamic Gantt chart visualization mapping project deadlines, task sequencing, and assignees over calendar milestones with drag-and-resize timeline bands.
-17. **Multi-Tenant Organizations & Workspaces**: Upgrade the platform hierarchy to support isolated organizations and distinct team spaces, enabling granular enterprise-grade tenant-level billing and control settings.
+9. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
+10. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
+11. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
+12. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
+13. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
+14. **Interactive Timeline / Gantt View**: Create a full-screen dynamic Gantt chart visualization mapping project deadlines, task sequencing, and assignees over calendar milestones with drag-and-resize timeline bands.
+15. **Multi-Tenant Organizations & Workspaces**: Upgrade the platform hierarchy to support isolated organizations and distinct team spaces, enabling granular enterprise-grade tenant-level billing and control settings.
 
 ---
 

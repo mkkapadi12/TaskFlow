@@ -35,7 +35,7 @@ const ForgotPasswordPage = () => {
         console.log('Reset URL (Dev mode):', result.data.resetUrl);
       }
     } catch (err) {
-      toast.error(err.data?.message || 'Failed to send reset link');
+      toast.error(err?.message || 'Failed to send reset link');
     }
   };
 

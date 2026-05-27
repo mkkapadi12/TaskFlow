@@ -99,7 +99,7 @@ const Topbar = ({ onMenuClick }) => {
                 {user?.name?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
-            <span className="hidden max-w-[120px] truncate text-sm font-medium sm:block">
+            <span className="hidden max-w-30 truncate text-sm font-medium sm:block">
               {user?.name || 'User'}
             </span>
             <DASHBOARD_ICONS.CHEVRONDOWN

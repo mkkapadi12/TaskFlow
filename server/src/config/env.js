@@ -6,13 +6,22 @@ const env = {
     nodeEnv: process.env.NODE_ENV || 'development',
     isDev: process.env.NODE_ENV === 'development',
     isProd: process.env.NODE_ENV === 'production',
-    url: process.env.SERVER_URL || `http://localhost:${Number(process.env.PORT) || 5000}`,
+    url:
+      process.env.SERVER_URL ||
+      `http://localhost:${Number(process.env.PORT) || 5000}`,
     additional: process.env.ADDITIONAL_SERVER_URLS,
   },
 
   client: {
     url: process.env.CLIENT_URL || `http://${process.env.IP_ADDRESS}:5173`,
     additional: process.env.ADDITIONAL_CLIENT_URLS,
+  },
+
+  vercel: {
+    cron: {
+      secret: process.env.CRON_SECRET,
+    },
+    isVercel: process.env.VERCEL,
   },
 
   db: {

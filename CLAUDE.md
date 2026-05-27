@@ -41,7 +41,7 @@ mysql -u root -p <db_name> < server/database/project_docs.sql
 
 `server/database/call.sql` is a scratch file for ad-hoc SP invocation — not part of bootstrap.
 
-`.env` files are required in both `client/` and `server/` (templates in `.env.example`). The server validates required env vars at boot in `server/src/config/env.js` and exits if any are missing (`DATABASE_URL`, `DATABASE_NAME`, `JWT_SECRET`, `CLOUDINARY_*`). The client needs `VITE_API_URL` — Vite proxies `/api` → `VITE_API_URL` in `vite.config.js`, so client code always calls `/api/...` regardless of where the server lives.
+`.env` files are required in both `client/` and `server/` (templates in `.env.example`). The server validates required env vars at boot in `server/src/config/env.js` and exits if any are missing (`DATABASE_URL`, `DATABASE_NAME`, `JWT_SECRET`, `CLOUDINARY_*`). Additional env vars include `SERVER_URL`, `ADDITIONAL_SERVER_URLS` (for Swagger), `ADDITIONAL_CLIENT_URLS` (for CORS), `CRON_SECRET` (for Vercel cron auth), and `IP_ADDRESS`. The client needs `VITE_API_URL` — Vite proxies `/api` → `VITE_API_URL` in `vite.config.js`, so client code always calls `/api/...` regardless of where the server lives.
 
 ## Architecture
 
@@ -61,6 +61,27 @@ The return shape from `callProcedure` is the raw `mysql2` result and differs by 
 - Multi-resultset SPs (e.g. `sp_GetFullProjectDetails` returns project + members + tasks): destructure positionally — `const [projectRows, memberRows, taskRows] = await callProcedure(...)`. See `ProjectModel.getProjectDetailsById` for the pattern.
 
 SPs use `SIGNAL SQLSTATE '45000'` for business-rule errors; `globalErrorHandler` (`server/src/middlewares/error.middleware.js`) maps those to 400 with the SQL message, and maps other `ER_*` codes (e.g. `ER_DUP_ENTRY` → 409).
+
+### Server: deployment (Vercel)
+
+The server is deployed as a **Vercel Serverless Function**. Key pieces:
+
+- `server/api/index.js` — serverless entry point; imports the Express `app`, pre-warms the DB pool, and `export default app`.
+- `server/vercel.json` — `rewrites` sends all routes to `/api/index.js`; `crons` triggers `GET /api/cron/reminders` daily at midnight.
+- `server/src/routes.js` has a secure `GET /cron/reminders` route that verifies `Authorization: Bearer <CRON_SECRET>` before running `checkAndSendReminders()`.
+- `reminder.service.js` — `initReminderService` detects `process.env.VERCEL` and skips `setInterval` scheduling (the Vercel cron replaces it).
+- `app.js` sets `app.set('trust proxy', 1)` so `req.ip` reflects the real client IP behind Vercel's proxy (required for rate limiting).
+
+For local development, `server/index.js` boots the server with `app.listen()` and runs `initReminderService()` with the in-memory scheduler.
+
+### Server: rate limiting
+
+`server/src/middlewares/rateLimit.middleware.js` exports two limiters using `express-rate-limit`:
+
+- **`authLimiter`** — 10 requests per 15 minutes. Applied to `/auth/login` and `/auth/register`.
+- **`passwordResetLimiter`** — 3 requests per hour. Applied to `/auth/forgot-password` and `/auth/reset-password`.
+
+Both return `{ success: false, message }` on 429 and use `standardHeaders: true` (`RateLimit-*` headers).
 
 ### Server: auth and authorization
 
@@ -88,12 +109,14 @@ The task status machine is enforced in the model layer and in `sp_VerifyTask`:
 ### Server: emails and notifications
 
 - Email delivery is in `services/email.service.js` (SMTP via Nodemailer; HTML in `templates/emails/`). In-app notification settings live in `services/notification.service.js` and `database/notification.sql`. Respect the per-user `notification_settings` toggles before sending any email triggered by a user-facing event.
-- **Deadline Reminder Emails**: Scheduled as an hourly background service booted inside `index.js` (`reminder.service.js`). It automatically checks for uncompleted tasks due within 24 hours (`sp_GetUpcomingTaskReminders`) and sends alert emails using a custom template.
+- **Deadline Reminder Emails**: On Vercel, triggered via a daily cron job (`GET /api/cron/reminders`). Locally, scheduled via `setInterval` in `initReminderService` (booted in `index.js`). It checks for uncompleted tasks due within 24 hours (`sp_GetUpcomingTaskReminders`) and sends alert emails using the `deadlineReminder.js` template.
 - **Project-Level Reminders Control**: Project owners can pause/resume reminders via the `allowReminders` field in `projects` (persisted as `TINYINT(1)` via `sp_UpdateProject`). This is configured in the responsive **Settings** tab in the client project details view.
 
 ### Client: RTK Query endpoint injection
 
 `client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task", "NotificationSettings", "Document", "Comment"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
+
+Client-side dependencies also include `jszip` + `file-saver` for client-side ZIP packaging of bulk document downloads, and `@vercel/analytics` for page-view analytics.
 
 The base query is a custom `axiosBaseQuery` that delegates to `client/src/lib/axios.js`. That axios instance:
 
@@ -115,6 +138,8 @@ Auth state lives in `features/auth/auth.slice.js` and persists the JWT to `local
 
 Each domain owns its folder under `client/src/features/<name>/`: `pages/`, `components/`, `*.api.js` (RTK Query injection), and optionally `*.slice.js`. Current domains: `auth`, `users`, `project`, `tasks`, `documents`, `notifications`, `admin`, `guest`. Shadcn primitives live in `client/src/components/ui/`; layout shells live in `client/src/components/layouts/{app,guest}/`; loading skeletons live in `client/src/skeleton/`.
 
+The `documents` feature includes `DocumentList.jsx` (with search bar, extension filter, multi-select checkboxes, floating bulk-action bar, and client-side ZIP download via `jszip` + `file-saver`), `DocumentUploader.jsx`, and `DocumentPreviewModal.jsx` with per-format viewers.
+
 Path alias: `@/*` → `client/src/*` (configured in both `jsconfig.json` and `vite.config.js` — keep them in sync).
 
 ### Client: i18n
@@ -124,7 +149,7 @@ Translations live in `client/src/i18n/` (`index.js` configures i18next; `locales
 ## Conventions
 
 - **Client formatting**: Prettier config (`client/.prettierrc`) — double quotes, no semicolons, 2-space indent, ES5 trailing commas. There is no Prettier config on the server; match surrounding style there.
-- **Client lint**: `bun run lint` in `client/` runs ESLint with React Hooks + React Refresh rules. The server has no lint script.
+- **Client lint**: `bun run lint` in `client/` runs ESLint with React Hooks + React Refresh rules. Server lint: `bun run lint` in `server/` runs ESLint.
 - **Imports**: server uses ESM (`"type": "module"`); every relative import needs the `.js` extension.
-- **API response shape**: controllers return `{ success: boolean, message?: string, data?: any }`. Errors come back as `{ success: false, message }` (plus `errors: [{field, message}]` for Zod validation failures).
-- **Swagger docs**: route annotations live in `server/src/docs/*.docs.js` (separate from route files); reusable schema components are in `server/src/schema/swagger.schemas.js`. The spec is served at `/api/docs`.
+- **API response shape**: controllers return `{ success: boolean, message?: string, data?: any }`. Errors come back as `{ success: false, message }` (plus `errors: [{field, message}]` for Zod validation failures). Rate-limited endpoints return 429 with `{ success: false, message }`.
+- **Swagger docs**: route annotations live in `server/src/docs/*.docs.js` (separate from route files); reusable schema components are in `server/src/schema/swagger.schemas.js`. The spec is served at `/api/docs`. Swagger server URLs are dynamically populated from `SERVER_URL` + `ADDITIONAL_SERVER_URLS` env vars.

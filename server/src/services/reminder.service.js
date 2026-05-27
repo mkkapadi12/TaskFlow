@@ -1,4 +1,5 @@
 import callProcedure from '../config/callProcedure.js';
+import env from '../config/env.js';
 import { sendDeadlineReminderEmail } from './email.service.js';
 
 // Helper to calculate relative remaining time string for the email
@@ -65,8 +66,10 @@ export const checkAndSendReminders = async () => {
 // Start scheduling
 export const initReminderService = async () => {
   // If running in serverless environment, bypass in-memory scheduler
-  if (process.env.VERCEL) {
-    console.log('[Reminder Service] Running on Vercel. Background scheduler bypassed.');
+  if (env.vercel.isVercel) {
+    console.log(
+      '[Reminder Service] Running on Vercel. Background scheduler bypassed.'
+    );
     return;
   }
 

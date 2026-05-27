@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import env from './config/env.js';
 import authRoutes from './routes/auth.routes.js';
 import documentRoutes from './routes/document.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
@@ -20,7 +21,10 @@ router.use('/projects/:projectId/documents', documentRoutes);
 // Secure GET /cron/reminders route for Vercel Cron
 router.get('/cron/reminders', async (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (
+    env.vercel.cron.secret &&
+    authHeader !== `Bearer ${env.vercel.cron.secret}`
+  ) {
     return res.status(401).json({ success: false, message: 'Unauthorized' });
   }
 

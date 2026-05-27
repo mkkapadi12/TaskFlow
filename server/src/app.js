@@ -10,6 +10,9 @@ import routes from './routes.js';
 
 const app = express();
 
+// Trust the first proxy (e.g., Vercel) so that req.ip gets the correct client IP for rate limiting
+app.set('trust proxy', 1);
+
 app.use(
   helmet({
     contentSecurityPolicy: {
