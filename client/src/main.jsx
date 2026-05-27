@@ -1,6 +1,7 @@
 import './i18n/index.js';
 import './index.css';
 
+import { Analytics } from '@vercel/analytics/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -11,6 +12,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AppProviders>
       <App />
+      <Analytics />
     </AppProviders>
   </StrictMode>
 );
