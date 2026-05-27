@@ -6,6 +6,7 @@ import notificationRoutes from './routes/notification.routes.js';
 import projectRoutes from './routes/project.routes.js';
 import taskRoutes from './routes/task.routes.js';
 import userRoutes from './routes/user.routes.js';
+import { checkAndSendReminders } from './services/reminder.service.js';
 
 const router = Router();
 
@@ -15,5 +16,20 @@ router.use('/projects', projectRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/notifications/settings', notificationRoutes);
 router.use('/projects/:projectId/documents', documentRoutes);
+
+// Secure GET /cron/reminders route for Vercel Cron
+router.get('/cron/reminders', async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+
+  try {
+    await checkAndSendReminders();
+    res.json({ success: true, message: 'Reminders checked and sent.' });
+  } catch (err) {
+    next(err);
+  }
+});
 
 export default router;

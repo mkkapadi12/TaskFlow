@@ -64,6 +64,12 @@ export const checkAndSendReminders = async () => {
 
 // Start scheduling
 export const initReminderService = async () => {
+  // If running in serverless environment, bypass in-memory scheduler
+  if (process.env.VERCEL) {
+    console.log('[Reminder Service] Running on Vercel. Background scheduler bypassed.');
+    return;
+  }
+
   // 1. Perform immediate check at server startup
   await checkAndSendReminders();
 
