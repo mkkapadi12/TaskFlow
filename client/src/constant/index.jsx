@@ -324,3 +324,12 @@ export const EXT_COLORS = {
   // =========================
   default: 'bg-muted text-muted-foreground',
 };
+
+export const priorityColors = {
+  LOW: 'border-l-blue-500 bg-blue-500/5 hover:bg-blue-500/10 text-blue-500 border-blue-500/20',
+  MEDIUM:
+    'border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/10 text-amber-600 border-amber-500/20',
+  HIGH: 'border-l-orange-500 bg-orange-500/5 hover:bg-orange-500/10 text-orange-600 border-orange-500/20',
+  URGENT:
+    'border-l-red-500 bg-red-500/5 hover:bg-red-500/10 text-red-600 border-red-500/20',
+};

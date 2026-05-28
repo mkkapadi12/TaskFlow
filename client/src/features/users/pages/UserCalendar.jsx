@@ -94,8 +94,6 @@ const UserCalendar = () => {
     );
   };
 
-  console.log(selectedDate);
-
   // Filter tasks for the selected date
   const selectedDateString = selectedDate ? formatDateKey(selectedDate) : '';
   const tasksOnSelectedDate = tasksWithDeadlines.filter((task) => {

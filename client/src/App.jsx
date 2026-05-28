@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import AppLayout from './components/layouts/app/AppLayout';
@@ -6,30 +7,27 @@ import GuestLayout from './components/layouts/guest/GuestLayout';
 // ── Route Components
 import GuestRoute from './components/routes/GuestRoute';
 import ProtectedRoute from './components/routes/ProtectedRoute';
-import ForgotPasswordPage from './features/auth/pages/ForgotPasswordPage';
-// ── Auth Components
-import LoginPage from './features/auth/pages/LoginPage';
-import RegisterPage from './features/auth/pages/RegisterPage';
-import ResetPasswordPage from './features/auth/pages/ResetPasswordPage';
-import About from './features/guest/pages/About';
-import Contact from './features/guest/pages/Contact';
-import Docs from './features/guest/pages/Docs';
-// ── Error Page
-import ErrorPage from './features/guest/pages/ErrorPage';
-// ── Guest Pages Components
-import Home from './features/guest/pages/Home';
-import PrivacyPolicy from './features/guest/pages/PrivacyPolicy';
-import AdvancedAnalytics from './features/project/pages/AdvancedAnalytics';
-import ProjectDetails from './features/project/pages/ProjectDetails';
-// ── Project Pages Components
-import Projects from './features/project/pages/Projects';
-// ── Task Pages Components
-import MyTask from './features/tasks/pages/MyTask';
-import ProfilePage from './features/users/pages/ProfilePage';
-// ── User Pages Components
-import SettingPage from './features/users/pages/SettingPage';
-import UserCalendar from './features/users/pages/UserCalendar';
-import UserDashboard from './features/users/pages/UserDashboard';
+import FullPageSpinner from './components/ui/loader';
+
+// ── Lazy Loaded Page Components
+const ForgotPasswordPage = lazy(() => import('./features/auth/pages/ForgotPasswordPage'));
+const LoginPage = lazy(() => import('./features/auth/pages/LoginPage'));
+const RegisterPage = lazy(() => import('./features/auth/pages/RegisterPage'));
+const ResetPasswordPage = lazy(() => import('./features/auth/pages/ResetPasswordPage'));
+const About = lazy(() => import('./features/guest/pages/About'));
+const Contact = lazy(() => import('./features/guest/pages/Contact'));
+const Docs = lazy(() => import('./features/guest/pages/Docs'));
+const ErrorPage = lazy(() => import('./features/guest/pages/ErrorPage'));
+const Home = lazy(() => import('./features/guest/pages/Home'));
+const PrivacyPolicy = lazy(() => import('./features/guest/pages/PrivacyPolicy'));
+const AdvancedAnalytics = lazy(() => import('./features/project/pages/AdvancedAnalytics'));
+const ProjectDetails = lazy(() => import('./features/project/pages/ProjectDetails'));
+const Projects = lazy(() => import('./features/project/pages/Projects'));
+const MyTask = lazy(() => import('./features/tasks/pages/MyTask'));
+const ProfilePage = lazy(() => import('./features/users/pages/ProfilePage'));
+const SettingPage = lazy(() => import('./features/users/pages/SettingPage'));
+const UserCalendar = lazy(() => import('./features/users/pages/UserCalendar'));
+const UserDashboard = lazy(() => import('./features/users/pages/UserDashboard'));
 
 const router = createBrowserRouter([
   // ── Guest routes (redirect to /dashboard if already logged in)
@@ -84,6 +82,10 @@ const router = createBrowserRouter([
   { path: '*', element: <ErrorPage /> },
 ]);
 
-const App = () => <RouterProvider router={router} />;
+const App = () => (
+  <Suspense fallback={<FullPageSpinner />}>
+    <RouterProvider router={router} />
+  </Suspense>
+);
 
 export default App;

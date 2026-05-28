@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import PriorityBadge from '@/components/shared/PriorityBadge';
+import StatsCard from '@/components/shared/StatsCard';
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -54,20 +57,6 @@ const ROLE_STYLES = {
   OWNER: 'bg-primary/15 text-primary border-primary/30',
   ADMIN: 'bg-purple-500/10 text-purple-600 border-purple-500/30',
   MEMBER: 'bg-sky-500/10 text-sky-600 border-sky-500/30',
-};
-
-const TASK_STATUS_STYLES = {
-  TODO: 'bg-muted text-muted-foreground border-muted-foreground/30',
-  IN_PROGRESS: 'bg-primary/10 text-primary border-primary/30',
-  IN_REVIEW: 'bg-amber-500/10 text-amber-600 border-amber-500/30',
-  DONE: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
-};
-
-const TASK_PRIORITY_STYLES = {
-  LOW: 'bg-blue-500/10 text-blue-500',
-  MEDIUM: 'bg-yellow-500/10 text-yellow-600',
-  HIGH: 'bg-orange-500/10 text-orange-600',
-  URGENT: 'bg-destructive/10 text-destructive',
 };
 
 const ProjectDetails = () => {
@@ -297,55 +286,27 @@ const ProjectDetails = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="flex flex-col items-center gap-2 p-3 text-center sm:flex-row sm:gap-4 sm:p-5 sm:text-left">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11">
-              <DASHBOARD_ICONS.USERS className="h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            <div className="w-full min-w-0">
-              <div className="text-muted-foreground truncate text-[10px] tracking-wider uppercase sm:text-xs">
-                Members
-              </div>
-              <div className="text-lg font-semibold sm:text-2xl">
-                {project.memberCount ?? members.length}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="flex flex-col items-center gap-2 p-3 text-center sm:flex-row sm:gap-4 sm:p-5 sm:text-left">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11">
-              <DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            <div className="w-full min-w-0">
-              <div className="text-muted-foreground truncate text-[10px] tracking-wider uppercase sm:text-xs">
-                Tasks
-              </div>
-              <div className="text-lg font-semibold sm:text-2xl">
-                {project.taskCount ?? tasks.length}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-          <CardContent className="flex flex-col items-center gap-2 p-3 text-center sm:flex-row sm:gap-4 sm:p-5 sm:text-left">
-            <div className="bg-primary/10 text-primary flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11">
-              <DASHBOARD_ICONS.CALENDARDAYS className="h-4 w-4 sm:h-5 sm:w-5" />
-            </div>
-            <div className="w-full min-w-0">
-              <div className="text-muted-foreground truncate text-[10px] tracking-wider uppercase sm:text-xs">
-                Created
-              </div>
-              <div className="mt-0.5 truncate text-[11px] font-medium sm:text-sm">
-                {project.createdAt
-                  ? formatDateDisplay(project.createdAt, 'short')
-                  : '—'}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Members"
+          value={project.memberCount ?? members.length}
+          icon={<DASHBOARD_ICONS.USERS className="h-4 w-4 sm:h-5 sm:w-5" />}
+          variant="minimal"
+          accentColor="primary"
+        />
+        <StatsCard
+          title="Tasks"
+          value={project.taskCount ?? tasks.length}
+          icon={<DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4 sm:h-5 sm:w-5" />}
+          variant="minimal"
+          accentColor="primary"
+        />
+        <StatsCard
+          title="Created"
+          value={project.createdAt ? formatDateDisplay(project.createdAt, 'short') : '—'}
+          icon={<DASHBOARD_ICONS.CALENDARDAYS className="h-4 w-4 sm:h-5 sm:w-5" />}
+          variant="minimal"
+          accentColor="primary"
+        />
       </div>
 
       {/* Unified Tab Switcher */}
@@ -644,14 +605,11 @@ const ProjectDetails = () => {
                           {task.title}
                         </span>
                         {task.priority && (
-                          <Badge
-                            className={cn(
-                              TASK_PRIORITY_STYLES[task.priority],
-                              'shrink-0 rounded-full border-none px-2 py-0.5 text-[9px] font-semibold tracking-wider uppercase'
-                            )}
-                          >
-                            {task.priority}
-                          </Badge>
+                          <PriorityBadge
+                            priority={task.priority}
+                            size="sm"
+                            className="shrink-0 text-[9px] tracking-wider uppercase"
+                          />
                         )}
                         {needsReview && (
                           <Badge
@@ -686,16 +644,11 @@ const ProjectDetails = () => {
                         Status
                       </span>
                       <div className="flex items-center gap-2">
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            TASK_STATUS_STYLES[task.status] ||
-                              TASK_STATUS_STYLES.TODO,
-                            'shrink-0 rounded-full border-none px-2.5 py-0.5 text-[9px] font-bold tracking-wider uppercase'
-                          )}
-                        >
-                          {task.status?.replace('_', ' ')}
-                        </Badge>
+                        <StatusBadge
+                          status={task.status}
+                          size="sm"
+                          className="shrink-0 text-[9px] tracking-wider uppercase font-bold"
+                        />
                         {isManager && (
                           <Button
                             variant="ghost"

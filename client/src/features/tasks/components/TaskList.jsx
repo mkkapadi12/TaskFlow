@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 
-import { Badge } from '@/components/ui/badge';
+import PriorityBadge from '@/components/shared/PriorityBadge';
+import StatusBadge from '@/components/shared/StatusBadge';
 import { Card, CardContent } from '@/components/ui/card';
-import { priorityConfig, statusConfig } from '@/constant';
+import { statusConfig } from '@/constant';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { formatDateDisplay } from '@/lib/utils';
 
@@ -32,7 +33,6 @@ const TaskList = ({ tasks, isLoading }) => {
     <div className="space-y-3">
       {tasks.map((task) => {
         const status = statusConfig[task.status] ?? statusConfig.TODO;
-        const priority = priorityConfig[task.priority];
         const overdue = isOverdue(task.deadline, task.status);
 
         return (
@@ -56,13 +56,8 @@ const TaskList = ({ tasks, isLoading }) => {
                       </h3>
 
                       {/* Priority badge */}
-                      {priority && (
-                        <Badge
-                          variant="outline"
-                          className={`${priority.className} rounded-full px-2 py-0 text-[10px] font-medium`}
-                        >
-                          {priority.label}
-                        </Badge>
+                      {task.priority && (
+                        <PriorityBadge priority={task.priority} size="sm" />
                       )}
                     </div>
 
@@ -93,12 +88,7 @@ const TaskList = ({ tasks, isLoading }) => {
                   {/* Right: status + deadline */}
                   <div className="flex flex-row flex-wrap items-center gap-2 sm:flex-col sm:items-end sm:gap-2">
                     {/* Status badge */}
-                    <Badge
-                      variant="outline"
-                      className={`${status.className} rounded-full border px-2.5 py-0.5 text-[11px] font-medium`}
-                    >
-                      {status.label}
-                    </Badge>
+                    <StatusBadge status={task.status} />
 
                     {/* Deadline */}
                     {task.deadline && (

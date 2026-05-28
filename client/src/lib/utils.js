@@ -69,3 +69,24 @@ export const formatBytes = (bytes) => {
 };
 
 export const getExt = (name) => name.split('.').pop()?.toLowerCase() || 'file';
+
+export const getRemainingDaysLabel = (deadlineStr) => {
+  if (!deadlineStr) return '';
+  const deadline = new Date(deadlineStr);
+  const now = new Date();
+  const dDate = new Date(
+    deadline.getFullYear(),
+    deadline.getMonth(),
+    deadline.getDate()
+  );
+  const nDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const diffTime = dDate.getTime() - nDate.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays < 0) return 'Overdue';
+  return `In ${diffDays} days`;
+};
+

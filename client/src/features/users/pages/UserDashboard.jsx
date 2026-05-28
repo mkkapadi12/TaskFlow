@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   Cell,
   Legend,
@@ -7,15 +8,17 @@ import {
   Tooltip,
 } from 'recharts';
 
-import { Badge } from '@/components/ui/badge';
+import PriorityBadge from '@/components/shared/PriorityBadge';
+import StatsCard from '@/components/shared/StatsCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { priorityColors } from '@/constant';
 import { useGetMyProjectsQuery } from '@/features/project/project.api';
 import {
   useGetMyTasksQuery,
   useGetOverdueTasksQuery,
 } from '@/features/tasks/task.api';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
-import { cn, formatDateDisplay } from '@/lib/utils';
+import { cn, formatDateDisplay, getRemainingDaysLabel } from '@/lib/utils';
 
 const UserDashboard = () => {
   const { data: projectData, isLoading: projectsLoading } =
@@ -28,57 +31,66 @@ const UserDashboard = () => {
   const tasksData = tasks?.data;
   const overdueTasksData = overdueTasks?.data;
 
-  if (projectsLoading || tasksLoading || overdueLoading) {
-    return <div className="p-6">Loading dashboard data...</div>;
-  }
-
   // Process data for chart
-  const statusCounts = Array.isArray(tasksData)
-    ? tasksData.reduce((acc, task) => {
-        acc[task.status] = (acc[task.status] || 0) + 1;
-        return acc;
-      }, {})
-    : {};
-
-  const chartData = Object.entries(statusCounts).map(([name, value]) => ({
-    name,
-    value,
-  }));
-
-  // Helper to calculate relative remaining days label
-  const getRemainingDaysLabel = (deadlineStr) => {
-    const deadline = new Date(deadlineStr);
-    const now = new Date();
-    const dDate = new Date(
-      deadline.getFullYear(),
-      deadline.getMonth(),
-      deadline.getDate()
-    );
-    const nDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    const diffTime = dDate.getTime() - nDate.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Tomorrow';
-    if (diffDays < 0) return 'Overdue';
-    return `In ${diffDays} days`;
-  };
+  const chartData = useMemo(() => {
+    if (!Array.isArray(tasksData)) return [];
+    const statusCounts = tasksData.reduce((acc, task) => {
+      acc[task.status] = (acc[task.status] || 0) + 1;
+      return acc;
+    }, {});
+    return Object.entries(statusCounts).map(([name, value]) => ({
+      name,
+      value,
+    }));
+  }, [tasksData]);
 
   const COLORS = ['#10b981', '#38bdf8', '#f59e0b', '#8b5cf6'];
 
+  const DASHBOARD_DATA = [
+    {
+      title: 'Total Projects',
+      value: projects?.length || 0,
+      description: 'Active projects you are part of',
+      icon: <DASHBOARD_ICONS.BRIEFCASE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />,
+      accentColor: 'sky',
+    },
+    {
+      title: 'Total Tasks',
+      value: tasks?.data?.length || 0,
+      description: 'Tasks assigned to you',
+      icon: (
+        <DASHBOARD_ICONS.LISTCHECKS className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+      ),
+      accentColor: 'violet',
+    },
+    {
+      title: 'Overdue Tasks',
+      value: overdueTasksData?.length || 0,
+      description: 'Tasks past their deadline',
+      icon: (
+        <DASHBOARD_ICONS.ALERTTRIANGLE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+      ),
+      accentColor: 'destructive',
+    },
+  ];
+
   // Filter upcoming deadlines
-  const upcomingTasks = Array.isArray(tasksData)
-    ? tasksData
-        .filter((task) => {
-          if (!task.deadline) return false;
-          const deadline = new Date(task.deadline);
-          const now = new Date();
-          return deadline > now && task.status !== 'DONE';
-        })
-        .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
-        .slice(0, 5)
-    : [];
+  const upcomingTasks = useMemo(() => {
+    if (!Array.isArray(tasksData)) return [];
+    return tasksData
+      .filter((task) => {
+        if (!task.deadline) return false;
+        const deadline = new Date(task.deadline);
+        const now = new Date();
+        return deadline > now && task.status !== 'DONE';
+      })
+      .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+      .slice(0, 5);
+  }, [tasksData]);
+
+  if (projectsLoading || tasksLoading || overdueLoading) {
+    return <div className="p-6">Loading dashboard data...</div>;
+  }
 
   return (
     <div className="space-y-4 p-3 sm:space-y-6 sm:p-6">
@@ -90,60 +102,16 @@ const UserDashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <Card className="border-border/50 bg-card/50 hover:bg-card/80 border-l-4 border-l-sky-500 p-0 shadow-sm backdrop-blur-sm transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
-            <CardTitle className="text-muted-foreground sm:text-foreground text-[11px] font-semibold tracking-tight sm:text-sm sm:font-medium">
-              Total Projects
-            </CardTitle>
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sky-500/10 text-sky-600 sm:h-8 sm:w-8 dark:text-sky-400">
-              <DASHBOARD_ICONS.BRIEFCASE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-            <div className="text-foreground text-lg font-bold sm:text-2xl">
-              {projects?.length || 0}
-            </div>
-            <p className="text-muted-foreground mt-1 hidden text-xs sm:block">
-              Active projects you are part of
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-border/50 bg-card/50 hover:bg-card/80 border-l-4 border-l-violet-500 p-0 shadow-sm backdrop-blur-sm transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
-            <CardTitle className="text-muted-foreground sm:text-foreground text-[11px] font-semibold tracking-tight sm:text-sm sm:font-medium">
-              Total Tasks
-            </CardTitle>
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-500/10 text-violet-600 sm:h-8 sm:w-8 dark:text-violet-400">
-              <DASHBOARD_ICONS.LISTCHECKS className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-            <div className="text-foreground text-lg font-bold sm:text-2xl">
-              {tasks?.data?.length || 0}
-            </div>
-            <p className="text-muted-foreground mt-1 hidden text-xs sm:block">
-              Tasks assigned to you
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-border/50 bg-card/50 hover:bg-card/80 border-l-destructive border-l-4 p-0 shadow-sm backdrop-blur-sm transition-all">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
-            <CardTitle className="text-muted-foreground sm:text-foreground text-[11px] font-semibold tracking-tight sm:text-sm sm:font-medium">
-              Overdue Tasks
-            </CardTitle>
-            <div className="bg-destructive/10 text-destructive flex h-7 w-7 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8">
-              <DASHBOARD_ICONS.ALERTTRIANGLE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
-            <div className="text-destructive text-lg font-bold sm:text-2xl">
-              {overdueTasksData?.length || 0}
-            </div>
-            <p className="text-muted-foreground mt-1 hidden text-xs sm:block">
-              Tasks past their deadline
-            </p>
-          </CardContent>
-        </Card>
+        {DASHBOARD_DATA.map((item, index) => (
+          <StatsCard
+            key={index}
+            title={item.title}
+            value={item.value}
+            description={item.description}
+            icon={item.icon}
+            accentColor={item.accentColor}
+          />
+        ))}
       </div>
 
       {/* Charts and Lists */}
@@ -209,23 +177,6 @@ const UserDashboard = () => {
             <div className="space-y-3">
               {upcomingTasks.length > 0 ? (
                 upcomingTasks.map((task) => {
-                  const priorityColors = {
-                    LOW: 'border-l-blue-500 bg-blue-500/5 hover:bg-blue-500/10 text-blue-500 border-blue-500/20',
-                    MEDIUM:
-                      'border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/10 text-amber-600 border-amber-500/20',
-                    HIGH: 'border-l-orange-500 bg-orange-500/5 hover:bg-orange-500/10 text-orange-600 border-orange-500/20',
-                    URGENT:
-                      'border-l-red-500 bg-red-500/5 hover:bg-red-500/10 text-red-600 border-red-500/20',
-                  };
-
-                  const priorityBadges = {
-                    LOW: 'bg-blue-500/10 text-blue-500 border-blue-500/30',
-                    MEDIUM:
-                      'bg-amber-500/10 text-amber-500 border-amber-500/30',
-                    HIGH: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
-                    URGENT: 'bg-red-500/10 text-red-500 border-red-500/30',
-                  };
-
                   return (
                     <div
                       key={task.id}
@@ -263,21 +214,11 @@ const UserDashboard = () => {
                         </div>
                       </div>
 
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          'shrink-0 rounded-full border px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase',
-                          task.priority === 'URGENT'
-                            ? priorityBadges.URGENT
-                            : task.priority === 'HIGH'
-                              ? priorityBadges.HIGH
-                              : task.priority === 'MEDIUM'
-                                ? priorityBadges.MEDIUM
-                                : priorityBadges.LOW
-                        )}
-                      >
-                        {task.priority}
-                      </Badge>
+                      <PriorityBadge
+                        priority={task.priority}
+                        size="sm"
+                        className="shrink-0 text-[8px] font-bold tracking-wider uppercase"
+                      />
                     </div>
                   );
                 })

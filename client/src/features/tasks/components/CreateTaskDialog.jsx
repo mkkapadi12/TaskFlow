@@ -64,7 +64,7 @@ const CreateTaskDialog = ({ open, onOpenChange, projectId, members = [] }) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-120">
         <DialogHeader>
           <DialogTitle>Create Task</DialogTitle>
           <DialogDescription>
