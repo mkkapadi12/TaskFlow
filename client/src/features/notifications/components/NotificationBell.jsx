@@ -57,6 +57,7 @@ export default function NotificationBell() {
   const { data: response, isLoading } = useGetNotificationsQuery(undefined, {
     refetchOnMountOrArgChange: false,
     pollingInterval: socketConnected ? 0 : 8000,
+    skip: !user?.id,
   });
   const [markRead] = useMarkNotificationReadMutation();
   const [markAllRead] = useMarkAllNotificationsReadMutation();
