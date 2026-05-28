@@ -1,6 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 
+import { baseApi } from '@/app/baseApi';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { NAV_ITEMS } from '@/constant';
@@ -9,6 +10,7 @@ import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { ICONS } from '@/lib/icons/icons';
+import { disconnectSocket } from '@/lib/socket';
 import { cn } from '@/lib/utils';
 
 const Sidebar = ({ open, onClose }) => {
@@ -28,7 +30,9 @@ const Sidebar = ({ open, onClose }) => {
       variant: 'destructive',
     });
     if (isConfirmed) {
+      disconnectSocket();
       dispatch(logout());
+      dispatch(baseApi.util.resetApiState());
     }
   };
 

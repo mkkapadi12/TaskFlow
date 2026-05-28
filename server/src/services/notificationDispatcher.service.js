@@ -2,26 +2,23 @@ import callProcedure from '../config/callProcedure.js';
 import { sendToUser } from '../config/socket.js';
 import NotificationModel from '../models/notification.model.js';
 
-/**
- * Helper to fetch a task's full info.
- */
+// Helper to fetch a task's full info.
+
 const getTaskInfo = async (taskId) => {
   const [rows] = await callProcedure('sp_GetTaskById', [taskId]);
   return rows[0] || null;
 };
 
-/**
- * Helper to fetch a project's full info.
- */
+// Helper to fetch a project's full info.
+
 const getProjectInfo = async (projectId) => {
   const [rows] = await callProcedure('sp_GetProjectById', [projectId]);
   return rows[0] || null;
 };
 
-/**
- * Central notification dispatcher.
- * Fire-and-forget design: completely wrapped in try/catch so it never blocks the main API controller response.
- */
+// Central notification dispatcher.
+// Fire-and-forget design: completely wrapped in try/catch so it never blocks the main API controller response.
+
 const dispatchNotification = async (type, payload) => {
   try {
     const { actorId, actorName } = payload;
@@ -170,8 +167,9 @@ const dispatchNotification = async (type, payload) => {
     }
 
     // Filter out: null/undefined, and actorId (don't notify yourself)
-    const uniqueRecipients = [...new Set(recipients)]
-      .filter(id => id !== null && id !== undefined && Number(id) !== Number(actorId));
+    const uniqueRecipients = [...new Set(recipients)].filter(
+      (id) => id !== null && id !== undefined && Number(id) !== Number(actorId)
+    );
 
     if (uniqueRecipients.length === 0) {
       return;
@@ -181,12 +179,21 @@ const dispatchNotification = async (type, payload) => {
     await Promise.all(
       uniqueRecipients.map(async (userId) => {
         try {
-          const newNotif = await NotificationModel.create(userId, type, title, body, meta);
+          const newNotif = await NotificationModel.create(
+            userId,
+            type,
+            title,
+            body,
+            meta
+          );
           if (newNotif) {
             sendToUser(userId, 'notification', newNotif);
           }
         } catch (dbErr) {
-          console.error(`[NotificationDispatcher] DB Insert failed for userId ${userId}:`, dbErr.message);
+          console.error(
+            `[NotificationDispatcher] DB Insert failed for userId ${userId}:`,
+            dbErr.message
+          );
         }
       })
     );

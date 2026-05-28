@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
+import { baseApi } from '@/app/baseApi';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { PAGE_TITLES } from '@/constant';
@@ -58,6 +59,7 @@ const Topbar = ({ onMenuClick }) => {
     if (isConfirmed) {
       disconnectSocket();
       dispatch(logout());
+      dispatch(baseApi.util.resetApiState());
     }
   };
 

@@ -25,6 +25,7 @@ const axiosBaseQuery =
     } catch (err) {
       if (err.response?.status === 401) {
         api.dispatch(logout());
+        api.dispatch(baseApi.util.resetApiState());
       }
       return {
         error: {
