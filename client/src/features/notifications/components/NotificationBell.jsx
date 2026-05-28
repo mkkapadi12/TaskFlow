@@ -9,6 +9,7 @@ import {
   useMarkAllNotificationsReadMutation,
   useMarkNotificationReadMutation,
 } from '@/features/notifications/notification.api';
+import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 
 export default function NotificationBell() {
@@ -16,10 +17,46 @@ export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // RTK Query API
+  const { user } = useAuth();
+  const [socketConnected, setSocketConnected] = useState(false);
+
+  // Monitor WebSocket status for dynamic polling control
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let activeSocket = null;
+    let onConnect = null;
+    let onDisconnect = null;
+
+    import('@/lib/socket').then(({ getSocket }) => {
+      const socket = getSocket(user.id);
+      if (!socket) {
+        setSocketConnected(false);
+        return;
+      }
+
+      activeSocket = socket;
+      setSocketConnected(socket.connected);
+
+      onConnect = () => setSocketConnected(true);
+      onDisconnect = () => setSocketConnected(false);
+
+      socket.on('connect', onConnect);
+      socket.on('disconnect', onDisconnect);
+    });
+
+    return () => {
+      if (activeSocket) {
+        if (onConnect) activeSocket.off('connect', onConnect);
+        if (onDisconnect) activeSocket.off('disconnect', onDisconnect);
+      }
+    };
+  }, [user]);
+
+  // RTK Query API — Polls every 8 seconds if WebSocket is bypassed (Vercel) or disconnected
   const { data: response, isLoading } = useGetNotificationsQuery(undefined, {
-    // Keep polling active but don't force refetch on mount if already cached
     refetchOnMountOrArgChange: false,
+    pollingInterval: socketConnected ? 0 : 8000,
   });
   const [markRead] = useMarkNotificationReadMutation();
   const [markAllRead] = useMarkAllNotificationsReadMutation();

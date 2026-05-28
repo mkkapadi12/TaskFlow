@@ -3,12 +3,20 @@ import { io } from 'socket.io-client';
 const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
 let socket = null;
 
-console.log(window.location.origin);
+// Vercel serverless functions do not support persistent WebSockets.
+// Disable connection to prevent continuous 404 requests in Vercel logs.
+const isVercel = window.location.hostname.includes('.vercel.app') || 
+                 (import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.includes('.vercel.app'));
 
 /**
  * Connect to the Socket.io server and register the current user.
  */
 export const getSocket = (userId) => {
+  if (isVercel) {
+    console.log('[Socket] Running on Vercel Serverless. WebSockets bypassed, falling back to HTTP polling.');
+    return null;
+  }
+
   if (!socket) {
     console.log(`[Socket] Initializing connection to ${socketUrl}`);
     socket = io(socketUrl, {
