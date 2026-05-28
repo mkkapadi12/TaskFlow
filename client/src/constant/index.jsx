@@ -184,29 +184,6 @@ export const VALUES = [
   },
 ];
 
-export const TEAM = [
-  {
-    name: 'Alex Rivera',
-    role: 'Founder & CEO',
-    initials: 'AR',
-  },
-  {
-    name: 'Sarah Chen',
-    role: 'Lead Designer',
-    initials: 'SC',
-  },
-  {
-    name: 'Marcus Johnson',
-    role: 'Full-Stack Engineer',
-    initials: 'MJ',
-  },
-  {
-    name: 'Priya Patel',
-    role: 'Product Manager',
-    initials: 'PP',
-  },
-];
-
 export const statusConfig = {
   TODO: {
     label: 'To Do',
@@ -333,3 +310,14 @@ export const priorityColors = {
   URGENT:
     'border-l-red-500 bg-red-500/5 hover:bg-red-500/10 text-red-600 border-red-500/20',
 };
+
+export const STATUS_COLORS = {
+  ACTIVE: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
+  INACTIVE: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
+};
+
+export const STATUS_OPTIONS = [
+  { value: 'ALL', label: 'All Projects' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'INACTIVE', label: 'Inactive' },
+];

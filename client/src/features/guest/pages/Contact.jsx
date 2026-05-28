@@ -62,7 +62,7 @@ const Contact = () => {
           </span>
           <h1 className="mt-6 text-4xl leading-[1.05] font-bold tracking-tight sm:text-5xl md:text-6xl">
             {t('title')}{' '}
-            <span className="from-primary to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+            <span className="from-primary to-foreground bg-linear-to-r bg-clip-text text-transparent">
               {t('titleHighlight')}
             </span>
           </h1>

@@ -38,7 +38,7 @@ const METHOD_STYLES = {
 const MethodBadge = ({ method }) => (
   <span
     className={cn(
-      'inline-flex min-w-[60px] items-center justify-center rounded-md border px-2 py-0.5 text-[11px] font-bold tracking-wider',
+      'inline-flex min-w-15 items-center justify-center rounded-md border px-2 py-0.5 text-[11px] font-bold tracking-wider',
       METHOD_STYLES[method]
     )}
   >
@@ -610,7 +610,7 @@ Authorization: Bearer <token>
                         key={`${method}-${path}`}
                         className="group border-border bg-card hover:bg-accent/40 flex flex-col gap-3 rounded-xl border p-4 motion-safe:transition-colors sm:flex-row sm:items-center sm:gap-4"
                       >
-                        <div className="flex items-center gap-3 sm:min-w-[280px]">
+                        <div className="flex items-center gap-3 sm:min-w-70">
                           <MethodBadge method={method} />
                           <code className="text-foreground text-sm font-medium">
                             {path}

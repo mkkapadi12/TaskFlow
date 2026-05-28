@@ -33,7 +33,7 @@ const Home = () => {
 
           <h1 className="mt-6 text-4xl leading-[1.05] font-bold tracking-tight sm:text-5xl md:text-6xl">
             {t('hero.title')}{' '}
-            <span className="from-primary to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+            <span className="from-primary to-foreground bg-linear-to-r bg-clip-text text-transparent">
               {t('hero.subtitle')}
             </span>
           </h1>
@@ -147,7 +147,7 @@ const Home = () => {
 
       {/* ── Final CTA ──────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28 lg:px-8">
-        <div className="border-border from-primary/5 via-card to-accent/5 relative overflow-hidden rounded-3xl border bg-gradient-to-br p-10 text-center md:p-14">
+        <div className="border-border from-primary/5 via-card to-accent/5 relative overflow-hidden rounded-3xl border bg-linear-to-br p-10 text-center md:p-14">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             {t('ctaSection.title')}
           </h2>

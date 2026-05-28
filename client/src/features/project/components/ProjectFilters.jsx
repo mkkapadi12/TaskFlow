@@ -8,18 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { STATUS_COLORS, STATUS_OPTIONS } from '@/constant';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
-
-const STATUS_OPTIONS = [
-  { value: 'ALL', label: 'All Projects' },
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'INACTIVE', label: 'Inactive' },
-];
-
-const STATUS_COLORS = {
-  ACTIVE: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-  INACTIVE: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
-};
 
 const ProjectFilters = ({
   status,
@@ -70,7 +60,7 @@ const ProjectFilters = ({
           <Select value={status} onValueChange={onStatusChange}>
             <SelectTrigger
               id="project-status-filter"
-              className="bg-background/50 border-border/40 focus:ring-primary/30 w-[160px] text-sm transition-all focus:ring-1"
+              className="bg-background/50 border-border/40 focus:ring-primary/30 w-40 text-sm transition-all focus:ring-1"
             >
               <SelectValue placeholder="All Projects" />
             </SelectTrigger>
