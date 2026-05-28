@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Cell,
   Legend,
@@ -53,6 +54,7 @@ const UserDashboard = () => {
       description: 'Active projects you are part of',
       icon: <DASHBOARD_ICONS.BRIEFCASE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />,
       accentColor: 'sky',
+      path: '/projects',
     },
     {
       title: 'Total Tasks',
@@ -62,6 +64,7 @@ const UserDashboard = () => {
         <DASHBOARD_ICONS.LISTCHECKS className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
       ),
       accentColor: 'violet',
+      path: '/tasks',
     },
     {
       title: 'Overdue Tasks',
@@ -71,6 +74,7 @@ const UserDashboard = () => {
         <DASHBOARD_ICONS.ALERTTRIANGLE className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
       ),
       accentColor: 'destructive',
+      path: '/tasks',
     },
   ];
 
@@ -103,14 +107,15 @@ const UserDashboard = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {DASHBOARD_DATA.map((item, index) => (
-          <StatsCard
-            key={index}
-            title={item.title}
-            value={item.value}
-            description={item.description}
-            icon={item.icon}
-            accentColor={item.accentColor}
-          />
+          <Link key={index} to={item.path}>
+            <StatsCard
+              title={item.title}
+              value={item.value}
+              description={item.description}
+              icon={item.icon}
+              accentColor={item.accentColor}
+            />
+          </Link>
         ))}
       </div>
 

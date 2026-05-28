@@ -10,6 +10,17 @@ export const documentApi = baseApi.injectEndpoints({
       }),
       providesTags: (result, error, projectId) => [
         { type: 'Document', id: projectId },
+        { type: 'Document', id: 'LIST' },
+      ],
+    }),
+
+    getGlobalDocuments: builder.query({
+      query: () => ({
+        url: '/documents',
+        method: 'GET',
+      }),
+      providesTags: () => [
+        { type: 'Document', id: 'LIST' },
       ],
     }),
 
@@ -21,6 +32,7 @@ export const documentApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, { projectId }) => [
         { type: 'Document', id: projectId },
+        { type: 'Document', id: 'LIST' },
       ],
     }),
 
@@ -31,6 +43,7 @@ export const documentApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, { projectId }) => [
         { type: 'Document', id: projectId },
+        { type: 'Document', id: 'LIST' },
       ],
     }),
   }),
@@ -38,6 +51,7 @@ export const documentApi = baseApi.injectEndpoints({
 
 export const {
   useGetDocumentsQuery,
+  useGetGlobalDocumentsQuery,
   useUploadDocumentsMutation,
   useDeleteDocumentMutation,
 } = documentApi;

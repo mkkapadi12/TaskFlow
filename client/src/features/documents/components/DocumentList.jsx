@@ -10,17 +10,29 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { EXT_COLORS } from '@/constant';
 import { useAlertDialog } from '@/hooks/useAlertDialog';
+import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { formatBytes, formatDateDisplay, getExt } from '@/lib/utils';
 
 import {
   useDeleteDocumentMutation,
   useGetDocumentsQuery,
+  useGetGlobalDocumentsQuery,
 } from '../document.api';
 import DocumentPreviewModal from './DocumentPreviewModal';
 
-const DocumentList = ({ projectId, isManager }) => {
-  const { data, isLoading } = useGetDocumentsQuery(projectId);
+const DocumentList = ({ projectId, isManager, global = false }) => {
+  const { data: projectData, isLoading: projectLoading } = useGetDocumentsQuery(
+    projectId,
+    { skip: global }
+  );
+  const { data: globalData, isLoading: globalLoading } =
+    useGetGlobalDocumentsQuery(undefined, { skip: !global });
+  const data = global ? globalData : projectData;
+  const isLoading = global ? globalLoading : projectLoading;
+
+  const { user } = useAuth();
+
   const [deleteDocument] = useDeleteDocumentMutation();
   const confirm = useAlertDialog();
   const [previewDoc, setPreviewDoc] = useState(null);
@@ -60,9 +72,10 @@ const DocumentList = ({ projectId, isManager }) => {
     );
   }, [filteredDocs, selectedIds]);
 
-  const handleDelete = async (documentId) => {
+  const handleDelete = async (documentId, docProjectId) => {
+    const targetProjectId = projectId || docProjectId;
     try {
-      await deleteDocument({ projectId, documentId }).unwrap();
+      await deleteDocument({ projectId: targetProjectId, documentId }).unwrap();
       toast.success('Document deleted');
       // Remove deleted document from selection if it was selected
       if (selectedIds.has(documentId)) {
@@ -232,6 +245,12 @@ const DocumentList = ({ projectId, isManager }) => {
           {filteredDocs.map((doc) => {
             const ext = getExt(doc.name);
             const isSelected = selectedIds.has(doc.id);
+            const canDelete =
+              isManager ||
+              (global &&
+                (doc.memberRole === 'OWNER' ||
+                  doc.memberRole === 'ADMIN' ||
+                  doc.projectOwnerId === user?.id));
             return (
               <li
                 key={doc.id}
@@ -264,6 +283,7 @@ const DocumentList = ({ projectId, isManager }) => {
                     <p className="text-muted-foreground mt-0.5 hidden truncate text-[11px] sm:block">
                       {formatBytes(doc.size)} · by {doc.uploaderName} ·{' '}
                       {formatDateDisplay(doc.createdAt, 'dd/mm/yyyy')}
+                      {global && ` · Project: ${doc.projectTitle}`}
                     </p>
                   </div>
                 </div>
@@ -271,6 +291,7 @@ const DocumentList = ({ projectId, isManager }) => {
                 <div className="border-border/5 flex w-full shrink-0 items-center justify-between gap-2 border-t pt-2 sm:w-auto sm:justify-end sm:border-t-0 sm:pt-0">
                   <span className="text-muted-foreground text-xs font-medium sm:hidden">
                     {formatBytes(doc.size)} · {doc.uploaderName}
+                    {global && ` · ${doc.projectTitle}`}
                   </span>
                   <div className="flex items-center gap-1">
                     <Button
@@ -294,7 +315,7 @@ const DocumentList = ({ projectId, isManager }) => {
                       </Button>
                     </a>
 
-                    {isManager && (
+                    {canDelete && (
                       <Button
                         variant="ghost"
                         size="sm"
@@ -320,7 +341,7 @@ const DocumentList = ({ projectId, isManager }) => {
                             variant: 'destructive',
                           });
                           if (isConfirmed) {
-                            handleDelete(doc.id);
+                            handleDelete(doc.id, doc.projectId);
                           }
                         }}
                         className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 w-8 shrink-0 p-0"

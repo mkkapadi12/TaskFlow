@@ -13,6 +13,7 @@ import {
   Eye,
   FilePen,
   FileText,
+  HardDrive,
   Inbox,
   LayoutDashboard,
   ListChecks,
@@ -74,4 +75,5 @@ export const DASHBOARD_ICONS = {
   DOWNLOAD: Download,
   SEND: Send,
   MESSAGESQUARE: MessageSquare,
+  HARDDRIVE:HardDrive
 };

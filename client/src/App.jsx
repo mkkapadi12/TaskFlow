@@ -28,6 +28,7 @@ const ProfilePage = lazy(() => import('./features/users/pages/ProfilePage'));
 const SettingPage = lazy(() => import('./features/users/pages/SettingPage'));
 const UserCalendar = lazy(() => import('./features/users/pages/UserCalendar'));
 const UserDashboard = lazy(() => import('./features/users/pages/UserDashboard'));
+const Requirements = lazy(() => import('./features/documents/pages/Requirements'));
 
 const router = createBrowserRouter([
   // ── Guest routes (redirect to /dashboard if already logged in)
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
             element: <AdvancedAnalytics />,
           },
           { path: '/analytics', element: <AdvancedAnalytics /> },
+          { path: '/documents', element: <Requirements /> },
           { path: '/tasks', element: <MyTask /> },
         ],
       },

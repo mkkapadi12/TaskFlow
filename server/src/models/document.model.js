@@ -56,6 +56,12 @@ const DocumentModel = {
     return docs;
   },
 
+  // Get all documents across all user's projects
+  getAllUserDocs: async (userId) => {
+    const [docs] = await callProcedure('sp_GetAllUserDocuments', [userId]);
+    return docs;
+  },
+
   // Delete single doc (admin OR owner only)
   delete: async (documentId, userId, projectId) => {
     // auth: must be admin OR owner of that project

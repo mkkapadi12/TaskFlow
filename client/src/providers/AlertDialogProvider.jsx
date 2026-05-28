@@ -80,7 +80,7 @@ export const AlertDialogProvider = ({ children }) => {
               </AlertDialogDescription>
             )}
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="grid grid-cols-2 sm:flex sm:flex-row sm:justify-end">
             <AlertDialogCancel onClick={() => handleClose(false)}>
               {state.cancelText}
             </AlertDialogCancel>

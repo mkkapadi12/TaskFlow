@@ -12,9 +12,12 @@ const StatsCard = ({
 }) => {
   const accentClasses = {
     sky: 'border-l-sky-500 bg-sky-500/10 text-sky-600 dark:text-sky-400',
-    violet: 'border-l-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-400',
-    emerald: 'border-l-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    amber: 'border-l-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400',
+    violet:
+      'border-l-violet-500 bg-violet-500/10 text-violet-600 dark:text-violet-400',
+    emerald:
+      'border-l-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    amber:
+      'border-l-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400',
     destructive: 'border-l-destructive bg-destructive/10 text-destructive',
     primary: 'border-l-primary bg-primary/10 text-primary',
   };
@@ -23,16 +26,26 @@ const StatsCard = ({
 
   if (variant === 'minimal') {
     return (
-      <Card className={cn('border-border/50 bg-card/50 backdrop-blur-sm transition-all', className)}>
+      <Card
+        className={cn(
+          'border-border/50 bg-card/50 backdrop-blur-sm transition-all',
+          className
+        )}
+      >
         <CardContent className="flex flex-col items-center gap-2 p-3 text-center sm:flex-row sm:gap-4 sm:p-5 sm:text-left">
-          <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11', selectedAccent)}>
+          <div
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-11 sm:w-11',
+              selectedAccent
+            )}
+          >
             {icon}
           </div>
           <div className="w-full min-w-0">
             <div className="text-muted-foreground truncate text-[10px] tracking-wider uppercase sm:text-xs">
               {title}
             </div>
-            <div className="text-foreground text-lg font-bold sm:text-2xl mt-0.5">
+            <div className="text-foreground mt-0.5 text-sm font-bold sm:text-xl">
               {value}
             </div>
           </div>
@@ -43,16 +56,23 @@ const StatsCard = ({
 
   // Dashboard variant: vertical layout with border highlight
   return (
-    <Card className={cn(
-      'border-border/50 bg-card/50 hover:bg-card/85 p-0 shadow-sm backdrop-blur-sm transition-all border-l-4',
-      selectedAccent.split(' ')[0], // Extracts just the border-l class
-      className
-    )}>
+    <Card
+      className={cn(
+        'border-border/50 bg-card/50 hover:bg-card/85 border-l-4 p-0 shadow-sm backdrop-blur-sm transition-all',
+        selectedAccent.split(' ')[0], // Extracts just the border-l class
+        className
+      )}
+    >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 pb-1 sm:p-6 sm:pb-2">
         <CardTitle className="text-muted-foreground sm:text-foreground text-[11px] font-semibold tracking-tight sm:text-sm sm:font-medium">
           {title}
         </CardTitle>
-        <div className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8', selectedAccent.split(' ').slice(1).join(' '))}>
+        <div
+          className={cn(
+            'flex h-7 w-7 shrink-0 items-center justify-center rounded-full sm:h-8 sm:w-8',
+            selectedAccent.split(' ').slice(1).join(' ')
+          )}
+        >
           {icon}
         </div>
       </CardHeader>

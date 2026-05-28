@@ -68,4 +68,26 @@ BEGIN
     SELECT ROW_COUNT() AS deletedCount;
 END //
 
+
+-- 5. Get all documents across all user's projects
+DROP PROCEDURE IF EXISTS sp_GetAllUserDocuments //
+CREATE PROCEDURE sp_GetAllUserDocuments(
+    IN p_userId INT
+)
+BEGIN
+    SELECT
+        d.id, d.projectId, d.uploadedBy, d.name,
+        d.url, d.publicId, d.size, d.mimeType, d.createdAt,
+        u.name AS uploaderName, u.avatar AS uploaderAvatar,
+        p.title AS projectTitle,
+        p.ownerId AS projectOwnerId,
+        pm.role AS memberRole
+    FROM project_documents d
+    JOIN projects p ON p.id = d.projectId
+    JOIN project_members pm ON pm.projectId = p.id
+    JOIN users u ON u.id = d.uploadedBy
+    WHERE pm.userId = p_userId
+    ORDER BY d.createdAt DESC;
+END //
+
 DELIMITER ;

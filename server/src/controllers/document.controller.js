@@ -20,10 +20,16 @@ const uploadDocuments = async (req, res, next) => {
 
 const getDocuments = async (req, res, next) => {
   try {
-    const docs = await DocumentModel.getByProject({
-      projectId: Number(req.params.projectId),
-      userId: req.user.id,
-    });
+    const projectId = req.params.projectId;
+    let docs;
+    if (projectId) {
+      docs = await DocumentModel.getByProject({
+        projectId: Number(projectId),
+        userId: req.user.id,
+      });
+    } else {
+      docs = await DocumentModel.getAllUserDocs(req.user.id);
+    }
 
     res.status(200).json({ success: true, data: docs });
   } catch (err) {

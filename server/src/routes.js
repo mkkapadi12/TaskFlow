@@ -17,6 +17,7 @@ router.use('/projects', projectRoutes);
 router.use('/tasks', taskRoutes);
 router.use('/notifications/settings', notificationRoutes);
 router.use('/projects/:projectId/documents', documentRoutes);
+router.use('/documents', documentRoutes);
 
 // Secure GET /cron/reminders route for Vercel Cron
 router.get('/cron/reminders', async (req, res, next) => {

@@ -296,14 +296,22 @@ const ProjectDetails = () => {
         <StatsCard
           title="Tasks"
           value={project.taskCount ?? tasks.length}
-          icon={<DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4 sm:h-5 sm:w-5" />}
+          icon={
+            <DASHBOARD_ICONS.LISTCHECKS className="h-4 w-4 sm:h-5 sm:w-5" />
+          }
           variant="minimal"
           accentColor="primary"
         />
         <StatsCard
           title="Created"
-          value={project.createdAt ? formatDateDisplay(project.createdAt, 'short') : '—'}
-          icon={<DASHBOARD_ICONS.CALENDARDAYS className="h-4 w-4 sm:h-5 sm:w-5" />}
+          value={
+            project.createdAt
+              ? formatDateDisplay(project.createdAt, 'short')
+              : '—'
+          }
+          icon={
+            <DASHBOARD_ICONS.CALENDARDAYS className="h-4 w-4 sm:h-5 sm:w-5" />
+          }
           variant="minimal"
           accentColor="primary"
         />
@@ -647,7 +655,7 @@ const ProjectDetails = () => {
                         <StatusBadge
                           status={task.status}
                           size="sm"
-                          className="shrink-0 text-[9px] tracking-wider uppercase font-bold"
+                          className="shrink-0 text-[9px] font-bold tracking-wider uppercase"
                         />
                         {isManager && (
                           <Button
