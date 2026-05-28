@@ -21,6 +21,7 @@ app.use(
         'script-src': ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
         'style-src': ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
         'img-src': ["'self'", 'data:', 'cdnjs.cloudflare.com'],
+        'connect-src': ["'self'", 'cdnjs.cloudflare.com'],
       },
     },
   })
