@@ -37,6 +37,7 @@ mysql -u root -p <db_name> < server/database/tasks.sql
 mysql -u root -p <db_name> < server/database/notification.sql
 mysql -u root -p <db_name> < server/database/task_comments.sql
 mysql -u root -p <db_name> < server/database/project_docs.sql
+mysql -u root -p <db_name> < server/database/notifications_feed.sql
 ```
 
 `server/database/call.sql` is a scratch file for ad-hoc SP invocation — not part of bootstrap.
@@ -109,12 +110,14 @@ The task status machine is enforced in the model layer and in `sp_VerifyTask`:
 ### Server: emails and notifications
 
 - Email delivery is in `services/email.service.js` (SMTP via Nodemailer; HTML in `templates/emails/`). In-app notification settings live in `services/notification.service.js` and `database/notification.sql`. Respect the per-user `notification_settings` toggles before sending any email triggered by a user-facing event.
+- **In-App Live Notification Feed**: Real-time events (comments, task assignments, member changes) are dispatched via `notificationDispatcher.service.js` and stored in the `notifications` table. It broadcasts to active users in real-time via a **Socket.io WebSocket server** initialized on http server boot.
+- **Vercel Serverless Fallback**: Because Vercel serverless functions do not support persistent WebSockets, the client automatically detects `.vercel.app` domains, bypasses WebSocket connection to prevent 404 logs spam, and **automatically falls back to a highly responsive 8-second HTTP polling** mechanism using RTK Query. It immediately stops polling upon user logout by resetting Redux API state using `baseApi.util.resetApiState()`.
 - **Deadline Reminder Emails**: On Vercel, triggered via a daily cron job (`GET /api/cron/reminders`). Locally, scheduled via `setInterval` in `initReminderService` (booted in `index.js`). It checks for uncompleted tasks due within 24 hours (`sp_GetUpcomingTaskReminders`) and sends alert emails using the `deadlineReminder.js` template.
 - **Project-Level Reminders Control**: Project owners can pause/resume reminders via the `allowReminders` field in `projects` (persisted as `TINYINT(1)` via `sp_UpdateProject`). This is configured in the responsive **Settings** tab in the client project details view.
 
 ### Client: RTK Query endpoint injection
 
-`client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task", "NotificationSettings", "Document", "Comment"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
+`client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task", "NotificationSettings", "Document", "Comment", "Notification"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
 
 Client-side dependencies also include `jszip` + `file-saver` for client-side ZIP packaging of bulk document downloads, and `@vercel/analytics` for page-view analytics.
 
@@ -136,9 +139,9 @@ Auth state lives in `features/auth/auth.slice.js` and persists the JWT to `local
 
 ### Client: feature slicing
 
-Each domain owns its folder under `client/src/features/<name>/`: `pages/`, `components/`, `*.api.js` (RTK Query injection), and optionally `*.slice.js`. Current domains: `auth`, `users`, `project`, `tasks`, `documents`, `notifications`, `admin`, `guest`. Shadcn primitives live in `client/src/components/ui/`; layout shells live in `client/src/components/layouts/{app,guest}/`; loading skeletons live in `client/src/skeleton/`.
+Each domain owns its folder under `client/src/features/<name>/`: `pages/`, `components/`, `*.api.js` (RTK Query injection), and optionally `*.slice.js`. Current domains: `auth`, `users`, `project`, `tasks`, `documents`, `notifications`, `admin`, `guest`. Shadcn primitives live in `client/src/components/ui/`; reusable shared UI tokens and badges live in `client/src/components/shared/` (`StatusBadge`, `PriorityBadge`, `StatsCard`); layout shells live in `client/src/components/layouts/{app,guest}/`; loading skeletons live in `client/src/skeleton/`.
 
-The `documents` feature includes `DocumentList.jsx` (with search bar, extension filter, multi-select checkboxes, floating bulk-action bar, and client-side ZIP download via `jszip` + `file-saver`), `DocumentUploader.jsx`, and `DocumentPreviewModal.jsx` with per-format viewers.
+The `documents` feature includes `DocumentList.jsx` (with search bar, extension filter, multi-select checkboxes, floating bulk-action bar, and client-side ZIP download via `jszip` + `file-saver`), `DocumentUploader.jsx`, and `DocumentPreviewModal.jsx` with per-format viewers. It also features a global aggregated requirements dashboard at `/documents` (`Requirements.jsx`) compiling documents across all projects for which the user is a member, reusing the `<DocumentList>` component in read-only global mode to avoid code duplication.
 
 Path alias: `@/*` → `client/src/*` (configured in both `jsconfig.json` and `vite.config.js` — keep them in sync).
 

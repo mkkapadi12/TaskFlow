@@ -47,6 +47,7 @@ TaskFlow/
 | Security             | `helmet`, `cors`, `express-rate-limit`      |
 | File uploads         | `multer` (memory storage) + Cloudinary      |
 | Email                | `nodemailer` (SMTP)                         |
+| Real-time            | Socket.io                                   |
 | API Docs             | `swagger-jsdoc` + `swagger-ui-express` at `/api/docs` |
 | Deployment           | Vercel (Serverless Functions + Cron Jobs)   |
 | Dev runner           | `nodemon`                                   |
@@ -65,6 +66,7 @@ TaskFlow/
 | Theming              | `next-themes` (dark/light)                  |
 | Internationalization | `i18next` + `react-i18next` + `i18next-browser-languagedetector` |
 | Notifications        | `sonner`                                    |
+| Real-time            | Socket.io-client                            |
 | Charts               | `recharts`                                  |
 | Date / calendar      | `date-fns`, `react-day-picker`              |
 | Icons                | `lucide-react`                              |
@@ -88,6 +90,7 @@ Defined in `server/database/create.sql`. Tables:
 | `notification_settings` | Per-user email preference toggles. Fields: `userId` (unique), `welcome`, `passwordReset`, `memberAdded`, `memberRemoved` (all `TINYINT(1)`, default 1). |
 | `project_documents`     | Per-project file metadata. Fields: `id`, `projectId`, `uploadedBy`, `name`, `url`, `publicId`, `size`, `mimeType`, `createdAt`. Actual files live on Cloudinary. |
 | `task_comments`         | Task comments and activity logs. Fields: `id`, `taskId`, `userId`, `content`, `type` (`COMMENT`/`ACTIVITY`), `createdAt`. |
+| `notifications`         | In-app notification center feed. Fields: `id`, `userId` (recipient), `type`, `title`, `body`, `isRead` (`TINYINT(1)`, default 0), `meta` (`JSON`), `createdAt`. |
 
 All data access is funneled through **stored procedures** (called from `server/src/config/callProcedure.js`), organized per domain:
 
@@ -97,6 +100,7 @@ All data access is funneled through **stored procedures** (called from `server/s
 - `database/notification.sql` — `sp_GetNotificationSettings` (returns a virtual default row when no record exists yet), `sp_UpdateNotificationSettings` (upsert)
 - `database/project_docs.sql` — `sp_CreateProjectDocument`, `sp_GetProjectDocuments`, `sp_GetProjectDocumentById`, `sp_DeleteProjectDocument`
 - `database/task_comments.sql` — `sp_CreateTaskComment`, `sp_GetTaskComments`, `sp_DeleteTaskComment`, `sp_GetTaskCommentById`, `sp_CreateTaskActivity` (convenience activity logging)
+- `database/notifications_feed.sql` — `sp_CreateNotification`, `sp_GetNotifications`, `sp_GetUnreadCount`, `sp_MarkNotificationRead`, `sp_MarkAllNotificationsRead`, `sp_DeleteNotification`
 - `database/call.sql` — ad-hoc invocation scratch (not part of bootstrap)
 
 ---
@@ -107,21 +111,22 @@ Layout under `server/`:
 
 ```
 server/
-├── index.js                     → Local dev entry point (app.listen + pool + initReminderService)
+├── index.js                     → Local dev entry point (app.listen + pool + initReminderService + Socket.io server)
+├── deploy_sp.js                 → Automated stored procedures compiler & database deployment script
 ├── api/
 │   └── index.js                 → Vercel Serverless Function entry point (exports Express app)
-├── vercel.json                  → Vercel config: wildcard rewrite + daily cron schedule
+├── vercel.json                  → Vercel config: wildcard rewrite + daily cron schedule + Swagger asset packaging
 └── src/
     ├── app.js                   → Express app (trust proxy, helmet, cors, json, swagger, routes, error handler)
-    ├── routes.js                → Mounts /auth, /users, /projects, /tasks,
-    │                              /notifications/settings, /projects/:projectId/documents,
-    │                              and /cron/reminders (Vercel cron endpoint) under /api
+    ├── routes.js                → Mounts /auth, /users, /projects, /tasks, /notifications, /documents,
+    │                              /projects/:projectId/documents, and /cron/reminders under /api
     ├── config/
     │   ├── env.js               → Loads + validates required env vars (incl. server.url, vercel.cron.secret)
-    │   ├── db.js                → MySQL pool (connectionLimit: 10)
+    │   ├── db.js                → MySQL pool (connectionLimit: 10) with Vercel cold-start fail-safe
     │   ├── callProcedure.js     → Helper to invoke stored procedures
     │   ├── cloudinary.js        → Cloudinary SDK init
     │   ├── mailer.js            → Nodemailer transporter
+    │   ├── socket.js            → Socket.io server initialization and active connection tracking
     │   └── swagger.js           → OpenAPI 3.0 spec generation (dynamic multi-server from env)
     ├── routes/                  → auth | user | project | task | notification | document
     ├── controllers/             → Thin controllers calling model methods
@@ -140,6 +145,7 @@ server/
     │   │                          sendProjectMemberAddedEmail, sendProjectMemberRemovedEmail, sendDeadlineReminderEmail
     │   │                          (each gated by getNotificationSettings)
     │   ├── notification.service.js → getNotificationSettings / updateNotificationSettings
+    │   ├── notificationDispatcher.service.js → Fire-and-forget in-app notification creator & live socket emitter
     │   └── reminder.service.js  → checkAndSendReminders, initReminderService (Vercel: bypassed, uses cron route instead)
     ├── templates/emails/        → welcome.js, passwordReset.js, addMember.js, removeMember.js, deadlineReminder.js
     └── utils/                   → sendEmail, uploadToCloudinary (image + raw doc), requireRole
@@ -208,11 +214,15 @@ Base URL: `http://localhost:5000/api` (local) / `https://<your-vercel-domain>/ap
 | GET    | `/:taskId/comments`        | Project member    | List all comments and activity logs for a task|
 | DELETE | `/:taskId/comments/:commentId` | Author or OWNER / ADMIN | Delete a comment (system activity entries cannot be deleted)|
 
-#### Notifications (`/notifications/settings`) — JWT required
-| Method | Path | Description                                                                |
-|--------|------|----------------------------------------------------------------------------|
-| GET    | `/`  | Return the user's email preference toggles (defaults to all-enabled if no row yet) |
-| PATCH  | `/`  | Body of any subset of `{ welcome, passwordReset, memberAdded, memberRemoved }`. Each field accepts `0`/`1` and is partial-update via SP. |
+#### Notifications (`/notifications`) — JWT required
+| Method | Path              | Description                                                                |
+|--------|-------------------|----------------------------------------------------------------------------|
+| GET    | `/settings`       | Return the user's email preference toggles (defaults to all-enabled if no row yet) |
+| PATCH  | `/settings`       | Body of any subset of `{ welcome, passwordReset, memberAdded, memberRemoved }`. Each field accepts `0`/`1` and is partial-update via SP. |
+| GET    | `/feed`           | Return the user's paginated notifications feed, newest first. Includes real-time WebSocket sync. |
+| PATCH  | `/:id/read`       | Mark a specific notification as read. |
+| PATCH  | `/read-all`       | Mark all notifications of a user as read. |
+| DELETE | `/:id`            | Hard-delete a single notification. |
 
 #### Project Documents (`/projects/:projectId/documents`) — JWT required, nested router with `mergeParams`
 | Method | Path                | Access                  | Description                                                  |
@@ -220,6 +230,11 @@ Base URL: `http://localhost:5000/api` (local) / `https://<your-vercel-domain>/ap
 | GET    | `/`                 | Project member          | List all documents on the project (newest first), with uploader info |
 | POST   | `/`                 | OWNER / ADMIN           | Multipart upload, field `documents`, up to 5 files × 20 MB. Streams each buffer to Cloudinary as `resource_type: raw` and persists metadata via `sp_CreateProjectDocument`. |
 | DELETE | `/:documentId`      | OWNER / ADMIN (of project that owns the doc) | Deletes from Cloudinary first, then drops the DB row. |
+
+#### Global Documents (`/documents`) — JWT required
+| Method | Path                | Access                  | Description                                                  |
+|--------|---------------------|-------------------------|--------------------------------------------------------------|
+| GET    | `/`                 | Auth                    | List all documents across all projects that the user belongs to (newest first) |
 
 ### Required environment variables (`server/.env`)
 `PORT`, `NODE_ENV`, `CLIENT_URL`, `ADDITIONAL_CLIENT_URLS`, `SERVER_URL`, `ADDITIONAL_SERVER_URLS`, `DATABASE_URL`, `DATABASE_NAME`, `DATABASE_HOST`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_PORT`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`, `CRON_SECRET`, `IP_ADDRESS`.
@@ -252,16 +267,16 @@ Layout under `client/src/`:
 ```
 src/
 ├── main.jsx                 → React root
-├── App.jsx                  → createBrowserRouter route tree
+├── App.jsx                  → createBrowserRouter route tree (with Route-level React.lazy code-splitting)
 ├── index.css                → Tailwind base + theme tokens
 ├── app/
 │   ├── store.js             → Redux store (baseApi + auth slice)
-│   └── baseApi.js           → RTK Query base with axios baseQuery.
-│                              tagTypes: User / Project / Task / NotificationSettings / Document
+│   └── baseApi.js           → RTK Query base with custom axiosBaseQuery (gets token natively via api.getState())
+│                              tagTypes: User / Project / Task / NotificationSettings / Document / Comment / Notification
 ├── lib/
-│   ├── axios.js             → Axios instance (interceptors, baseURL "/api", 401 → logout,
-│   │                          strips JSON Content-Type for FormData)
+│   ├── axios.js             → Axios instance (interceptors, baseURL "/api", 401 → logout)
 │   ├── utils.js             → `cn` (clsx + tailwind-merge)
+│   ├── socket.js            → WebSocket singleton client with automated Vercel connection bypassing
 │   └── icons/               → Centralized lucide-react icon maps
 ├── i18n/
 │   ├── index.js             → i18next init: detector → localStorage → navigator
@@ -272,23 +287,24 @@ src/
 │   └── ThemeProvider.jsx    → next-themes wrapper
 ├── components/
 │   ├── layouts/
-│   │   ├── app/             → AppLayout, Sidebar, Topbar (authenticated)
+│   │   ├── app/             → AppLayout, Sidebar, Topbar (with `<NotificationBell />`)
 │   │   └── guest/           → GuestLayout, Header, Footer (public)
 │   ├── routes/
 │   │   ├── ProtectedRoute.jsx → Requires auth
 │   │   └── GuestRoute.jsx     → Redirects authed users to /dashboard
-│   └── ui/                  → shadcn primitives (button, card, dialog, …)
+│   ├── shared/              → Standardized shared components (StatusBadge, PriorityBadge, StatsCard)
+│   └── ui/                  → shadcn primitives (button, card, dialog, loader, …)
 ├── features/                → Feature-sliced modules
 │   ├── auth/                → LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage,
 │   │                          slice + api (register, login, getProfile, forgot/reset/change password)
 │   ├── users/               → ProfilePage, SettingPage, UserDashboard, UserCalendar
 │   ├── project/             → Projects (list), ProjectDetails, CreateProjectDialog
 │   ├── tasks/               → MyTask, TaskList, TaskFilters, TaskHeader, dialogs
-│   ├── documents/           → DocumentList, DocumentUploader, document.api.js
-│   ├── notifications/       → notification.api.js (UI consumed inside SettingPage)
+│   ├── documents/           → DocumentList, DocumentUploader, DocumentPreviewModal, Requirements page, document.api.js
+│   ├── notifications/       → notification.api.js, SettingPage preferences, NotificationBell dropdown
 │   ├── admin/               → (placeholder folder, reserved for future admin tooling)
 │   └── guest/               → Home, About, Contact, Docs, ErrorPage
-├── skeleton/                → Loading skeletons (e.g. ProjectDetalsSkeleton)
+├── skeleton/                → Loading skeletons (e.g. ProjectDetailsSkeleton)
 ├── schemas/                 → Zod schemas (auth, user, contact)
 ├── hooks/                   → useAuth, use-mobile
 ├── helper/                  → ThemeToggle
@@ -314,6 +330,7 @@ src/
 | `/projects`                 | Protected        | `Projects`          |
 | `/projects/:projectId`      | Protected        | `ProjectDetails` (tabs: overview, tasks, members, documents) |
 | `/tasks`                    | Protected        | `MyTask`            |
+| `/documents`                | Protected        | `Requirements` (Global documents listing) |
 | `*`                         | —                | `ErrorPage`         |
 
 ### State / data flow
@@ -393,6 +410,12 @@ src/
 - [x] Per-user toggles for welcome / password-reset / member-added / member-removed
 - [x] SP returns a virtual default row (all enabled) if the user has never saved settings — no FK insert side-effects
 - [x] Partial PATCH semantics (`null` fields preserve existing values)
+- [x] **In-App Live Notification Feed**: Real-time action feed storing system actions (comment additions, task assignments, role updates) in a dedicated `notifications` schema and broadcasting them.
+- [x] **Socket.io WebSocket Server Integration**: Active session connection tracking on HTTP boot for immediate, <1ms multi-tab notifications delivery.
+- [x] **Vercel WebSocket Bypassing**: Client sniffs hostnames ending in `.vercel.app` to prevent WebSocket execution and avoid spamming console with 404/504 errors in Vercel's serverless environment.
+- [x] **RTK Query Polling Fallback**: Automatically activates a highly responsive 8-second HTTP polling mechanism when deployed to serverless environments (Vercel).
+- [x] **Instant Polling Halt on Logout**: Coupled `baseApi.util.resetApiState()` dispatch on user logout to cleanly wipe Redux cache and kill active interval polling instantly.
+- [x] **Glassmorphic Notification Dropdown Bell**: Mounted in the header with a real-time unread count indicator, category-specific Lucide icons, relative action timestamps via `date-fns`, and interactive "Mark Read", "Mark All Read", and "Delete" triggers.
 - [x] **Task Deadline Reminders**: Hourly background service checking soon-to-be-overdue tasks with SMTP emails, custom transactional template, self-healing DB schema/procedure compilation migrations on server start, and owner-controlled reminders setting.
 
 **Internationalization**
@@ -404,7 +427,23 @@ src/
 - [x] **UserCalendar**: Fully interactive calendar view mapping task deadlines onto a month grid with custom priority indicator dots, and list details sidebar displaying tasks for selected dates
 - [x] **Advanced Project Analytics**: Enrich the project analytics screen with comprehensive interactive graphs, including Task Completion Velocity line/area charts (tasks finished over time), Workload by Assignee bar charts, task distribution by status and priority, and historical completion metrics.
 
-**Infra / DX**
+**Requirements (Global Documents)**
+- [x] **Centralized Requirements Workspace**: Aggregated documents dashboard at `/documents` compiling files across all projects where a user has active membership.
+- [x] **Polished Metrics Dashboard**: Integrates summary counters utilizing reusable `<StatsCard>` components displaying total file counts, formatted total size, and unique project counts.
+- [x] **Highly Reusable `<DocumentList>`**: Generalizes complex document filtering, extension search, checkbox multi-selection, and client-side ZIP packaging for dry integration in both global and project-scoped views.
+
+**Client Performance & Optimization**
+- [x] **Route-Level Code Splitting**: All pages lazy-loaded with `React.lazy()` and rendered within a global `Suspense` boundary featuring a polished glassmorphic backdrop page loader, optimizing initial bundle payloads.
+- [x] **Circular Redux Store Bypass**: Decoupled Axios-store cyclic dependencies by leveraging the `api.getState()` param inside the custom `axiosBaseQuery` to retrieve authorization tokens natively.
+
+**UI/UX Quality & Dry Standards**
+- [x] **Shared Design Badge Components**: Centralized `StatusBadge` and `PriorityBadge` components standardizing color systems, dynamic classes, and localization lookups.
+- [x] **Harmonized `<StatsCard>`**: Flexible cards supporting circular minimal dashboard modes and standard top-accent dashboard modes.
+
+**Infra / DX / Swagger Deployability**
+- [x] **Vercel Swagger Assets Bundler**: Added Vercel Lambda explicit asset bundle rules (`includeFiles` for `swagger-ui-dist`) to properly serve interactive OpenAPI Swagger UI docs in production without throwing asset load mime errors.
+- [x] **Content Security Policy (CSP) Updates**: Configured helmet options in `app.js` to allow `cdnjs.cloudflare.com` resources under `connect-src` directives.
+- [x] **Database Cold-Start Fail-Safe**: Bypassed strict connection pool `process.exit(1)` handshakes on container boot (`db.js`), allowing Vercel cold-starts to handle latency and self-heal transparently.
 - [x] **SEO & Metadata Optimization** — custom brand-focused title, description, keywords, Open Graph card metadata, Twitter card description, brand favicon integration, and mobile device theme-color support in `index.html`.
 - [x] Helmet + CORS configured for `CLIENT_URL` + `ADDITIONAL_CLIENT_URLS` (multi-origin support)
 - [x] Global error handler (`AppError` + `globalErrorHandler`) maps `SIGNAL 45000` → 400 and `ER_DUP_ENTRY` → 409
@@ -430,23 +469,22 @@ src/
 ### Near-term
 1. **Soft-Deletes & Project Archiving**: Transition from permanent project deletion to support archiving projects (soft delete) to hide inactive items while preserving history, requiring database status modifications and stored procedure updates.
 2. **Task Checklists / Subtasks**: Enable users to create granular checklist sub-items within individual tasks, displaying an interactive progress bar showing completion percentages in the task details workspace.
-3. **In-App Live Notification Feed**: Implement an in-app notifications center (a header-mounted bell dropdown) with read/unread states, dynamically reporting real-time system events (comment additions, task assignment changes) without relying solely on emails.
 
 ### Mid-term
-4. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
-5. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
-6. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
-7. **Task Dependencies & Sequencing**: Let users establish link relationships between tasks (e.g. "Task B blocks Task C", "Task A must finish before Task B starts"), with warning indicators in the board view when deadlines conflict.
-8. **Project Template Factory**: Allow system administrators to compile project blueprints (standardized boards, column milestones, boilerplate documents) and deploy new project structures instantly from pre-saved configurations.
+3. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
+4. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
+5. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
+6. **Task Dependencies & Sequencing**: Let users establish link relationships between tasks (e.g. "Task B blocks Task C", "Task A must finish before Task B starts"), with warning indicators in the board view when deadlines conflict.
+7. **Project Template Factory**: Allow system administrators to compile project blueprints (standardized boards, column milestones, boilerplate documents) and deploy new project structures instantly from pre-saved configurations.
 
 ### Long-term / nice-to-have
-9. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
-10. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
-11. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
-12. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
-13. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
-14. **Interactive Timeline / Gantt View**: Create a full-screen dynamic Gantt chart visualization mapping project deadlines, task sequencing, and assignees over calendar milestones with drag-and-resize timeline bands.
-15. **Multi-Tenant Organizations & Workspaces**: Upgrade the platform hierarchy to support isolated organizations and distinct team spaces, enabling granular enterprise-grade tenant-level billing and control settings.
+8. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
+9. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
+10. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
+11. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
+12. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
+13. **Interactive Timeline / Gantt View**: Create a full-screen dynamic Gantt chart visualization mapping project deadlines, task sequencing, and assignees over calendar milestones with drag-and-resize timeline bands.
+14. **Multi-Tenant Organizations & Workspaces**: Upgrade the platform hierarchy to support isolated organizations and distinct team spaces, enabling granular enterprise-grade tenant-level billing and control settings.
 
 ---
 
@@ -461,6 +499,7 @@ mysql -u root -p <db_name> < server/database/tasks.sql
 mysql -u root -p <db_name> < server/database/notification.sql
 mysql -u root -p <db_name> < server/database/task_comments.sql
 mysql -u root -p <db_name> < server/database/project_docs.sql
+mysql -u root -p <db_name> < server/database/notifications_feed.sql
 
 # 2. Backend
 cd server
