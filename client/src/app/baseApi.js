@@ -13,7 +13,7 @@ const axiosBaseQuery =
         ...headers,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       };
-      
+
       const result = await axiosInstance({
         url,
         method,

@@ -19,9 +19,7 @@ export const documentApi = baseApi.injectEndpoints({
         url: '/documents',
         method: 'GET',
       }),
-      providesTags: () => [
-        { type: 'Document', id: 'LIST' },
-      ],
+      providesTags: () => [{ type: 'Document', id: 'LIST' }],
     }),
 
     uploadDocuments: builder.mutation({

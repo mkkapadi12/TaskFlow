@@ -118,8 +118,6 @@ const TaskDetailDialog = ({
     }
   };
 
-  
-
   const handleVerify = async (approve) => {
     try {
       await verifyTask({

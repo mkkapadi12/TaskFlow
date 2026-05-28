@@ -89,4 +89,3 @@ export const getRemainingDaysLabel = (deadlineStr) => {
   if (diffDays < 0) return 'Overdue';
   return `In ${diffDays} days`;
 };
-

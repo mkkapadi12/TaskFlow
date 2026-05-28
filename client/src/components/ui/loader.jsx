@@ -8,7 +8,10 @@ const FullPageSpinner = () => {
           {/* Animated Spinner Ring */}
           <div className="border-muted absolute h-full w-full rounded-full border-4"></div>
           <div className="border-primary absolute h-full w-full animate-spin rounded-full border-4 border-t-transparent"></div>
-          <DASHBOARD_ICONS.BRIEFCASE size={20} className="text-primary animate-pulse" />
+          <DASHBOARD_ICONS.BRIEFCASE
+            size={20}
+            className="text-primary animate-pulse"
+          />
         </div>
         <p className="text-muted-foreground animate-pulse text-xs font-medium tracking-wider uppercase">
           Loading TaskFlow...
