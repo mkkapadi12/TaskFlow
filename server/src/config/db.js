@@ -23,7 +23,8 @@ pool
   })
   .catch((err) => {
     console.error('MySQL connection failed:', err.message);
-    process.exit(1);
+    // Do not call process.exit(1) in serverless environments to prevent hard crashes.
+    // The pool will attempt reconnection dynamically on incoming requests.
   });
 
 export default pool;
