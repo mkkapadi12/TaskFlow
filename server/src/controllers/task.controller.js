@@ -80,11 +80,7 @@ const updateTask = async (req, res, next) => {
     // Fetch before updating to check for assignee changes
     const originalTask = await TaskModel.getById(taskId, req.user.id);
 
-    const task = await TaskModel.update(
-      taskId,
-      req.user.id,
-      req.body
-    );
+    const task = await TaskModel.update(taskId, req.user.id, req.body);
     res.status(200).json({
       success: true,
       message: 'Task updated successfully',
@@ -92,7 +88,11 @@ const updateTask = async (req, res, next) => {
     });
 
     // Fire-and-forget notification dispatch
-    if (task && task.assigneeId && task.assigneeId !== originalTask.assigneeId) {
+    if (
+      task &&
+      task.assigneeId &&
+      task.assigneeId !== originalTask.assigneeId
+    ) {
       notificationDispatcher.dispatch('TASK_ASSIGNED', {
         actorId: req.user.id,
         actorName: req.user.name,

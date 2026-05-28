@@ -366,7 +366,7 @@
  *         description: Not a member of the project
  *       404:
  *         description: Task not found
- * 
+ *
  *   get:
  *     summary: Get all comments and activity logs for a task
  *     description: Requires project membership. Returns all comments and system activity records.

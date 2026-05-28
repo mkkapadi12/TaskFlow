@@ -11,7 +11,9 @@ const serverUrls = [
 
 const servers = serverUrls.map((url) => ({
   url: url.endsWith('/api') ? url : `${url}/api`,
-  description: url.includes('localhost') ? 'Local Environment' : 'Production/Staging Environment',
+  description: url.includes('localhost')
+    ? 'Local Environment'
+    : 'Production/Staging Environment',
 }));
 
 const options = {

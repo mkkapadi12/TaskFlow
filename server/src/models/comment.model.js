@@ -1,9 +1,6 @@
 import callProcedure from '../config/callProcedure.js';
 import { AppError } from '../middlewares/error.middleware.js';
-import {
-  getMembership,
-  requireMembership,
-} from '../utils/requireRole.js';
+import { getMembership, requireMembership } from '../utils/requireRole.js';
 
 /**
  * Load a single task row (reused for project-membership checks).

@@ -108,7 +108,7 @@ const AuthModel = {
     let decoded;
     try {
       decoded = jwt.verify(token, env.jwt.secret);
-    } catch (err) {
+    } catch {
       throw new AppError('Invalid or expired token', 400);
     }
     const hashedPassword = await bcrypt.hash(password, 10);
