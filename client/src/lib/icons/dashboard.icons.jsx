@@ -1,9 +1,12 @@
 import {
   AlertTriangle,
   ArrowLeft,
+  Bell,
+  BellRing,
   Briefcase,
   Calendar,
   CalendarDays,
+  CheckCheck,
   CheckCircle,
   ChevronDown,
   ChevronLeft,
@@ -75,5 +78,8 @@ export const DASHBOARD_ICONS = {
   DOWNLOAD: Download,
   SEND: Send,
   MESSAGESQUARE: MessageSquare,
-  HARDDRIVE:HardDrive
+  HARDDRIVE: HardDrive,
+  BELL: Bell,
+  BELLRING: BellRing,
+  CHECKCHECK: CheckCheck,
 };

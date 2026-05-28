@@ -45,6 +45,7 @@ export const baseApi = createApi({
     'NotificationSettings',
     'Document',
     'Comment',
+    'Notification',
   ],
   endpoints: () => ({}), // feature apis inject here
 });

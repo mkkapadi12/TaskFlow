@@ -1,3 +1,4 @@
+-- Active: 1779868249965@@localhost@3306@my_db
 DELIMITER //
 
 -- Get settings; if no row yet, return a virtual default row (no INSERT)

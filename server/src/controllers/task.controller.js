@@ -1,4 +1,5 @@
 import TaskModel from '../models/task.model.js';
+import notificationDispatcher from '../services/notificationDispatcher.service.js';
 
 const createTask = async (req, res, next) => {
   try {
@@ -8,6 +9,16 @@ const createTask = async (req, res, next) => {
       message: 'Task created successfully',
       data: task,
     });
+
+    // Fire-and-forget notification dispatch
+    if (task && task.assigneeId) {
+      notificationDispatcher.dispatch('TASK_ASSIGNED', {
+        actorId: req.user.id,
+        actorName: req.user.name,
+        taskId: task.id,
+        assigneeId: task.assigneeId,
+      });
+    }
   } catch (err) {
     next(err);
   }
@@ -65,8 +76,12 @@ const getTaskById = async (req, res, next) => {
 
 const updateTask = async (req, res, next) => {
   try {
+    const taskId = Number(req.params.taskId);
+    // Fetch before updating to check for assignee changes
+    const originalTask = await TaskModel.getById(taskId, req.user.id);
+
     const task = await TaskModel.update(
-      Number(req.params.taskId),
+      taskId,
       req.user.id,
       req.body
     );
@@ -75,6 +90,16 @@ const updateTask = async (req, res, next) => {
       message: 'Task updated successfully',
       data: task,
     });
+
+    // Fire-and-forget notification dispatch
+    if (task && task.assigneeId && task.assigneeId !== originalTask.assigneeId) {
+      notificationDispatcher.dispatch('TASK_ASSIGNED', {
+        actorId: req.user.id,
+        actorName: req.user.name,
+        taskId: task.id,
+        assigneeId: task.assigneeId,
+      });
+    }
   } catch (err) {
     next(err);
   }
@@ -109,8 +134,12 @@ const getOverdueTasks = async (req, res, next) => {
 
 const updateTaskStatus = async (req, res, next) => {
   try {
+    const taskId = Number(req.params.taskId);
+    // Fetch before updating to check for status changes
+    const originalTask = await TaskModel.getById(taskId, req.user.id);
+
     const task = await TaskModel.updateStatus(
-      Number(req.params.taskId),
+      taskId,
       req.user.id,
       req.body.status
     );
@@ -119,6 +148,17 @@ const updateTaskStatus = async (req, res, next) => {
       message: 'Task status updated',
       data: task,
     });
+
+    // Fire-and-forget notification dispatch
+    if (task && task.status !== originalTask.status) {
+      notificationDispatcher.dispatch('TASK_STATUS_CHANGED', {
+        actorId: req.user.id,
+        actorName: req.user.name,
+        taskId: task.id,
+        oldStatus: originalTask.status,
+        newStatus: task.status,
+      });
+    }
   } catch (err) {
     next(err);
   }
@@ -138,6 +178,16 @@ const verifyTask = async (req, res, next) => {
         : 'Task sent back for changes',
       data: task,
     });
+
+    // Fire-and-forget notification dispatch
+    if (task) {
+      notificationDispatcher.dispatch('TASK_VERIFIED', {
+        actorId: req.user.id,
+        actorName: req.user.name,
+        taskId: task.id,
+        approved: Boolean(req.body.approve),
+      });
+    }
   } catch (err) {
     next(err);
   }

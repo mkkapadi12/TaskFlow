@@ -6,11 +6,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { PAGE_TITLES } from '@/constant';
 import { logout } from '@/features/auth/auth.slice';
+import NotificationBell from '@/features/notifications/components/NotificationBell';
 import { ThemeToggle } from '@/helper/ThemeToggle';
 import { useAlertDialog } from '@/hooks/useAlertDialog';
 import { useAuth } from '@/hooks/useAuth';
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { GUEST_ICONS } from '@/lib/icons/guest.icons';
+import { disconnectSocket } from '@/lib/socket';
 
 const Topbar = ({ onMenuClick }) => {
   const location = useLocation();
@@ -54,6 +56,7 @@ const Topbar = ({ onMenuClick }) => {
       variant: 'destructive',
     });
     if (isConfirmed) {
+      disconnectSocket();
       dispatch(logout());
     }
   };
@@ -86,6 +89,7 @@ const Topbar = ({ onMenuClick }) => {
       {/* Right — theme toggle + avatar dropdown */}
       <div className="flex items-center gap-2">
         <ThemeToggle />
+        <NotificationBell />
 
         {/* User avatar dropdown */}
         <div className="relative" ref={dropdownRef}>

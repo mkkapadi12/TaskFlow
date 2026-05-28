@@ -1,4 +1,5 @@
 import CommentModel from '../models/comment.model.js';
+import notificationDispatcher from '../services/notificationDispatcher.service.js';
 
 const createComment = async (req, res, next) => {
   try {
@@ -11,6 +12,14 @@ const createComment = async (req, res, next) => {
       success: true,
       message: 'Comment added',
       data: comment,
+    });
+
+    // Fire-and-forget notification dispatch
+    notificationDispatcher.dispatch('COMMENT_ADDED', {
+      actorId: req.user.id,
+      actorName: req.user.name,
+      taskId: Number(req.params.taskId),
+      commentPreview: req.body.content ? req.body.content.slice(0, 100) : '',
     });
   } catch (err) {
     next(err);

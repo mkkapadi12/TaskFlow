@@ -5,6 +5,7 @@ import {
   sendProjectMemberAddedEmail,
   sendProjectMemberRemovedEmail,
 } from '../services/email.service.js';
+import notificationDispatcher from '../services/notificationDispatcher.service.js';
 
 const getProjectBasicInfo = async (projectId) => {
   const [rows] = await callProcedure('sp_GetProjectById', [projectId]);
@@ -130,6 +131,16 @@ const addProjectMember = async (req, res, next) => {
       message: 'Member added successfully',
       data: member,
     });
+
+    // Fire-and-forget notification dispatch
+    if (member) {
+      notificationDispatcher.dispatch('MEMBER_ADDED', {
+        actorId: req.user.id,
+        actorName: req.user.name,
+        projectId,
+        memberId: Number(member.userId),
+      });
+    }
   } catch (err) {
     next(err);
   }
@@ -148,6 +159,17 @@ const updateMemberRole = async (req, res, next) => {
       message: 'Member role updated successfully',
       data: member,
     });
+
+    // Fire-and-forget notification dispatch
+    if (member) {
+      notificationDispatcher.dispatch('MEMBER_ROLE_CHANGED', {
+        actorId: req.user.id,
+        actorName: req.user.name,
+        projectId: Number(req.params.projectId),
+        memberId: Number(req.params.userId),
+        newRole: req.body.role,
+      });
+    }
   } catch (err) {
     next(err);
   }
@@ -191,6 +213,14 @@ const removeMember = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: result.message,
+    });
+
+    // Fire-and-forget notification dispatch
+    notificationDispatcher.dispatch('MEMBER_REMOVED', {
+      actorId: req.user.id,
+      actorName: req.user.name,
+      projectId,
+      memberId: targetUserId,
     });
   } catch (err) {
     next(err);

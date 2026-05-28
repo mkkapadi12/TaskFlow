@@ -122,3 +122,21 @@ CREATE TABLE IF NOT EXISTS project_documents (
     INDEX idx_doc_projectId (projectId),
     INDEX idx_doc_uploadedBy (uploadedBy)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- notifications feed
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id         INT          PRIMARY KEY AUTO_INCREMENT,
+    userId     INT          NOT NULL,           -- recipient
+    type       VARCHAR(50)  NOT NULL,           -- e.g. 'COMMENT_ADDED', 'TASK_ASSIGNED'
+    title      VARCHAR(255) NOT NULL,           -- human-readable title
+    body       TEXT         DEFAULT NULL,        -- detail message
+    isRead     TINYINT(1)   NOT NULL DEFAULT 0,
+    meta       JSON         DEFAULT NULL,        -- { taskId, projectId, commentId, actorId, actorName, ... }
+    createdAt  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_notif_user FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_notif_userId    (userId),
+    INDEX idx_notif_isRead    (userId, isRead),
+    INDEX idx_notif_createdAt (createdAt)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { disconnectSocket } from '@/lib/socket';
+
 const tokenFromStorage = localStorage.getItem('token');
 
 const authSlice = createSlice({
@@ -24,6 +26,11 @@ const authSlice = createSlice({
       state.token = null;
       state.isAuthenticated = false;
       localStorage.removeItem('token');
+      try {
+        disconnectSocket();
+      } catch (err) {
+        console.error('[Socket] Disconnect on logout failed:', err);
+      }
     },
   },
 });
