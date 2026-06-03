@@ -14,17 +14,34 @@ const ProjectModel = {
     return project[0];
   },
 
-  // Delete a project (only owner)
-  delete: async (projectId, ownerId) => {
+  // Archive a project — soft-delete (only owner)
+  archive: async (projectId, ownerId) => {
     await requireOwner(projectId, ownerId);
     const [result] = await callProcedure('sp_DeleteProject', [projectId]);
+    return result[0];
+  },
 
+  // Restore an archived project back to ACTIVE (only owner)
+  restore: async (projectId, ownerId) => {
+    await requireOwner(projectId, ownerId);
+    const [result] = await callProcedure('sp_RestoreProject', [projectId]);
+    return result[0];
+  },
+
+  // Permanently delete a project — irreversible (only owner)
+  permanentDelete: async (projectId, ownerId) => {
+    await requireOwner(projectId, ownerId);
+    const [result] = await callProcedure('sp_PermanentDeleteProject', [
+      projectId,
+    ]);
     return result[0];
   },
 
   // get all projects
-  findAll: async () => {
-    const [projects] = await callProcedure('sp_GetAllProjects');
+  findAll: async (includeArchived = false) => {
+    const [projects] = await callProcedure('sp_GetAllProjects', [
+      includeArchived ? 1 : 0,
+    ]);
     return projects;
   },
 
@@ -92,14 +109,28 @@ const ProjectModel = {
   },
 
   // Get projects owned by a specific user
-  getByOwner: async (ownerId) => {
-    const [projects] = await callProcedure('sp_GetProjectsByOwner', [ownerId]);
+  getByOwner: async (ownerId, includeArchived = false) => {
+    const [projects] = await callProcedure('sp_GetProjectsByOwner', [
+      ownerId,
+      includeArchived ? 1 : 0,
+    ]);
     return projects;
   },
 
   // Get projects where user is a member
-  getByMember: async (userId) => {
-    const [projects] = await callProcedure('sp_GetProjectsByMember', [userId]);
+  getByMember: async (userId, includeArchived = false) => {
+    const [projects] = await callProcedure('sp_GetProjectsByMember', [
+      userId,
+      includeArchived ? 1 : 0,
+    ]);
+    return projects;
+  },
+
+  // Get archived projects where user is a member
+  getArchivedByMember: async (userId) => {
+    const [projects] = await callProcedure('sp_GetArchivedProjectsByMember', [
+      userId,
+    ]);
     return projects;
   },
 

@@ -27,16 +27,18 @@ CREATE TABLE IF NOT EXISTS projects (
     title       VARCHAR(255)  NOT NULL,
     description TEXT          NOT NULL,
     ownerId     INT           NOT NULL,
-    status      ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
+    status      ENUM('ACTIVE', 'INACTIVE', 'ARCHIVED') NOT NULL DEFAULT 'ACTIVE',
     createdAt   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     allowReminders TINYINT(1) NOT NULL DEFAULT 1,
+    archivedAt  TIMESTAMP     NULL DEFAULT NULL,
 
     CONSTRAINT fk_projects_owner
         FOREIGN KEY (ownerId) REFERENCES users(id) ON DELETE CASCADE,
 
-    INDEX idx_projects_ownerId (ownerId),
-    INDEX idx_projects_status  (status)
+    INDEX idx_projects_ownerId    (ownerId),
+    INDEX idx_projects_status     (status),
+    INDEX idx_projects_archivedAt (archivedAt)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 

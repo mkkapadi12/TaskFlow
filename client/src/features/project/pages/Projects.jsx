@@ -15,7 +15,12 @@ const Projects = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: projectsData, isLoading, refetch } = useGetMyProjectsQuery();
+  const includeArchived = statusFilter === 'ARCHIVED' || statusFilter === 'ALL';
+  const {
+    data: projectsData,
+    isLoading,
+    refetch,
+  } = useGetMyProjectsQuery({ includeArchived });
   const [createProject] = useCreateProjectMutation();
 
   const handleCreateProject = async (data) => {

@@ -76,7 +76,9 @@ const ProjectFilters = ({
                         className={`inline-block h-2 w-2 rounded-full border ${
                           opt.value === 'ACTIVE'
                             ? 'border-emerald-500/20 bg-emerald-500'
-                            : 'border-gray-500/20 bg-gray-500'
+                            : opt.value === 'ARCHIVED'
+                              ? 'border-amber-500/20 bg-amber-500'
+                              : 'border-gray-500/20 bg-gray-500'
                         }`}
                       />
                     )}

@@ -314,10 +314,12 @@ export const priorityColors = {
 export const STATUS_COLORS = {
   ACTIVE: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
   INACTIVE: 'bg-gray-500/10 text-gray-500 border-gray-500/20',
+  ARCHIVED: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
 };
 
 export const STATUS_OPTIONS = [
   { value: 'ALL', label: 'All Projects' },
   { value: 'ACTIVE', label: 'Active' },
   { value: 'INACTIVE', label: 'Inactive' },
+  { value: 'ARCHIVED', label: 'Archived' },
 ];

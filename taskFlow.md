@@ -84,7 +84,7 @@ Defined in `server/database/create.sql`. Tables:
 | Table                   | Purpose                                                              |
 |-------------------------|----------------------------------------------------------------------|
 | `users`                 | Accounts. Fields: `id`, `name`, `email` (unique), `password`, `role` (`USER` / `ADMIN`), `avatar`, `publicId` (Cloudinary), `phone`, timestamps. |
-| `projects`              | Projects owned by a user. Fields: `id`, `title`, `description`, `ownerId` → users, `status` (`ACTIVE` / `INACTIVE`), `allowReminders` (`TINYINT(1)`, default 1). |
+| `projects`              | Projects owned by a user. Fields: `id`, `title`, `description`, `ownerId` → users, `status` (`ACTIVE` / `INACTIVE` / `ARCHIVED`), `allowReminders` (`TINYINT(1)`, default 1), `archivedAt` (`TIMESTAMP`, default NULL). |
 | `project_members`       | Join table: which users belong to which projects with role `OWNER` / `ADMIN` / `MEMBER`. Unique `(projectId, userId)`. |
 | `tasks`                 | Tasks scoped to a project. Fields: `id`, `title`, `description`, `status` (`TODO`/`IN_PROGRESS`/`IN_REVIEW`/`DONE`), `priority` (`LOW`/`MEDIUM`/`HIGH`/`URGENT`), `deadline`, `projectId`, `assigneeId`, `creatorId`, `reminderSent` (`TINYINT(1)`, default 0). |
 | `notification_settings` | Per-user email preference toggles. Fields: `userId` (unique), `welcome`, `passwordReset`, `memberAdded`, `memberRemoved` (all `TINYINT(1)`, default 1). |
@@ -95,7 +95,7 @@ Defined in `server/database/create.sql`. Tables:
 All data access is funneled through **stored procedures** (called from `server/src/config/callProcedure.js`), organized per domain:
 
 - `database/users.sql` — `sp_CreateUser`, `sp_GetUserById`, `sp_GetUserByEmail`, `sp_GetAllUsers`, `sp_UpdateUser`, `sp_DeleteUser`, `sp_SearchUser`, `sp_GetUserCount`, `sp_GetUsersByRole`, `sp_CheckUserExists`, `sp_UpdatePassword`, `sp_ChangePassword`
-- `database/project.sql` — `sp_CreateProject`, `sp_GetAllProjects`, `sp_GetProjectsByOwner`, `sp_GetProjectsByMember`, `sp_GetProjectById`, `sp_UpdateProject`, `sp_DeleteProject`, `sp_AddProjectMember`, `sp_GetProjectMembers`, `sp_UpdateMemberRole`, `sp_RemoveProjectMember`, `sp_GetMemberRole`, `sp_GetFullProjectDetails`
+- `database/project.sql` — `sp_CreateProject`, `sp_GetAllProjects`, `sp_GetProjectsByOwner`, `sp_GetProjectsByMember`, `sp_GetProjectById`, `sp_UpdateProject`, `sp_DeleteProject` (soft-delete), `sp_AddProjectMember`, `sp_GetProjectMembers`, `sp_UpdateMemberRole`, `sp_RemoveProjectMember`, `sp_GetMemberRole`, `sp_GetFullProjectDetails`, `sp_RestoreProject` (restore), `sp_PermanentDeleteProject` (hard delete), `sp_GetArchivedProjectsByMember`
 - `database/tasks.sql` — `sp_CreateTask`, `sp_GetTasksByProject`, `sp_GetTasksByAssignee`, `sp_GetTaskById`, `sp_UpdateTask`, `sp_DeleteTask`, `sp_GetOverdueTasks`, `sp_VerifyTask` (owner-only `IN_REVIEW` → `DONE` / `IN_PROGRESS` transition, SIGNALs 45000 if precondition fails), `sp_GetUpcomingTaskReminders`, `sp_MarkTaskReminderSent`
 - `database/notification.sql` — `sp_GetNotificationSettings` (returns a virtual default row when no record exists yet), `sp_UpdateNotificationSettings` (upsert)
 - `database/project_docs.sql` — `sp_CreateProjectDocument`, `sp_GetProjectDocuments`, `sp_GetProjectDocumentById`, `sp_DeleteProjectDocument`
@@ -188,11 +188,14 @@ Base URL: `http://localhost:5000/api` (local) / `https://<your-vercel-domain>/ap
 |--------|---------------------------------------|--------|------------------------------|
 | GET    | `/`                                   | ADMIN  | All projects                 |
 | GET    | `/my`                                 | Auth   | Projects I'm a member of     |
+| GET    | `/archived`                           | Auth   | Get archived projects where user is a member |
 | GET    | `/owner/:ownerId`                     | ADMIN  | Projects by owner            |
 | POST   | `/create`                             | ADMIN  | Create project               |
 | GET    | `/:projectId`                         | Auth   | Project details + members + tasks (multi-resultset SP) |
 | PUT    | `/:projectId`                         | Auth   | Update project               |
-| DELETE | `/:projectId`                         | Auth   | Delete project               |
+| DELETE | `/:projectId`                         | Auth   | Archive project (soft-delete) — sets status to ARCHIVED, owner only |
+| PATCH  | `/:projectId/restore`                 | Auth   | Restore archived project back to ACTIVE, owner only |
+| DELETE | `/:projectId/permanent`               | Auth   | Permanently delete project, owner only |
 | GET    | `/:projectId/members`                 | Auth   | List members                 |
 | POST   | `/:projectId/add-member`              | ADMIN  | Add member (triggers `memberAdded` email) |
 | PATCH  | `/:projectId/member/:userId`          | Auth   | Update member role           |
@@ -381,6 +384,9 @@ src/
 - [x] Full project details query (project + members + tasks in one multi-resultset call)
 - [x] `Projects` and `ProjectDetails` pages with header, create dialog, members panel
 - [x] Member added / removed emails (gated by `memberAdded` / `memberRemoved` toggles); removal supports a `reason` body field forwarded to the email template
+- [x] **Soft-Deletes & Project Archiving** — Transitioned project deletion from permanent `DELETE FROM projects` to a soft-delete (archive) model.
+- [x] **Project Restore & Permanent Delete** — Project owner can restore archived projects back to active or permanently delete them.
+- [x] **Archived Project Read-Only Guards** — Extensive database and UI guards blocking all task edits, status changes, verification, member changes, and comment addition/deletion when a project is archived.
 
 **Tasks**
 - [x] CRUD with stored procedures
@@ -467,8 +473,7 @@ src/
 ## 7. Future / Planned Implementation
 
 ### Near-term
-1. **Soft-Deletes & Project Archiving**: Transition from permanent project deletion to support archiving projects (soft delete) to hide inactive items while preserving history, requiring database status modifications and stored procedure updates.
-2. **Task Checklists / Subtasks**: Enable users to create granular checklist sub-items within individual tasks, displaying an interactive progress bar showing completion percentages in the task details workspace.
+1. **Task Checklists / Subtasks**: Enable users to create granular checklist sub-items within individual tasks, displaying an interactive progress bar showing completion percentages in the task details workspace.
 
 ### Mid-term
 3. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
@@ -536,6 +541,11 @@ bun run dev            # http://localhost:5173 (also reachable on LAN IP:5173)
   2. Assignee or any manager moves status through `TODO` → `IN_PROGRESS` → `IN_REVIEW` via `PATCH /tasks/:taskId/status`.
   3. Owner approves via `PATCH /tasks/:taskId/verify` with `{ approve: true }` (→ `DONE`) or rejects with `{ approve: false }` (→ `IN_PROGRESS`). The SP refuses if the task isn't currently `IN_REVIEW`.
   4. `DONE` is reachable **only** through the verify endpoint; the generic `PUT /tasks/:taskId` ignores any `status` field.
+- **Project archiving & read-only enforcement**:
+  - Setting a project status to `ARCHIVED` acts as a soft-delete, hiding it from default active lists but preserving all related tasks, members, comments, and documents.
+  - While a project is archived, it becomes strictly **read-only** for all project roles.
+  - Database stored procedures block all modifications on archived projects, including task edits (`sp_UpdateTask`), task deletions (`sp_DeleteTask`), task verifications (`sp_VerifyTask`), member updates (`sp_UpdateMemberRole`), member removals (`sp_RemoveProjectMember`), and task comments (`sp_CreateTaskComment`, `sp_DeleteTaskComment`) by raising SQL errors via `SIGNAL SQLSTATE '45000'`.
+  - The client UI mirrors this read-only state by displaying an archived warning banner, disabling all edit dialogs, disabling Kanban card drag/drop status moves, disabling comment submissions and deletion, and disabling member role changes or member removal.
 - **Email gating**: every sender in `email.service.js` calls `getNotificationSettings(userId)` first and short-circuits if the user has opted out — respect this when adding new email triggers.
 - **Uploads**:
   - Avatars use the default `upload` (memory storage, 5 MB image filter) → `uploadToCloudinary` as an image.

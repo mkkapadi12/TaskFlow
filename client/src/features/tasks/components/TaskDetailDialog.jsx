@@ -48,12 +48,14 @@ const TaskDetailDialog = ({
   members = [],
   currentUserId,
   projectRole,
+  isProjectArchived,
 }) => {
   const isOwner = projectRole === 'OWNER';
   const isManager = isOwner || projectRole === 'ADMIN';
   const isAssignee = task && task.assigneeId === currentUserId;
-  const canChangeStatus = isManager || isAssignee;
-  const canVerify = isOwner && task?.status === 'IN_REVIEW';
+  const canChangeStatus = !isProjectArchived && (isManager || isAssignee);
+  const canVerify =
+    !isProjectArchived && isOwner && task?.status === 'IN_REVIEW';
 
   const UserIcon = DASHBOARD_ICONS.USER2 || 'span';
   const CalendarIcon = DASHBOARD_ICONS.CALENDAR || 'span';
@@ -152,6 +154,12 @@ const TaskDetailDialog = ({
           </DialogTitle>
         </DialogHeader>
 
+        {isProjectArchived && (
+          <div className="shrink-0 border-b border-amber-500/20 bg-amber-500/10 px-6 py-2 text-center text-xs font-medium text-amber-600">
+            This project is archived. Task details are read-only.
+          </div>
+        )}
+
         {/* Content Body Layout */}
         <form
           onSubmit={handleSubmit(onSaveFields)}
@@ -170,7 +178,7 @@ const TaskDetailDialog = ({
               <Input
                 id="title"
                 {...register('title', { required: true })}
-                disabled={!isManager}
+                disabled={!isManager || isProjectArchived}
                 placeholder="Task title..."
                 className="placeholder:text-muted-foreground/40 border-none bg-transparent px-0 text-lg font-semibold tracking-tight shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-100"
               />
@@ -190,7 +198,7 @@ const TaskDetailDialog = ({
               <Textarea
                 id="description"
                 {...register('description')}
-                disabled={!isManager}
+                disabled={!isManager || isProjectArchived}
                 placeholder="No description provided..."
                 className="placeholder:text-muted-foreground/30 min-h-25 resize-none border-none bg-transparent px-0 text-sm shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-100"
               />
@@ -206,6 +214,7 @@ const TaskDetailDialog = ({
                 taskStatus={task.status}
                 currentUserId={currentUserId}
                 projectRole={projectRole}
+                isProjectArchived={isProjectArchived}
               />
             </div>
           </div>
@@ -266,7 +275,7 @@ const TaskDetailDialog = ({
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
-                      disabled={!isManager}
+                      disabled={!isManager || isProjectArchived}
                     >
                       <SelectTrigger
                         id="assigneeId"
@@ -302,7 +311,7 @@ const TaskDetailDialog = ({
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
-                      disabled={!isManager}
+                      disabled={!isManager || isProjectArchived}
                     >
                       <SelectTrigger
                         id="priority"
@@ -337,7 +346,7 @@ const TaskDetailDialog = ({
                       value >= new Date().toLocaleDateString('en-CA') ||
                       'Deadline cannot be in the past',
                   })}
-                  disabled={!isManager}
+                  disabled={!isManager || isProjectArchived}
                   className="bg-background/50 border-border/60 hover:bg-background/80 h-9 w-full cursor-pointer transition-colors"
                 />
                 {errors.deadline && (
@@ -377,7 +386,7 @@ const TaskDetailDialog = ({
             </div>
 
             {/* Save Changes / Cancel buttons */}
-            {isManager && (
+            {isManager && !isProjectArchived && (
               <div className="border-border/40 mt-auto flex items-center gap-2 border-t pt-4">
                 <Button
                   type="button"

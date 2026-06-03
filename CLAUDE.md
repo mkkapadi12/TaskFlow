@@ -99,13 +99,16 @@ Both return `{ success: false, message }` on 429 and use `standardHeaders: true`
 
 `validate(zodSchema)` middleware (`middlewares/validate.middleware.js`) parses `req.body`, **replaces it with the parsed/coerced data**, and returns 400 with a field-keyed error array on failure. Always import schemas from `server/src/schema/`.
 
-### Server: task workflow rules
+### Server: project archiving (soft-deletes) & task workflow rules
 
-The task status machine is enforced in the model layer and in `sp_VerifyTask`:
-
-- `PUT /tasks/:taskId` (update) **ignores any `status` field** — fields like title, description, priority, deadline, and assignee only.
-- `PATCH /tasks/:taskId/status` moves `TODO ↔ IN_PROGRESS ↔ IN_REVIEW` and is callable by the assignee or any project manager. It **cannot set `DONE`**.
-- `PATCH /tasks/:taskId/verify` is the only path to `DONE`: owner-only, requires current status `IN_REVIEW`, body `{ approve: bool }`. Approve → `DONE`, reject → `IN_PROGRESS`. The SP `SIGNAL`s if the precondition fails.
+Projects can be soft-deleted (archived) by setting `status = 'ARCHIVED'` and recording `archivedAt = NOW()`.
+- **Read-Only Mode**: Once archived, a project and all its tasks, members, and comments become strictly read-only.
+- **Stored Procedure Guards**: Stored procedures (`sp_UpdateTask`, `sp_DeleteTask`, `sp_VerifyTask`, `sp_UpdateMemberRole`, `sp_RemoveProjectMember`, `sp_CreateTaskComment`, `sp_DeleteTaskComment`) throw `SIGNAL SQLSTATE '45000'` on any modification attempt on archived projects.
+- **Client Guards**: The frontend displays a warning banner and disables all task form inputs, status transitions, comment entry/deletion, and member alterations.
+- **Task status machine**: The task status machine is enforced in the model layer and in `sp_VerifyTask`:
+  - `PUT /tasks/:taskId` (update) **ignores any `status` field** — fields like title, description, priority, deadline, and assignee only.
+  - `PATCH /tasks/:taskId/status` moves `TODO ↔ IN_PROGRESS ↔ IN_REVIEW` and is callable by the assignee or any project manager. It **cannot set `DONE`**.
+  - `PATCH /tasks/:taskId/verify` is the only path to `DONE`: owner-only, requires current status `IN_REVIEW`, body `{ approve: bool }`. Approve → `DONE`, reject → `IN_PROGRESS`. The SP `SIGNAL`s if the precondition fails.
 
 ### Server: emails and notifications
 

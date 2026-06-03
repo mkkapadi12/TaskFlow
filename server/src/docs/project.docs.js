@@ -198,7 +198,11 @@
  * @swagger
  * /projects/{projectId}:
  *   delete:
- *     summary: Delete a project
+ *     summary: Archive a project (soft-delete)
+ *     description: |
+ *       Sets the project status to ARCHIVED and records the `archivedAt` timestamp.
+ *       All data (tasks, members, documents, comments) is preserved but the project
+ *       is hidden from default listing views. Owner only.
  *     tags: [Projects]
  *     parameters:
  *       - in: path
@@ -209,7 +213,80 @@
  *         description: Project ID
  *     responses:
  *       200:
- *         description: Project deleted
+ *         description: Project archived
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                   example: Project archived successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Project'
+ *       400:
+ *         description: Project is already archived
+ *       404:
+ *         description: Project not found
+ */
+
+/**
+ * @swagger
+ * /projects/{projectId}/restore:
+ *   patch:
+ *     summary: Restore an archived project
+ *     description: |
+ *       Sets the project status back to ACTIVE and clears `archivedAt`.
+ *       Only works on projects with status ARCHIVED. Owner only.
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Project ID
+ *     responses:
+ *       200:
+ *         description: Project restored
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                   example: Project restored successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Project'
+ *       400:
+ *         description: Only archived projects can be restored
+ */
+
+/**
+ * @swagger
+ * /projects/{projectId}/permanent:
+ *   delete:
+ *     summary: Permanently delete a project (irreversible)
+ *     description: |
+ *       Hard-deletes the project and all associated data (tasks, members,
+ *       documents, comments) via CASCADE. This action cannot be undone.
+ *       Owner only.
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Project ID
+ *     responses:
+ *       200:
+ *         description: Project permanently deleted
  *         content:
  *           application/json:
  *             schema:

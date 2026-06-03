@@ -2,14 +2,16 @@ import { Router } from 'express';
 
 import {
   addProjectMember,
+  archiveProject,
   createProject,
-  deleteProject,
   getAllProjects,
   getMembers,
   getMyProjects,
   getProject,
   getProjectsByOwner,
+  permanentDeleteProject,
   removeMember,
+  restoreProject,
   updateMemberRole,
   updateProject,
 } from '../controllers/project.controller.js';
@@ -36,8 +38,14 @@ router.get('/:projectId', protect, getProject);
 // Update project
 router.put('/:projectId', protect, updateProject);
 
-// Delete project
-router.delete('/:projectId', protect, deleteProject);
+// Archive project (soft-delete)
+router.delete('/:projectId', protect, archiveProject);
+
+// Restore archived project
+router.patch('/:projectId/restore', protect, restoreProject);
+
+// Permanently delete project (irreversible)
+router.delete('/:projectId/permanent', protect, permanentDeleteProject);
 
 // ── Members ───────────────────────────────────────────────────
 

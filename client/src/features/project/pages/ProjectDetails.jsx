@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import PriorityBadge from '@/components/shared/PriorityBadge';
@@ -30,8 +30,11 @@ import EditProjectDialog from '@/features/project/components/EditProjectDialog';
 import RemoveMemberDialog from '@/features/project/components/RemoveMemberDialog';
 import {
   useAddProjectMemberMutation,
+  useArchiveProjectMutation,
   useGetProjectDetailsQuery,
+  usePermanentDeleteProjectMutation,
   useRemoveProjectMemberMutation,
+  useRestoreProjectMutation,
   useUpdateMemberRoleMutation,
   useUpdateProjectMutation,
 } from '@/features/project/project.api';
@@ -51,6 +54,7 @@ const ROLE_OPTIONS = ['ADMIN', 'MEMBER', 'OWNER'];
 const STATUS_STYLES = {
   ACTIVE: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30',
   INACTIVE: 'bg-gray-500/10 text-gray-600 border-gray-500/30',
+  ARCHIVED: 'bg-amber-500/10 text-amber-600 border-amber-500/30',
 };
 
 const ROLE_STYLES = {
@@ -61,6 +65,7 @@ const ROLE_STYLES = {
 
 const ProjectDetails = () => {
   const { projectId } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const {
@@ -75,6 +80,12 @@ const ProjectDetails = () => {
     useAddProjectMemberMutation();
   const [updateMemberRole] = useUpdateMemberRoleMutation();
   const [removeProjectMember] = useRemoveProjectMemberMutation();
+  const [archiveProject, { isLoading: isArchiving }] =
+    useArchiveProjectMutation();
+  const [restoreProject, { isLoading: isRestoring }] =
+    useRestoreProjectMutation();
+  const [permanentDeleteProject, { isLoading: isPermanentDeleting }] =
+    usePermanentDeleteProjectMutation();
   const [deleteTask] = useDeleteTaskMutation();
   const confirm = useAlertDialog();
 
@@ -114,6 +125,7 @@ const ProjectDetails = () => {
   const members = project.members || [];
   const tasks = project.tasks || [];
   const isOwner = user?.id === project.ownerId;
+  const isArchived = project.status === 'ARCHIVED';
   const existingMemberIds = members.map((m) => m.userId);
 
   const currentMembership = members.find((m) => m.userId === user?.id);
@@ -182,8 +194,119 @@ const ProjectDetails = () => {
     }
   };
 
+  const handleArchive = async () => {
+    const isConfirmed = await confirm({
+      title: 'Archive this project?',
+      description: (
+        <span>
+          Are you sure you want to archive{' '}
+          <span className="text-foreground font-medium">{project.title}</span>?
+          The project and all its data will be preserved but hidden from default
+          views. You can restore it later.
+        </span>
+      ),
+      confirmText: 'Archive',
+      cancelText: 'Cancel',
+      media: <DASHBOARD_ICONS.ARCHIVE className="h-6 w-6 text-amber-600" />,
+      mediaClassName: 'bg-amber-500/10 text-amber-600',
+      variant: 'destructive',
+    });
+    if (isConfirmed) {
+      try {
+        const result = await archiveProject(Number(projectId)).unwrap();
+        toast.success(result?.message || 'Project archived successfully');
+      } catch (err) {
+        toast.error(err?.message || 'Failed to archive project');
+      }
+    }
+  };
+
+  const handleRestore = async () => {
+    try {
+      const result = await restoreProject(Number(projectId)).unwrap();
+      toast.success(result?.message || 'Project restored successfully');
+    } catch (err) {
+      toast.error(err?.message || 'Failed to restore project');
+    }
+  };
+
+  const handlePermanentDelete = async () => {
+    const isConfirmed = await confirm({
+      title: 'Permanently delete this project?',
+      description: (
+        <span>
+          This will permanently delete{' '}
+          <span className="text-foreground font-medium">{project.title}</span>{' '}
+          and all its tasks, documents, members, and comments.{' '}
+          <span className="text-destructive font-semibold">
+            This action cannot be undone.
+          </span>
+        </span>
+      ),
+      confirmText: 'Delete Forever',
+      cancelText: 'Cancel',
+      media: <DASHBOARD_ICONS.TRASH2 className="text-destructive h-6 w-6" />,
+      mediaClassName: 'bg-destructive/10 text-destructive',
+      variant: 'destructive',
+    });
+    if (isConfirmed) {
+      try {
+        await permanentDeleteProject(Number(projectId)).unwrap();
+        toast.success('Project permanently deleted');
+        navigate('/projects');
+      } catch (err) {
+        toast.error(err?.message || 'Failed to delete project');
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto space-y-4 px-3 py-5 sm:space-y-6 sm:px-6 sm:py-8">
+      {/* Archived banner */}
+      {isArchived && (
+        <div className="flex flex-col gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/20">
+              <DASHBOARD_ICONS.ARCHIVE className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                This project is archived
+              </p>
+              <p className="text-xs text-amber-600/80 dark:text-amber-400/70">
+                {project.archivedAt
+                  ? `Archived on ${formatDateDisplay(project.archivedAt, 'short')}`
+                  : 'All content is read-only.'}
+              </p>
+            </div>
+          </div>
+          {isOwner && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRestore}
+                disabled={isRestoring}
+                className="border-amber-500/30 text-amber-700 hover:bg-amber-500/10 dark:text-amber-400"
+              >
+                <DASHBOARD_ICONS.ARCHIVERESTORE className="mr-1.5 h-4 w-4" />
+                {isRestoring ? 'Restoring...' : 'Restore'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePermanentDelete}
+                disabled={isPermanentDeleting}
+                className="border-destructive/30 text-destructive hover:bg-destructive/10"
+              >
+                <DASHBOARD_ICONS.TRASH2 className="mr-1.5 h-4 w-4" />
+                {isPermanentDeleting ? 'Deleting...' : 'Delete Forever'}
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Back nav */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <Link to="/projects">
@@ -208,7 +331,7 @@ const ProjectDetails = () => {
               Analytics
             </Button>
           </Link>
-          {isOwner && (
+          {isOwner && !isArchived && (
             <Button
               onClick={() => setIsEditOpen(true)}
               className="shadow-primary/20 hover:shadow-primary/25 h-10 w-full flex-1 rounded-full shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-xl sm:w-auto sm:flex-none"
@@ -408,7 +531,7 @@ const ProjectDetails = () => {
                   : 'People with access to this project.'}
               </CardDescription>
             </div>
-            {isOwner && (
+            {isOwner && !isArchived && (
               <Button
                 onClick={() => setIsAddMemberOpen(true)}
                 variant="outline"
@@ -431,7 +554,7 @@ const ProjectDetails = () => {
             <ul className="divide-border/50 divide-y">
               {members.map((member) => {
                 const isMemberOwner = member.role === 'OWNER';
-                const canManage = isOwner && !isMemberOwner;
+                const canManage = isOwner && !isMemberOwner && !isArchived;
 
                 return (
                   <li
@@ -568,7 +691,7 @@ const ProjectDetails = () => {
                   Kanban
                 </Button>
               </div>
-              {isManager && (
+              {isManager && !isArchived && (
                 <Button
                   onClick={() => setIsCreateTaskOpen(true)}
                   variant="outline"
@@ -595,6 +718,7 @@ const ProjectDetails = () => {
               isManager={isManager}
               currentUserId={user?.id}
               onSelectTask={setSelectedTaskId}
+              isProjectArchived={isArchived}
             />
           ) : (
             <ul className="divide-border/50 divide-y">
@@ -657,7 +781,7 @@ const ProjectDetails = () => {
                           size="sm"
                           className="shrink-0 text-[9px] font-bold tracking-wider uppercase"
                         />
-                        {isManager && (
+                        {isManager && !isArchived && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -739,7 +863,9 @@ const ProjectDetails = () => {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isManager && <DocumentUploader projectId={projectId} />}
+          {isManager && !isArchived && (
+            <DocumentUploader projectId={projectId} />
+          )}
           <DocumentList projectId={projectId} isManager={isManager} />
         </CardContent>
       </Card>
@@ -763,43 +889,130 @@ const ProjectDetails = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="border-border/50 bg-background/30 flex items-center justify-between rounded-xl border p-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <DASHBOARD_ICONS.CLOCK className="h-4 w-4 text-sky-500" />
-                  Task Deadline Reminders
+            {/* Reminders toggle — hidden for archived projects */}
+            {!isArchived && (
+              <div className="border-border/50 bg-background/30 flex items-center justify-between rounded-xl border p-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <DASHBOARD_ICONS.CLOCK className="h-4 w-4 text-sky-500" />
+                    Task Deadline Reminders
+                  </div>
+                  <div className="text-muted-foreground text-xs">
+                    Send automatic email notifications to assignees 24 hours
+                    before tasks become overdue.
+                  </div>
                 </div>
-                <div className="text-muted-foreground text-xs">
-                  Send automatic email notifications to assignees 24 hours
-                  before tasks become overdue.
-                </div>
-              </div>
-              <Switch
-                id="tab-reminders"
-                checked={
-                  project.allowReminders === 1 ||
-                  project.allowReminders === true
-                }
-                disabled={isUpdatingProject}
-                onCheckedChange={async (checked) => {
-                  try {
-                    await updateProject({
-                      projectId,
-                      allowReminders: checked ? 1 : 0,
-                    }).unwrap();
-                    toast.success(
-                      checked
-                        ? 'Deadline reminders enabled'
-                        : 'Deadline reminders muted'
-                    );
-                  } catch (err) {
-                    toast.error(
-                      err?.message || 'Failed to update reminder settings'
-                    );
+                <Switch
+                  id="tab-reminders"
+                  checked={
+                    project.allowReminders === 1 ||
+                    project.allowReminders === true
                   }
-                }}
-              />
-            </div>
+                  disabled={isUpdatingProject}
+                  onCheckedChange={async (checked) => {
+                    try {
+                      await updateProject({
+                        projectId,
+                        allowReminders: checked ? 1 : 0,
+                      }).unwrap();
+                      toast.success(
+                        checked
+                          ? 'Deadline reminders enabled'
+                          : 'Deadline reminders muted'
+                      );
+                    } catch (err) {
+                      toast.error(
+                        err?.message || 'Failed to update reminder settings'
+                      );
+                    }
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Danger Zone */}
+            {isOwner && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="bg-destructive/10 h-px flex-1" />
+                  <span className="text-destructive text-xs font-semibold tracking-wider uppercase">
+                    Danger Zone
+                  </span>
+                  <div className="bg-destructive/10 h-px flex-1" />
+                </div>
+
+                {!isArchived ? (
+                  <div className="border-destructive/20 bg-destructive/5 flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm font-semibold">
+                        <DASHBOARD_ICONS.ARCHIVE className="h-4 w-4 text-amber-600" />
+                        Archive Project
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        Hide this project from default views. All data is
+                        preserved and can be restored.
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleArchive}
+                      disabled={isArchiving}
+                      className="border-amber-500/30 text-amber-700 hover:bg-amber-500/10 dark:text-amber-400"
+                    >
+                      <DASHBOARD_ICONS.ARCHIVE className="mr-1.5 h-4 w-4" />
+                      {isArchiving ? 'Archiving...' : 'Archive Project'}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="border-border/50 bg-background/30 flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm font-semibold">
+                          <DASHBOARD_ICONS.ARCHIVERESTORE className="h-4 w-4 text-emerald-600" />
+                          Restore Project
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          Bring this project back to active status.
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRestore}
+                        disabled={isRestoring}
+                        className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+                      >
+                        <DASHBOARD_ICONS.ARCHIVERESTORE className="mr-1.5 h-4 w-4" />
+                        {isRestoring ? 'Restoring...' : 'Restore Project'}
+                      </Button>
+                    </div>
+
+                    <div className="border-destructive/30 bg-destructive/5 flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="space-y-1">
+                        <div className="text-destructive flex items-center gap-2 text-sm font-semibold">
+                          <DASHBOARD_ICONS.TRASH2 className="h-4 w-4" />
+                          Permanently Delete
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          Delete this project and all its data forever. This
+                          cannot be undone.
+                        </div>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handlePermanentDelete}
+                        disabled={isPermanentDeleting}
+                      >
+                        <DASHBOARD_ICONS.TRASH2 className="mr-1.5 h-4 w-4" />
+                        {isPermanentDeleting ? 'Deleting...' : 'Delete Forever'}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -834,6 +1047,7 @@ const ProjectDetails = () => {
         members={members}
         currentUserId={user?.id}
         projectRole={projectRole}
+        isProjectArchived={isArchived}
       />
 
       <RemoveMemberDialog

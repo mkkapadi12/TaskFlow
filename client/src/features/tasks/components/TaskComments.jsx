@@ -20,6 +20,7 @@ export default function TaskComments({
   taskStatus,
   currentUserId,
   projectRole,
+  isProjectArchived,
 }) {
   const [content, setContent] = useState('');
   const bottomRef = useRef(null);
@@ -120,6 +121,7 @@ export default function TaskComments({
                 const isActivity = comment.type === 'ACTIVITY';
                 const canDelete =
                   !isActivity &&
+                  !isProjectArchived &&
                   (comment.userId === currentUserId || isManager);
 
                 if (isActivity) {
@@ -198,9 +200,11 @@ export default function TaskComments({
       </div>
 
       {/* Input Area */}
-      {taskStatus === 'DONE' ? (
+      {taskStatus === 'DONE' || isProjectArchived ? (
         <div className="text-muted-foreground/30 bg-muted/10 flex h-12 items-center justify-center rounded-xl border-2 border-dashed text-xs">
-          Task is completed
+          {isProjectArchived
+            ? 'Project is archived (read-only)'
+            : 'Task is completed'}
         </div>
       ) : (
         <div className="flex items-end gap-2">

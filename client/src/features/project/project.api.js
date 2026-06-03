@@ -3,7 +3,10 @@ import { baseApi } from '@/app/baseApi';
 export const projectApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getMyProjects: builder.query({
-      query: () => ({ url: '/projects/my', method: 'GET' }),
+      query: ({ includeArchived } = {}) => ({
+        url: `/projects/my${includeArchived ? '?includeArchived=true' : ''}`,
+        method: 'GET',
+      }),
       providesTags: ['Project'],
     }),
 
@@ -35,9 +38,28 @@ export const projectApi = baseApi.injectEndpoints({
       ],
     }),
 
-    deleteProject: builder.mutation({
+    archiveProject: builder.mutation({
       query: (projectId) => ({
         url: `/projects/${projectId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Project'],
+    }),
+
+    restoreProject: builder.mutation({
+      query: (projectId) => ({
+        url: `/projects/${projectId}/restore`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: (result, error, projectId) => [
+        'Project',
+        { type: 'Project', id: projectId },
+      ],
+    }),
+
+    permanentDeleteProject: builder.mutation({
+      query: (projectId) => ({
+        url: `/projects/${projectId}/permanent`,
         method: 'DELETE',
       }),
       invalidatesTags: ['Project'],
@@ -96,7 +118,9 @@ export const {
   useGetProjectDetailsQuery,
   useCreateProjectMutation,
   useUpdateProjectMutation,
-  useDeleteProjectMutation,
+  useArchiveProjectMutation,
+  useRestoreProjectMutation,
+  usePermanentDeleteProjectMutation,
   useGetProjectMembersQuery,
   useAddProjectMemberMutation,
   useUpdateMemberRoleMutation,

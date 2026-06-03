@@ -834,6 +834,7 @@ const AdvancedAnalytics = () => {
             (m) => m.userId === user?.id
           )?.role
         }
+        isProjectArchived={activeTaskProjDetails?.data?.status === 'ARCHIVED'}
       />
     </div>
   );

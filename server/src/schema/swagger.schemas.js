@@ -176,7 +176,12 @@
  *           example: 1
  *         status:
  *           type: string
- *           enum: [ACTIVE, INACTIVE]
+ *           enum: [ACTIVE, INACTIVE, ARCHIVED]
+ *         archivedAt:
+ *           type: string
+ *           format: date-time
+ *           nullable: true
+ *           description: Timestamp when the project was archived (null if not archived)
  *         createdAt:
  *           type: string
  *           format: date-time

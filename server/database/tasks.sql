@@ -18,6 +18,16 @@ CREATE PROCEDURE sp_CreateTask(
     IN p_creatorId   INT
 )
 BEGIN
+    DECLARE v_projectStatus VARCHAR(20);
+
+    -- Guard: cannot create tasks in an archived project
+    SELECT status INTO v_projectStatus FROM projects WHERE id = p_projectId;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot create tasks in an archived project';
+    END IF;
+
     -- Apply defaults
     IF p_status IS NULL OR p_status = '' THEN
         SET p_status = 'TODO';
@@ -136,6 +146,18 @@ CREATE PROCEDURE sp_UpdateTask(
     IN p_assigneeId  INT
 )
 BEGIN
+    DECLARE v_projectStatus VARCHAR(20);
+
+    SELECT p.status INTO v_projectStatus
+    FROM tasks t
+    JOIN projects p ON p.id = t.projectId
+    WHERE t.id = p_id;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot modify tasks in an archived project';
+    END IF;
+
     UPDATE tasks
     SET
         title       = IFNULL(p_title,       title),
@@ -169,6 +191,18 @@ CREATE PROCEDURE sp_DeleteTask(
     IN p_id INT
 )
 BEGIN
+    DECLARE v_projectStatus VARCHAR(20);
+
+    SELECT p.status INTO v_projectStatus
+    FROM tasks t
+    JOIN projects p ON p.id = t.projectId
+    WHERE t.id = p_id;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete tasks in an archived project';
+    END IF;
+
     DELETE FROM tasks WHERE id = p_id;
     SELECT ROW_COUNT() AS deletedCount;
 END //
@@ -201,14 +235,21 @@ CREATE PROCEDURE sp_VerifyTask(
 )
 BEGIN
     DECLARE v_currentStatus VARCHAR(20);
+    DECLARE v_projectStatus VARCHAR(20);
 
-    SELECT status INTO v_currentStatus
-    FROM tasks
-    WHERE id = p_id;
+    SELECT t.status, p.status INTO v_currentStatus, v_projectStatus
+    FROM tasks t
+    JOIN projects p ON p.id = t.projectId
+    WHERE t.id = p_id;
 
     IF v_currentStatus IS NULL THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Task not found';
+    END IF;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot verify tasks in an archived project';
     END IF;
 
     IF v_currentStatus <> 'IN_REVIEW' THEN
@@ -253,7 +294,8 @@ BEGIN
       AND t.deadline > NOW()
       AND t.deadline <= DATE_ADD(NOW(), INTERVAL 24 HOUR)
       AND t.reminderSent = 0
-      AND p.allowReminders = 1;
+      AND p.allowReminders = 1
+      AND p.status <> 'ARCHIVED';
 END //
 
 

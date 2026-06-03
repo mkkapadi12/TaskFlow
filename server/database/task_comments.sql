@@ -33,6 +33,18 @@ CREATE PROCEDURE sp_CreateTaskComment(
     IN p_type    VARCHAR(20)
 )
 BEGIN
+    DECLARE v_projectStatus VARCHAR(20);
+
+    SELECT p.status INTO v_projectStatus
+    FROM tasks t
+    JOIN projects p ON p.id = t.projectId
+    WHERE t.id = p_taskId;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot add comments/activities in an archived project';
+    END IF;
+
     IF p_type IS NULL OR p_type = '' THEN
         SET p_type = 'COMMENT';
     END IF;
@@ -83,6 +95,19 @@ CREATE PROCEDURE sp_DeleteTaskComment(
     IN p_commentId INT
 )
 BEGIN
+    DECLARE v_projectStatus VARCHAR(20);
+
+    SELECT p.status INTO v_projectStatus
+    FROM task_comments tc
+    JOIN tasks t ON t.id = tc.taskId
+    JOIN projects p ON p.id = t.projectId
+    WHERE tc.id = p_commentId;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete comments in an archived project';
+    END IF;
+
     DELETE FROM task_comments WHERE id = p_commentId;
     SELECT ROW_COUNT() AS deletedCount;
 END //

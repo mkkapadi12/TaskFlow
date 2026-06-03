@@ -30,6 +30,7 @@ const KanbanBoard = ({
   isManager,
   currentUserId,
   onSelectTask,
+  isProjectArchived,
 }) => {
   const [updateStatus, { isLoading: isStatusUpdating }] =
     useUpdateTaskStatusMutation();
@@ -57,6 +58,11 @@ const KanbanBoard = ({
 
   const handleDrop = async (taskId, sourceStatus, targetStatus) => {
     if (sourceStatus === targetStatus) return;
+
+    if (isProjectArchived) {
+      toast.error('Cannot change task status in an archived project.');
+      return;
+    }
 
     // 1. Check if the task is already completed
     if (sourceStatus === 'DONE') {
@@ -180,7 +186,9 @@ const KanbanBoard = ({
                   return (
                     <Card
                       key={task.id}
-                      draggable={!isStatusUpdating && !isVerifying}
+                      draggable={
+                        !isStatusUpdating && !isVerifying && !isProjectArchived
+                      }
                       onDragStart={(e) => {
                         e.dataTransfer.setData('taskId', task.id.toString());
                         e.dataTransfer.setData('sourceStatus', task.status);

@@ -1,11 +1,11 @@
 -- ============================================================
---  STORED PROCEDURES  â€“  projects & project_members
+--  STORED PROCEDURES  –  projects & project_members
 -- ============================================================
 
 DELIMITER //
 
 
--- â”€â”€ 1. Create Project â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 1. Create Project ────────────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_CreateProject //
 CREATE PROCEDURE sp_CreateProject(
     IN p_title       VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
@@ -33,45 +33,54 @@ BEGIN
 END //
 
 
--- â”€â”€ 2. Get All Projects (owner view) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 2. Get All Projects (admin view — excludes archived by default) ──
 DROP PROCEDURE IF EXISTS sp_GetAllProjects //
-CREATE PROCEDURE sp_GetAllProjects()
+CREATE PROCEDURE sp_GetAllProjects(
+    IN p_includeArchived TINYINT(1)
+)
 BEGIN
     SELECT
-        p.id, p.title, p.description, p.ownerId, p.status, p.createdAt, p.updatedAt,
+        p.id, p.title, p.description, p.ownerId, p.status, p.archivedAt,
+        p.createdAt, p.updatedAt,
         u.name AS ownerName,
         (SELECT COUNT(*) FROM project_members pm WHERE pm.projectId = p.id) AS memberCount,
         (SELECT COUNT(*) FROM tasks t          WHERE t.projectId  = p.id) AS taskCount
     FROM projects p
     JOIN users u ON u.id = p.ownerId
+    WHERE (p_includeArchived = 1 OR p.status <> 'ARCHIVED')
     ORDER BY p.createdAt DESC;
 END //
 
 
--- â”€â”€ 3. Get Projects by Owner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 3. Get Projects by Owner (excludes archived by default) ──
 DROP PROCEDURE IF EXISTS sp_GetProjectsByOwner //
 CREATE PROCEDURE sp_GetProjectsByOwner(
-    IN p_ownerId INT
+    IN p_ownerId         INT,
+    IN p_includeArchived TINYINT(1)
 )
 BEGIN
     SELECT
-        p.id, p.title, p.description, p.ownerId, p.status, p.createdAt, p.updatedAt,
+        p.id, p.title, p.description, p.ownerId, p.status, p.archivedAt,
+        p.createdAt, p.updatedAt,
         (SELECT COUNT(*) FROM project_members pm WHERE pm.projectId = p.id) AS memberCount,
         (SELECT COUNT(*) FROM tasks t          WHERE t.projectId  = p.id) AS taskCount
     FROM projects p
     WHERE p.ownerId = p_ownerId
+      AND (p_includeArchived = 1 OR p.status <> 'ARCHIVED')
     ORDER BY p.createdAt DESC;
 END //
 
 
--- â”€â”€ 4. Get Projects for a Member (projects the user belongs to) â”€â”€
+-- ── 4. Get Projects for a Member (excludes archived by default) ──
 DROP PROCEDURE IF EXISTS sp_GetProjectsByMember //
 CREATE PROCEDURE sp_GetProjectsByMember(
-    IN p_userId INT
+    IN p_userId          INT,
+    IN p_includeArchived TINYINT(1)
 )
 BEGIN
     SELECT
-        p.id, p.title, p.description, p.ownerId, p.status, p.createdAt, p.updatedAt,
+        p.id, p.title, p.description, p.ownerId, p.status, p.archivedAt,
+        p.createdAt, p.updatedAt,
         u.name  AS ownerName,
         pm.role AS memberRole,
         (SELECT COUNT(*) FROM project_members pm2 WHERE pm2.projectId = p.id) AS memberCount,
@@ -80,18 +89,20 @@ BEGIN
     JOIN projects p ON p.id = pm.projectId
     JOIN users    u ON u.id = p.ownerId
     WHERE pm.userId = p_userId
+      AND (p_includeArchived = 1 OR p.status <> 'ARCHIVED')
     ORDER BY p.createdAt DESC;
 END //
 
 
--- â”€â”€ 5. Get Project By ID â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 5. Get Project By ID ────────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_GetProjectById //
 CREATE PROCEDURE sp_GetProjectById(
     IN p_id INT
 )
 BEGIN
     SELECT
-        p.id, p.title, p.description, p.ownerId, p.status, p.allowReminders, p.createdAt, p.updatedAt,
+        p.id, p.title, p.description, p.ownerId, p.status, p.allowReminders,
+        p.archivedAt, p.createdAt, p.updatedAt,
         u.name AS ownerName, u.email AS ownerEmail
     FROM projects p
     JOIN users u ON u.id = p.ownerId
@@ -99,7 +110,7 @@ BEGIN
 END //
 
 
--- ── 6. Update Project ─────────────────────────────────────────
+-- ── 6. Update Project (blocked for archived projects) ────────
 DROP PROCEDURE IF EXISTS sp_UpdateProject //
 CREATE PROCEDURE sp_UpdateProject(
     IN p_id             INT,
@@ -109,6 +120,15 @@ CREATE PROCEDURE sp_UpdateProject(
     IN p_allowReminders TINYINT(1)
 )
 BEGIN
+    DECLARE v_currentStatus VARCHAR(20);
+
+    SELECT status INTO v_currentStatus FROM projects WHERE id = p_id;
+
+    IF v_currentStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot update an archived project. Restore it first.';
+    END IF;
+
     UPDATE projects
     SET
         title          = IFNULL(p_title,          title),
@@ -119,7 +139,8 @@ BEGIN
     WHERE id = p_id;
 
     SELECT
-        p.id, p.title, p.description, p.ownerId, p.status, p.allowReminders, p.createdAt, p.updatedAt,
+        p.id, p.title, p.description, p.ownerId, p.status, p.allowReminders,
+        p.archivedAt, p.createdAt, p.updatedAt,
         u.name AS ownerName
     FROM projects p
     JOIN users u ON u.id = p.ownerId
@@ -127,9 +148,81 @@ BEGIN
 END //
 
 
--- â”€â”€ 7. Delete Project â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 7. Archive Project (soft-delete) ─────────────────────────
 DROP PROCEDURE IF EXISTS sp_DeleteProject //
 CREATE PROCEDURE sp_DeleteProject(
+    IN p_id INT
+)
+BEGIN
+    DECLARE v_currentStatus VARCHAR(20);
+
+    SELECT status INTO v_currentStatus FROM projects WHERE id = p_id;
+
+    IF v_currentStatus IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Project not found';
+    END IF;
+
+    IF v_currentStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Project is already archived';
+    END IF;
+
+    UPDATE projects
+    SET status     = 'ARCHIVED',
+        archivedAt = NOW(),
+        updatedAt  = NOW()
+    WHERE id = p_id;
+
+    SELECT
+        p.id, p.title, p.description, p.ownerId, p.status, p.archivedAt,
+        p.createdAt, p.updatedAt,
+        u.name AS ownerName
+    FROM projects p
+    JOIN users u ON u.id = p.ownerId
+    WHERE p.id = p_id;
+END //
+
+
+-- ── 7b. Restore Project (un-archive) ─────────────────────────
+DROP PROCEDURE IF EXISTS sp_RestoreProject //
+CREATE PROCEDURE sp_RestoreProject(
+    IN p_id INT
+)
+BEGIN
+    DECLARE v_currentStatus VARCHAR(20);
+
+    SELECT status INTO v_currentStatus FROM projects WHERE id = p_id;
+
+    IF v_currentStatus IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Project not found';
+    END IF;
+
+    IF v_currentStatus <> 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Only archived projects can be restored';
+    END IF;
+
+    UPDATE projects
+    SET status     = 'ACTIVE',
+        archivedAt = NULL,
+        updatedAt  = NOW()
+    WHERE id = p_id;
+
+    SELECT
+        p.id, p.title, p.description, p.ownerId, p.status, p.archivedAt,
+        p.createdAt, p.updatedAt,
+        u.name AS ownerName
+    FROM projects p
+    JOIN users u ON u.id = p.ownerId
+    WHERE p.id = p_id;
+END //
+
+
+-- ── 7c. Permanent Delete Project ──────────────────────────────
+DROP PROCEDURE IF EXISTS sp_PermanentDeleteProject //
+CREATE PROCEDURE sp_PermanentDeleteProject(
     IN p_id INT
 )
 BEGIN
@@ -138,11 +231,33 @@ BEGIN
 END //
 
 
--- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
---  project_members SPs
--- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 7d. Get Archived Projects for a Member ────────────────────
+DROP PROCEDURE IF EXISTS sp_GetArchivedProjectsByMember //
+CREATE PROCEDURE sp_GetArchivedProjectsByMember(
+    IN p_userId INT
+)
+BEGIN
+    SELECT
+        p.id, p.title, p.description, p.ownerId, p.status, p.archivedAt,
+        p.createdAt, p.updatedAt,
+        u.name  AS ownerName,
+        pm.role AS memberRole,
+        (SELECT COUNT(*) FROM project_members pm2 WHERE pm2.projectId = p.id) AS memberCount,
+        (SELECT COUNT(*) FROM tasks t             WHERE t.projectId  = p.id) AS taskCount
+    FROM project_members pm
+    JOIN projects p ON p.id = pm.projectId
+    JOIN users    u ON u.id = p.ownerId
+    WHERE pm.userId = p_userId
+      AND p.status = 'ARCHIVED'
+    ORDER BY p.archivedAt DESC;
+END //
 
--- â”€â”€ 8. Add Member to Project â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+-- ─────────────────────────────────────────────────────────────
+--  project_members SPs
+-- ─────────────────────────────────────────────────────────────
+
+-- ── 8. Add Member to Project ─────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_AddProjectMember //
 CREATE PROCEDURE sp_AddProjectMember(
     IN p_projectId INT,
@@ -151,9 +266,18 @@ CREATE PROCEDURE sp_AddProjectMember(
 )
 BEGIN
     DECLARE already_member INT DEFAULT 0;
+    DECLARE v_projectStatus VARCHAR(20);
 
     IF p_role IS NULL OR p_role = '' THEN
         SET p_role = 'MEMBER';
+    END IF;
+
+    -- Guard: cannot add members to archived projects
+    SELECT status INTO v_projectStatus FROM projects WHERE id = p_projectId;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot add members to an archived project';
     END IF;
 
     SELECT COUNT(*) INTO already_member
@@ -176,7 +300,7 @@ BEGIN
 END //
 
 
--- â”€â”€ 9. Get Members of a Project â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 9. Get Members of a Project ──────────────────────────────
 DROP PROCEDURE IF EXISTS sp_GetProjectMembers //
 CREATE PROCEDURE sp_GetProjectMembers(
     IN p_projectId INT
@@ -192,7 +316,7 @@ BEGIN
 END //
 
 
--- â”€â”€ 10. Update Member Role â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- ── 10. Update Member Role ───────────────────────────────────
 DROP PROCEDURE IF EXISTS sp_UpdateMemberRole //
 CREATE PROCEDURE sp_UpdateMemberRole(
     IN p_projectId INT,
@@ -200,6 +324,15 @@ CREATE PROCEDURE sp_UpdateMemberRole(
     IN p_role      VARCHAR(20)
 )
 BEGIN
+    DECLARE v_projectStatus VARCHAR(20);
+
+    SELECT status INTO v_projectStatus FROM projects WHERE id = p_projectId;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot update members of an archived project';
+    END IF;
+
     UPDATE project_members
     SET role = p_role
     WHERE projectId = p_projectId AND userId = p_userId;
@@ -219,6 +352,15 @@ CREATE PROCEDURE sp_RemoveProjectMember(
     IN p_userId    INT
 )
 BEGIN
+    DECLARE v_projectStatus VARCHAR(20);
+
+    SELECT status INTO v_projectStatus FROM projects WHERE id = p_projectId;
+
+    IF v_projectStatus = 'ARCHIVED' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot remove members from an archived project';
+    END IF;
+
     DELETE FROM project_members
     WHERE projectId = p_projectId AND userId = p_userId;
 
@@ -259,7 +401,7 @@ BEGIN
     -- Result set 1: project info + owner
     SELECT
         p.id, p.title, p.description, p.ownerId, p.status, p.allowReminders,
-        p.createdAt, p.updatedAt,
+        p.archivedAt, p.createdAt, p.updatedAt,
         u.name  AS ownerName,
         u.avatar AS ownerAvatar,
         u.email AS ownerEmail,

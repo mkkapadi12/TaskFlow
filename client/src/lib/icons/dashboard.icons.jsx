@@ -1,5 +1,7 @@
 import {
   AlertTriangle,
+  Archive,
+  ArchiveRestore,
   ArrowLeft,
   Bell,
   BellRing,
@@ -82,4 +84,6 @@ export const DASHBOARD_ICONS = {
   BELL: Bell,
   BELLRING: BellRing,
   CHECKCHECK: CheckCheck,
+  ARCHIVE: Archive,
+  ARCHIVERESTORE: ArchiveRestore,
 };

@@ -27,7 +27,8 @@ const createProject = async (req, res, next) => {
 
 const getAllProjects = async (req, res, next) => {
   try {
-    const projects = await ProjectModel.findAll();
+    const includeArchived = req.query.includeArchived === 'true';
+    const projects = await ProjectModel.findAll(includeArchived);
     res.status(200).json({
       success: true,
       data: projects,
@@ -69,15 +70,48 @@ const updateProject = async (req, res, next) => {
   }
 };
 
-const deleteProject = async (req, res, next) => {
+const archiveProject = async (req, res, next) => {
   try {
-    const result = await ProjectModel.delete(
-      Number(req.params.id),
+    const project = await ProjectModel.archive(
+      Number(req.params.projectId),
       req.user.id
     );
     res.status(200).json({
       success: true,
-      message: result,
+      message: 'Project archived successfully',
+      data: project,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const restoreProject = async (req, res, next) => {
+  try {
+    const project = await ProjectModel.restore(
+      Number(req.params.projectId),
+      req.user.id
+    );
+    res.status(200).json({
+      success: true,
+      message: 'Project restored successfully',
+      data: project,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const permanentDeleteProject = async (req, res, next) => {
+  try {
+    const result = await ProjectModel.permanentDelete(
+      Number(req.params.projectId),
+      req.user.id
+    );
+    res.status(200).json({
+      success: true,
+      message: 'Project permanently deleted',
+      data: result,
     });
   } catch (err) {
     next(err);
@@ -230,7 +264,11 @@ const removeMember = async (req, res, next) => {
 // Get projects the logged-in user is a member of
 const getMyProjects = async (req, res, next) => {
   try {
-    const projects = await ProjectModel.getByMember(req.user.id);
+    const includeArchived = req.query.includeArchived === 'true';
+    const projects = await ProjectModel.getByMember(
+      req.user.id,
+      includeArchived
+    );
     res.status(200).json({
       success: true,
       data: projects,
@@ -243,7 +281,11 @@ const getMyProjects = async (req, res, next) => {
 // Get projects owned by a specific user (admin)
 const getProjectsByOwner = async (req, res, next) => {
   try {
-    const projects = await ProjectModel.getByOwner(Number(req.params.ownerId));
+    const includeArchived = req.query.includeArchived === 'true';
+    const projects = await ProjectModel.getByOwner(
+      Number(req.params.ownerId),
+      includeArchived
+    );
     res.status(200).json({
       success: true,
       data: projects,
@@ -255,14 +297,16 @@ const getProjectsByOwner = async (req, res, next) => {
 
 export {
   addProjectMember,
+  archiveProject,
   createProject,
-  deleteProject,
   getAllProjects,
   getMembers,
   getMyProjects,
   getProject,
   getProjectsByOwner,
+  permanentDeleteProject,
   removeMember,
+  restoreProject,
   updateMemberRole,
   updateProject,
 };

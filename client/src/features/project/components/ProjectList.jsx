@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -32,35 +33,58 @@ const ProjectList = ({ projects, isLoading, isFiltered }) => {
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {projects.map((project) => (
-        <Link key={project.id} to={`/projects/${project.id}`}>
-          <Card className="border-border/50 bg-card/50 hover:border-primary/30 hover:shadow-primary/5 group h-full cursor-pointer backdrop-blur-sm transition-all hover:shadow-lg">
-            <CardHeader>
-              <CardTitle className="group-hover:text-primary transition-colors">
-                {project.title}
-              </CardTitle>
-              <CardDescription className="line-clamp-2">
-                {project.description || 'No description provided.'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-muted-foreground flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-1">
-                  <DASHBOARD_ICONS.USERS size={16} />
-                  <span>{project.memberCount || 0} Members</span>
+      {projects.map((project) => {
+        const isArchived = project.status === 'ARCHIVED';
+
+        return (
+          <Link key={project.id} to={`/projects/${project.id}`}>
+            <Card
+              className={`border-border/50 bg-card/50 hover:border-primary/30 hover:shadow-primary/5 group h-full cursor-pointer backdrop-blur-sm transition-all hover:shadow-lg ${
+                isArchived ? 'opacity-65' : ''
+              }`}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between gap-2">
+                  <CardTitle
+                    className={`group-hover:text-primary transition-colors ${isArchived ? 'text-muted-foreground' : ''}`}
+                  >
+                    {project.title}
+                  </CardTitle>
+                  {isArchived && (
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 gap-1 border-amber-500/30 bg-amber-500/10 text-xs text-amber-600"
+                    >
+                      <DASHBOARD_ICONS.ARCHIVE className="h-3 w-3" />
+                      Archived
+                    </Badge>
+                  )}
                 </div>
-                <div className="flex items-center gap-1">
-                  <DASHBOARD_ICONS.SQUARESTACK size={16} />
-                  <span>{project.taskCount || 0} Tasks</span>
+                <CardDescription className="line-clamp-2">
+                  {project.description || 'No description provided.'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-muted-foreground flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1">
+                    <DASHBOARD_ICONS.USERS size={16} />
+                    <span>{project.memberCount || 0} Members</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <DASHBOARD_ICONS.SQUARESTACK size={16} />
+                    <span>{project.taskCount || 0} Tasks</span>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter className="text-muted-foreground/70 text-xs">
-              Created on {formatDateDisplay(project.createdAt, 'dd/mm/yyyy')}
-            </CardFooter>
-          </Card>
-        </Link>
-      ))}
+              </CardContent>
+              <CardFooter className="text-muted-foreground/70 text-xs">
+                {isArchived && project.archivedAt
+                  ? `Archived on ${formatDateDisplay(project.archivedAt, 'dd/mm/yyyy')}`
+                  : `Created on ${formatDateDisplay(project.createdAt, 'dd/mm/yyyy')}`}
+              </CardFooter>
+            </Card>
+          </Link>
+        );
+      })}
     </div>
   );
 };

@@ -225,6 +225,7 @@ const UserCalendar = () => {
           members={members}
           currentUserId={user?.id}
           projectRole={projectRole}
+          isProjectArchived={projectDetailsData?.data?.status === 'ARCHIVED'}
         />
       )}
     </div>
