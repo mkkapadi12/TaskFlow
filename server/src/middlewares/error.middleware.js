@@ -62,6 +62,8 @@ const sendProdError = (err, res) => {
     res.status(err.statusCode).json({
       success: false,
       message: err.message,
+      status: err.status,
+      statusCode: err.statusCode,
     });
   } else {
     // Unknown error — don't leak details
