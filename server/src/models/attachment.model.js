@@ -19,7 +19,10 @@ const AttachmentModel = {
 
     // 2. Enforce only task assignee can upload task attachments
     if (!task.assigneeId || Number(task.assigneeId) !== Number(uploadedBy)) {
-      throw new AppError('Only the assignee of the task can upload attachments', 403);
+      throw new AppError(
+        'Only the assignee of the task can upload attachments',
+        403
+      );
     }
 
     const uploaded = [];
@@ -61,20 +64,26 @@ const AttachmentModel = {
     await requireMembership(task.projectId, userId);
 
     // 3. Fetch from DB
-    const [attachments] = await callProcedure('sp_GetTaskAttachments', [taskId]);
+    const [attachments] = await callProcedure('sp_GetTaskAttachments', [
+      taskId,
+    ]);
     return attachments;
   },
 
   delete: async (attachmentId, userId) => {
     // 1. Get attachment metadata
-    const [rows] = await callProcedure('sp_GetTaskAttachmentById', [attachmentId]);
+    const [rows] = await callProcedure('sp_GetTaskAttachmentById', [
+      attachmentId,
+    ]);
     const attachment = rows[0];
     if (!attachment) {
       throw new AppError('Attachment not found', 404);
     }
 
     // 2. Get task to find the project it belongs to
-    const [taskRows] = await callProcedure('sp_GetTaskById', [attachment.taskId]);
+    const [taskRows] = await callProcedure('sp_GetTaskById', [
+      attachment.taskId,
+    ]);
     const task = taskRows[0];
     if (!task) {
       throw new AppError('Task not found', 404);
@@ -91,7 +100,10 @@ const AttachmentModel = {
     }
 
     if (!isUploader && !isManager) {
-      throw new AppError('Only the uploader or a project manager can delete this attachment', 403);
+      throw new AppError(
+        'Only the uploader or a project manager can delete this attachment',
+        403
+      );
     }
 
     // 4. Delete from Cloudinary
@@ -100,7 +112,9 @@ const AttachmentModel = {
     });
 
     // 5. Delete from DB
-    const [result] = await callProcedure('sp_DeleteTaskAttachment', [attachmentId]);
+    const [result] = await callProcedure('sp_DeleteTaskAttachment', [
+      attachmentId,
+    ]);
     if (result[0]?.deletedCount === 0) {
       throw new AppError('Failed to delete attachment', 500);
     }
