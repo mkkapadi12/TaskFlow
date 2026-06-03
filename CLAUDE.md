@@ -50,7 +50,7 @@ mysql -u root -p <db_name> < server/database/notifications_feed.sql
 
 There is no ORM and no inline SQL in JS. Every read and write goes through `callProcedure(name, params)` (`server/src/config/callProcedure.js`), which wraps `pool.query("CALL sp_X(?,?,...)", params)`. SP definitions live in `server/database/*.sql`:
 
-- `users.sql`, `project.sql`, `tasks.sql` — one file per domain
+- `users.sql`, `project.sql`, `tasks.sql`, `task_attachments.sql` — files per domain
 - `create.sql` — table schema (users, projects, project_members, tasks)
 - `call.sql` — ad-hoc invocation scratch
 
@@ -102,13 +102,21 @@ Both return `{ success: false, message }` on 429 and use `standardHeaders: true`
 ### Server: project archiving (soft-deletes) & task workflow rules
 
 Projects can be soft-deleted (archived) by setting `status = 'ARCHIVED'` and recording `archivedAt = NOW()`.
-- **Read-Only Mode**: Once archived, a project and all its tasks, members, and comments become strictly read-only.
-- **Stored Procedure Guards**: Stored procedures (`sp_UpdateTask`, `sp_DeleteTask`, `sp_VerifyTask`, `sp_UpdateMemberRole`, `sp_RemoveProjectMember`, `sp_CreateTaskComment`, `sp_DeleteTaskComment`) throw `SIGNAL SQLSTATE '45000'` on any modification attempt on archived projects.
+- **Read-Only Mode**: Once archived, a project and all its tasks, members, comments, and attachments become strictly read-only.
+- **Stored Procedure Guards**: Stored procedures (`sp_UpdateTask`, `sp_DeleteTask`, `sp_VerifyTask`, `sp_UpdateMemberRole`, `sp_RemoveProjectMember`, `sp_CreateTaskComment`, `sp_DeleteTaskComment`, `sp_CreateTaskAttachment`, `sp_DeleteTaskAttachment`) throw `SIGNAL SQLSTATE '45000'` on any modification attempt on archived projects.
 - **Client Guards**: The frontend displays a warning banner and disables all task form inputs, status transitions, comment entry/deletion, and member alterations.
 - **Task status machine**: The task status machine is enforced in the model layer and in `sp_VerifyTask`:
   - `PUT /tasks/:taskId` (update) **ignores any `status` field** — fields like title, description, priority, deadline, and assignee only.
   - `PATCH /tasks/:taskId/status` moves `TODO ↔ IN_PROGRESS ↔ IN_REVIEW` and is callable by the assignee or any project manager. It **cannot set `DONE`**.
   - `PATCH /tasks/:taskId/verify` is the only path to `DONE`: owner-only, requires current status `IN_REVIEW`, body `{ approve: bool }`. Approve → `DONE`, reject → `IN_PROGRESS`. The SP `SIGNAL`s if the precondition fails.
+
+### Server: task attachments rules
+
+- **Task Attachments**: Upload files (PDFs, Office, images, text, markdown, json) up to 20MB directly to individual tasks, reusing the Cloudinary raw pipeline.
+- **Assignee-Only Uploads**: Only the task assignee can upload attachments. Enforced in both stored procedure (`sp_CreateTaskAttachment`) and model layer (`AttachmentModel.upload`) using robust type-safe checks.
+- **Conditional Deletion**: Only the uploader of the attachment or a project manager (`OWNER`/`ADMIN`) can delete a task attachment.
+- **Archived Guard**: Uploading and deleting attachments are blocked at the DB layer and UI layer if the project is archived.
+- **API Tag**: RTK Query calls use the tag type `'Attachment'`.
 
 ### Server: emails and notifications
 
@@ -120,7 +128,7 @@ Projects can be soft-deleted (archived) by setting `status = 'ARCHIVED'` and rec
 
 ### Client: RTK Query endpoint injection
 
-`client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task", "NotificationSettings", "Document", "Comment", "Notification"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
+`client/src/app/baseApi.js` creates a single `baseApi` with `tagTypes: ["User", "Project", "Task", "NotificationSettings", "Document", "Comment", "Notification", "Attachment"]` and an empty `endpoints` object. Each feature **injects** its endpoints via `baseApi.injectEndpoints({ endpoints: builder => ... })` in `features/*/[domain].api.js`. There is no central registry of endpoints — to find one, search for `injectEndpoints` or the hook name.
 
 Client-side dependencies also include `jszip` + `file-saver` for client-side ZIP packaging of bulk document downloads, and `@vercel/analytics` for page-view analytics.
 
