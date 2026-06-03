@@ -28,6 +28,7 @@ import {
 import { DASHBOARD_ICONS } from '@/lib/icons/dashboard.icons';
 import { formatDateDisplay } from '@/lib/utils';
 
+import TaskAttachmentsSection from './TaskAttachmentsSection';
 import TaskComments from './TaskComments';
 
 const ACTIVE_STATUSES = [
@@ -52,7 +53,10 @@ const TaskDetailDialog = ({
 }) => {
   const isOwner = projectRole === 'OWNER';
   const isManager = isOwner || projectRole === 'ADMIN';
-  const isAssignee = task && task.assigneeId === currentUserId;
+  const isAssignee =
+    task &&
+    !!task.assigneeId &&
+    Number(task.assigneeId) === Number(currentUserId);
   const canChangeStatus = !isProjectArchived && (isManager || isAssignee);
   const canVerify =
     !isProjectArchived && isOwner && task?.status === 'IN_REVIEW';
@@ -206,6 +210,15 @@ const TaskDetailDialog = ({
 
             {/* Divider */}
             <div className="border-border/40 my-2 border-t" />
+
+            {/* Attachments Block */}
+            <TaskAttachmentsSection
+              taskId={task.id}
+              taskAssigneeId={task.assigneeId}
+              isProjectArchived={isProjectArchived}
+              currentUserId={currentUserId}
+              projectRole={projectRole}
+            />
 
             {/* Activity / Comments Block */}
             <div className="min-h-0 flex-1">

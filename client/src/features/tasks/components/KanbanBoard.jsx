@@ -73,7 +73,8 @@ const KanbanBoard = ({
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
 
-    const isAssignee = task.assigneeId === currentUserId;
+    const isAssignee =
+      !!task.assigneeId && Number(task.assigneeId) === Number(currentUserId);
     const canChangeStatus = isManager || isAssignee;
 
     // 2. Check general permissions

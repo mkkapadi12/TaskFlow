@@ -54,4 +54,21 @@ router.post('/:taskId/comments', protect, createComment);
 router.get('/:taskId/comments', protect, getComments);
 router.delete('/:taskId/comments/:commentId', protect, deleteComment);
 
+// ── Task Attachments ────────────────────────────────────────
+import {
+  deleteAttachment,
+  getTaskAttachments,
+  uploadAttachments,
+} from '../controllers/attachment.controller.js';
+import { uploadDoc } from '../middlewares/upload.middleware.js';
+
+router.post(
+  '/:taskId/attachments',
+  protect,
+  uploadDoc.array('attachments', 5),
+  uploadAttachments
+);
+router.get('/:taskId/attachments', protect, getTaskAttachments);
+router.delete('/:taskId/attachments/:attachmentId', protect, deleteAttachment);
+
 export default router;

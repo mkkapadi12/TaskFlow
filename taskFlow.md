@@ -89,6 +89,7 @@ Defined in `server/database/create.sql`. Tables:
 | `tasks`                 | Tasks scoped to a project. Fields: `id`, `title`, `description`, `status` (`TODO`/`IN_PROGRESS`/`IN_REVIEW`/`DONE`), `priority` (`LOW`/`MEDIUM`/`HIGH`/`URGENT`), `deadline`, `projectId`, `assigneeId`, `creatorId`, `reminderSent` (`TINYINT(1)`, default 0). |
 | `notification_settings` | Per-user email preference toggles. Fields: `userId` (unique), `welcome`, `passwordReset`, `memberAdded`, `memberRemoved` (all `TINYINT(1)`, default 1). |
 | `project_documents`     | Per-project file metadata. Fields: `id`, `projectId`, `uploadedBy`, `name`, `url`, `publicId`, `size`, `mimeType`, `createdAt`. Actual files live on Cloudinary. |
+| `task_attachments`      | Task-specific file attachments. Fields: `id`, `taskId`, `uploadedBy`, `name`, `url`, `publicId`, `size`, `mimeType`, `createdAt`. Enforces task assignee-only upload constraint. |
 | `task_comments`         | Task comments and activity logs. Fields: `id`, `taskId`, `userId`, `content`, `type` (`COMMENT`/`ACTIVITY`), `createdAt`. |
 | `notifications`         | In-app notification center feed. Fields: `id`, `userId` (recipient), `type`, `title`, `body`, `isRead` (`TINYINT(1)`, default 0), `meta` (`JSON`), `createdAt`. |
 
@@ -99,6 +100,7 @@ All data access is funneled through **stored procedures** (called from `server/s
 - `database/tasks.sql` — `sp_CreateTask`, `sp_GetTasksByProject`, `sp_GetTasksByAssignee`, `sp_GetTaskById`, `sp_UpdateTask`, `sp_DeleteTask`, `sp_GetOverdueTasks`, `sp_VerifyTask` (owner-only `IN_REVIEW` → `DONE` / `IN_PROGRESS` transition, SIGNALs 45000 if precondition fails), `sp_GetUpcomingTaskReminders`, `sp_MarkTaskReminderSent`
 - `database/notification.sql` — `sp_GetNotificationSettings` (returns a virtual default row when no record exists yet), `sp_UpdateNotificationSettings` (upsert)
 - `database/project_docs.sql` — `sp_CreateProjectDocument`, `sp_GetProjectDocuments`, `sp_GetProjectDocumentById`, `sp_DeleteProjectDocument`
+- `database/task_attachments.sql` — `sp_CreateTaskAttachment`, `sp_GetTaskAttachments`, `sp_GetTaskAttachmentById`, `sp_DeleteTaskAttachment`
 - `database/task_comments.sql` — `sp_CreateTaskComment`, `sp_GetTaskComments`, `sp_DeleteTaskComment`, `sp_GetTaskCommentById`, `sp_CreateTaskActivity` (convenience activity logging)
 - `database/notifications_feed.sql` — `sp_CreateNotification`, `sp_GetNotifications`, `sp_GetUnreadCount`, `sp_MarkNotificationRead`, `sp_MarkAllNotificationsRead`, `sp_DeleteNotification`
 - `database/call.sql` — ad-hoc invocation scratch (not part of bootstrap)
@@ -216,6 +218,9 @@ Base URL: `http://localhost:5000/api` (local) / `https://<your-vercel-domain>/ap
 | POST   | `/:taskId/comments`        | Project member    | Add a comment to a task                      |
 | GET    | `/:taskId/comments`        | Project member    | List all comments and activity logs for a task|
 | DELETE | `/:taskId/comments/:commentId` | Author or OWNER / ADMIN | Delete a comment (system activity entries cannot be deleted)|
+| POST   | `/:taskId/attachments`        | Assignee of task  | Upload up to 5 attachments (max 20MB each) using Cloudinary memory-to-raw pipeline |
+| GET    | `/:taskId/attachments`        | Project member    | List all attachments for a task |
+| DELETE | `/:taskId/attachments/:attachmentId` | Uploader or OWNER/ADMIN | Delete task attachment |
 
 #### Notifications (`/notifications`) — JWT required
 | Method | Path              | Description                                                                |
@@ -402,6 +407,7 @@ src/
 - [x] **Task comments & activity log** — threaded discussion and automated system action logging (deadline/assignee changes, etc.) per task
 - [x] **Task Deletion** — conditional task deletion (owner/admin only) next to status badges in ProjectDetails, integrated with `useDeleteTaskMutation` and `useAlertDialog` confirmation hook
 - [x] **Advanced Task Filters** — dynamic task filtering in "My Tasks" page supporting Search, Status, Priority, and custom start/end deadline ranges with interactive active filter badges.
+- [x] **Task File Attachments** — Upload files (PDFs, Word, Excel, PPT, images, text, markdown, json) up to 20MB directly to individual tasks, reusing the Cloudinary raw pipeline. Enforces strict task assignee-only upload privilege and uploader/manager deletion rights, with full read-only behavior on archived projects.
 
 
 **Documents**
@@ -476,20 +482,19 @@ src/
 1. **Task Checklists / Subtasks**: Enable users to create granular checklist sub-items within individual tasks, displaying an interactive progress bar showing completion percentages in the task details workspace.
 
 ### Mid-term
-3. **Task File Attachments**: Enable project members to upload attachments directly to individual tasks, reusing the Cloudinary memory-to-raw upload pipelines.
-4. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
-5. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
-6. **Task Dependencies & Sequencing**: Let users establish link relationships between tasks (e.g. "Task B blocks Task C", "Task A must finish before Task B starts"), with warning indicators in the board view when deadlines conflict.
-7. **Project Template Factory**: Allow system administrators to compile project blueprints (standardized boards, column milestones, boilerplate documents) and deploy new project structures instantly from pre-saved configurations.
+2. **Time Tracking**: Implement timesheets and time-tracking entries per task, requiring a new `task_time_entries` table and associated stored procedures.
+3. **i18n Coverage for Dashboard**: Extend localization support (Hindi, Gujarati) to authenticated sections of the app (currently restricted to guest-facing pages).
+4. **Task Dependencies & Sequencing**: Let users establish link relationships between tasks (e.g. "Task B blocks Task C", "Task A must finish before Task B starts"), with warning indicators in the board view when deadlines conflict.
+5. **Project Template Factory**: Allow system administrators to compile project blueprints (standardized boards, column milestones, boilerplate documents) and deploy new project structures instantly from pre-saved configurations.
 
 ### Long-term / nice-to-have
-8. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
-9. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
-10. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
-11. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
-12. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
-13. **Interactive Timeline / Gantt View**: Create a full-screen dynamic Gantt chart visualization mapping project deadlines, task sequencing, and assignees over calendar milestones with drag-and-resize timeline bands.
-14. **Multi-Tenant Organizations & Workspaces**: Upgrade the platform hierarchy to support isolated organizations and distinct team spaces, enabling granular enterprise-grade tenant-level billing and control settings.
+6. **Real-Time Collaboration**: Integrate WebSockets (Socket.IO) for live Kanban board task transitions, chat, and presence indicators.
+7. **HttpOnly Cookies**: Transition auth token storage from `localStorage` to secure, HTTP-only refresh cookies for increased security against XSS.
+8. **Audit Logging**: Store administrative actions, project updates, and user modifications in a centralized `audit_logs` database table.
+9. **Automated Testing Suite**: Establish unit and integration testing frameworks for both backend (Jest/Supertest) and frontend (React Testing Library/Playwright).
+10. **CI/CD Deployment Pipelines**: Configure GitHub Actions workflows to automate builds, testing, and continuous deployments.
+11. **Interactive Timeline / Gantt View**: Create a full-screen dynamic Gantt chart visualization mapping project deadlines, task sequencing, and assignees over calendar milestones with drag-and-resize timeline bands.
+12. **Multi-Tenant Organizations & Workspaces**: Upgrade the platform hierarchy to support isolated organizations and distinct team spaces, enabling granular enterprise-grade tenant-level billing and control settings.
 
 ---
 
