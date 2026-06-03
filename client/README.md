@@ -19,30 +19,36 @@ TaskFlow is a modern, collaborative task and project management workspace design
 ## ✨ Features
 
 ### 📋 Project & Member Management
+
 - **Role-Based Collaboration**: Add members to projects with granular roles (`OWNER`, `ADMIN`, `MEMBER`).
 - **Project Archiving (Soft-Deletes)**: Archive completed or inactive projects. Archived projects are locked as strictly read-only, protecting comments, tasks, and files.
 
 ### ⏱️ Task Workspace & Kanban
+
 - **Task Lifecycle**: Move tasks through `To Do` ↔ `In Progress` ↔ `In Review`.
 - **Verification Gate**: Only project owners can verify tasks to `Done` or send them back to `In Progress` for revisions.
 - **Kanban Board**: Drag-and-drop tasks across status columns within project scopes.
 - **Checklists & Reminders**: Visual deadlines, custom priorities, and automatic email notifications for tasks due within 24 hours.
 
 ### 📎 Task Attachments & Previews
+
 - **Assignee-Only Uploads**: Only the assigned member can upload raw attachments (up to 20MB) to their task.
 - **Inline Preview**: Open and view PDFs, Markdown, text, and images directly in the browser using the premium preview viewer.
 - **Uploader/Manager Deletion**: Only the file uploader or project managers can delete attachments.
 
 ### 📁 Centralized Requirements & Documents
+
 - **Search & Filter**: Search files instantly and filter by file extension type.
 - **Bulk Action & ZIP Download**: Multi-select documents to package and download them as a single ZIP archive.
 - **Workspace Dashboard**: Review documents globally across all projects you belong to.
 
 ### 💬 Discussions & Activity Audits
+
 - **Comment Threads**: Exchange notes and feedback directly inside task side-panels.
 - **System Activity Log**: Auto-generated audit trails showing assignee changes, status updates, and deadline modifications.
 
 ### 📊 Dashboard & Calendar
+
 - **Interactive Calendar**: View deadlines on a monthly calendar layout.
 - **Visual Analytics**: Analyze status distributions, workload, and task completion velocity through dynamic charts.
 
